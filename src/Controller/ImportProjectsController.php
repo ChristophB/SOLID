@@ -6,10 +6,14 @@ use Exception;
 
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\node\Entity\Node;
 
 class ImportProjectsController {
     const VOCABULARY = 'Importiert mit Modul';
     const VID = '0815';
+    const PRJ_TITLE = 'Beispiel-Projekt';
+    const USER = 1;
+    const PRJ_CONTENT = '<b>Test Inhalt</b>';
     
     public function import() {
         try {
@@ -19,7 +23,11 @@ class ImportProjectsController {
                 [ 'test 1', 'test 2', 'test 3', 'test 4' ]
             );
         
-            self::createProject();
+            self::createProject([
+                'title' => self::PRJ_TITLE,
+                'uid' => self::USER,
+                'content' => self::PRJ_CONTENT
+            ]);
 
             return [ '#title'  => 'Success!' ];
         } catch (Exception $e) {
@@ -64,5 +72,20 @@ class ImportProjectsController {
         return $vocabulary;
     }
     
-    private function createProject() {}
+    private function createProject($params) {
+        if (!$params['title']) throw new Exception('Error: named parameter "title" missing');
+        
+        $node = Node::create([
+            'type'     => 'article',
+            'title'    => $params['title'],
+            'langcode' => 'de',
+            'status'   => 1,
+            'uid'      => $params['uid'],
+            'body'     => [
+                'value'  => $params['content'],
+                'format' => 'basic_html'
+            ]
+        ]);
+        $node->save();
+    }
 }
