@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\import_projects\Controller;
+namespace Drupal\project_importer\Controller;
 
 use Exception;
 
@@ -8,7 +8,7 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\node\Entity\Node;
 
-class ImportProjectsController {
+class ProjectImporterController {
     const VOCABULARY = 'Importiert mit Modul';
     const VID = '0815';
     const PRJ_TITLE = 'Beispiel-Projekt';

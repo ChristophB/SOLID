@@ -1,4 +1,4 @@
-# drupal8-project-import
+# drupal8-project-importer
 
 This is a Drupal 8 Module to import projects and taxonomies into Drupal, using the available API.
 The module is still in development and provides no usefull functionality at it's current state.

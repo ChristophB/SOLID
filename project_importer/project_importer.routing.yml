@@ -1,0 +1,6 @@
+import_projects:
+    path: /project_importer
+    defaults:
+        _controller: Drupal\project_importer\Controller\ProjectImporterController::import
+    requirements:
+        _permission: 'access content'

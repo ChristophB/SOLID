@@ -1,4 +1,4 @@
-name: Import Projects
+name: Project Importer
 type: module
 description: Imports Projects
 package: Custom
