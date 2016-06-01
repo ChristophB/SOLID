@@ -1,6 +1,14 @@
-import_projects:
-    path: /project_importer
+project_importer.import:
+    path: '/project_importer/import'
     defaults:
-        _controller: Drupal\project_importer\Controller\ProjectImporterController::import
+        _controller: '\Drupal\project_importer\Controller\ProjectImporterController::import'
     requirements:
         _permission: 'access content'
+
+project_importer.json_form:
+  path: '/project_importer'
+  defaults:
+        _title: 'ProjectImporter'
+        _form: '\Drupal\project_importer\Form\JSONForm'
+  requirements:
+    _permission: 'access content'

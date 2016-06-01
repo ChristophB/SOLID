@@ -25,7 +25,13 @@ class ProjectImporterController {
 	private static $tagMapper       = []; // [ 'Name1' => 'ID1', 'Name2' => 'ID2', ...]
 	private static $tagChildParents = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
 	
-	public function import() {
+	public function import($json_file) {
+		
+		$data = file_get_contents($json_file);
+		unlink($json_file);
+		$data = utf8_encode($data);
+		throw new Exception(var_dump(json_decode($data)). json_last_error()); // json_decode() ?
+		
 		self::$userId = 1;
 		try {
 			self::createTaxonomy(
@@ -64,7 +70,6 @@ class ProjectImporterController {
 	}
 	
 	private function createTaxonomy($vid, $name, $tags) {
-		// TODO parents should be processed before their children
 		if (!$vid) throw new Exception('Error: parameter $vid missing');
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		if (empty($tags)) throw new Exception('Error: parameter $tags missing');
