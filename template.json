@@ -1,11 +1,11 @@
 {
 	"vocabularies": [
 		{
-			"vid": "[maschienenlesbarer Name der Taxonomie]",
-			"name": "[Anzeigename der Taxonomie]",
+			"vid": "[maschienenlesbarer]",
+			"name": "[Anzeigename]",
 			"tags": [
 				{ 
-					"name": "[Anzeigename des Tags]", 
+					"name": "[Anzeigename]", 
 					"parents": [ 
 						"[Anzeigename eines übergeordneten Tags]", 
 						"[Weiterer übergeordneter Tag]" 
