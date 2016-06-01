@@ -1,0 +1,38 @@
+{
+	"vocabularys": [
+		{
+			"vid": "[maschienenlesbarer Name der Taxonomie]"
+			"name": "[Anzeigename der Taxonomie]",
+			"tags": [
+				{ 
+					"name": "[Anzeigename des Tags]", // muss auch taxonomieübergreifend eindeutig sein 
+					"parents": [ 
+						"[Anzeigename eines übergeordneten Tags]", 
+						"[Weiterer übergeordneter Tag]" 
+					] 
+				}, // Reihenfolge der Tags ist egal, es können auch erst die Kinder aufgeführt werden und später die Elterntags
+				{ "name": "Test 1", "parents": [ ] },
+				{ "name": "Test 2", "parents": [ "Test 1", "Test 3" ] },
+				{ "name": "Test 3", "parents": [ ] }
+			]
+		}
+	],
+	"projects": {
+		[
+			"title": "[Projekttitel]",
+			"content": "[Projektbeschreibung]", // gerne auch mit HTML-Tags
+			"summary": "[Zusammenfassung]", // vermutlich für die Darstellung in einer Suchergebnis-Liste
+			"alias": "[Alias]", // Projektseite ist dann auch über "http://domain.com/[Alias]" erreichbar
+			"img": [
+				"alt": "[Alt]",
+				"title": "[Titel],
+				"uri": "[Dateiname]",  
+			],
+			"tags": [
+				"[Anzeigename eines Tags]",
+				"Test 2", 
+				"Test 3" 
+			]    
+		]
+	}
+}
