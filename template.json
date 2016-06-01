@@ -1,7 +1,7 @@
 {
 	"vocabularys": [
 		{
-			"vid": "[maschienenlesbarer Name der Taxonomie]"
+			"vid": "[maschienenlesbarer Name der Taxonomie]",
 			"name": "[Anzeigename der Taxonomie]",
 			"tags": [
 				{ 
@@ -17,22 +17,22 @@
 			]
 		}
 	],
-	"projects": {
-		[
+	"projects": [
+		{
 			"title": "[Projekttitel]",
 			"content": "[Projektbeschreibung]", // gerne auch mit HTML-Tags
 			"summary": "[Zusammenfassung]", // vermutlich für die Darstellung in einer Suchergebnis-Liste
 			"alias": "[Alias]", // Projektseite ist dann auch über "http://domain.com/[Alias]" erreichbar
-			"img": [
+			"img": {
 				"alt": "[Alt]",
-				"title": "[Titel],
-				"uri": "[Dateiname]",  
-			],
+				"title": "[Titel]",
+				"uri": "[Dateiname]" 
+			},
 			"tags": [
 				"[Anzeigename eines Tags]",
 				"Test 2", 
 				"Test 3" 
-			]    
-		]
-	}
+			]
+		}    
+	]
 }
