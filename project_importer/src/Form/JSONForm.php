@@ -21,6 +21,7 @@ class JSONForm extends FormBase {
             '#type'   => 'managed_file',
             '#title'  => $this->t('Select a JSON file which contains projects and vocabularies.'),
             '#theme'  => 'advimagearray_thumb_upload',
+            '#upload_location'   => 'public://page',
             '#upload_validators' => [
 		        'file_validate_extensions' => array('json'),
 	        ],
@@ -40,9 +41,8 @@ class JSONForm extends FormBase {
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
-        // @todo: critical
-        $file = '/tmp/'. $_FILES['files']['name']['json_file'];
+        $file = file_save_upload('json_file', [], FALSE, 0);
         
-        \Drupal\project_importer\Controller\ProjectImporterController::import($file);
+        return \Drupal\project_importer\Controller\ProjectImporterController::import($file->id());
     }
 }

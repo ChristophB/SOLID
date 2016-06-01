@@ -10,77 +10,41 @@ use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
 
 class ProjectImporterController {
-	const VOCABULARY = 'Importiert mit Modul';
-	const VID        = '0815';
-	
-	const PRJ_TITLE     = 'Beispiel-Projekt';
-	const PRJ_CONTENT   = '<b>Test Inhalt</b>';
-	const PRJ_SUMMARY   = 'Test Summary';
-	const PRJ_ALIAS     = 'test_alias';
-	const PRJ_IMG_URI   = 'public://page/Chrysanthemum.jpg';
-	const PRJ_IMG_ALT   = 'Image Alt';
-	const PRJ_IMG_TITLE = 'Image Title';
-	
 	private static $userId;
 	private static $tagMapper       = []; // [ 'Name1' => 'ID1', 'Name2' => 'ID2', ...]
 	private static $tagChildParents = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
 	
-	public function import($json_file) {
-		
-		$data = file_get_contents($json_file);
-		unlink($json_file);
-		$data = utf8_encode($data);
-		throw new Exception(var_dump(json_decode($data)). json_last_error()); // json_decode() ?
-		
-		self::$userId = 1;
+	public function import($fid) {
 		try {
-			self::createTaxonomy(
-			    self::VID,
-			    self::VOCABULARY, 
-			    [ 
-			    	[ 'name' => 'test 1' ], 
-			    	[ 'name' => 'test 2', 'parents' => [ 'test 1' ] ], 
-			    	[ 'name' => 'test 3', 'parents' => [ 'test 2', 'test 4' ] ], 
-			    	[ 'name' => 'test 4' ],
-			    ]
-			);
-		
-			self::setTaxonomyParents();
-		
-			self::createProject([
-				'title'   => self::PRJ_TITLE,
-				'content' => self::PRJ_CONTENT,
-				'summary' => self::PRJ_SUMMARY,
-				'alias'   => self::PRJ_ALIAS,
-				'img'     => [
-					'alt'   => self::PRJ_IMG_ALT,
-					'title' => self::PRJ_IMG_TITLE,
-					'uri'   => self::PRJ_IMG_URI,  
-				],
-				'tags' => [ 'test 2', 'test 3' ],
-			]);
-
-			return [ '#title'  => 'Success!' ];
+			self::$userId = \Drupal::currentUser()->id();
+			$data = self::handleJsonFile($fid);
+			
+			foreach ($data['vocabularies'] as $vocabulary) {
+				self::createTaxonomy($vocabulary);
+				self::setTaxonomyParents();
+			}
+			
+			foreach ($data['projects'] as $project) {
+				self::createProject($project);
+			}
+			
+			drupal_set_message('Success! All vocabularies and projects are imported.');
 		} catch (Exception $e) {
-			return [ 
-				'#title' => 'Error!', 
-				'#markup' => $e->getMessage()
-			];
+			drupal_set_message('Error! '. $e->getMessage(), 'error');
 		}
 	}
 	
-	private function createTaxonomy($vid, $name, $tags) {
-		if (!$vid) throw new Exception('Error: parameter $vid missing');
-		if (!$name) throw new Exception('Error: parameter $name missing');
-		if (empty($tags)) throw new Exception('Error: parameter $tags missing');
-	
-		$vocabulary = self::createVocabulary($vid, $name);
+	private function createTaxonomy($params) {
+		if (!$params['vid']) throw new Exception('Error: named parameter "vid" missing');
+		if (!$params['name']) throw new Exception('Error: named parameter "name" missing');
+		if (empty($params['tags'])) throw new Exception('Error: named parameter "tags" missing');
+	 
+		$vocabulary = self::createVocabulary($params['vid'], $params['name']);
 		
-		foreach ($tags as $tag) {
+		foreach ($params['tags'] as $tag) {
 			$term = Term::create([
 				'name'   => $tag['name'],
 				'vid'    => $vocabulary->id(),
-				// 'parent' => self::mapTagNamesToTids($tag['parents']),
 			]);
 			$term->save();
 			
@@ -199,4 +163,17 @@ class ProjectImporterController {
 			$childEntity->save();
 		}
 	}
+	
+	private function handleJsonFile($fid) {
+		$json_file = \Drupal\file\Entity\File::load($fid);
+		$data = file_get_contents(drupal_realpath($json_file->getFileUri()));
+		file_delete($json_file->id());
+		
+		$data = json_decode($data, TRUE);
+		
+		if (json_last_error() != 0) throw new Exception('Error: Could not decode the json file.');
+		
+		return $data;
+	}
+	
 }
