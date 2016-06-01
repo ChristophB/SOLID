@@ -13,3 +13,4 @@ Possible import formats:
 * CSV
 * OWL
 * XML
+* JSON
