@@ -10,13 +10,13 @@ use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
 
 class ProjectImporterController {
-	private static $userId;
 	private static $tagMapper       = []; // [ 'Name1' => 'ID1', 'Name2' => 'ID2', ...]
 	private static $tagChildParents = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
+	private static $entities        = []; // for rolling back on error
+	
 	
 	public function import($fid) {
 		try {
-			self::$userId = \Drupal::currentUser()->id();
 			$data = self::handleJsonFile($fid);
 			
 			foreach ($data['vocabularies'] as $vocabulary) {
@@ -30,7 +30,8 @@ class ProjectImporterController {
 			
 			drupal_set_message('Success! All vocabularies and projects are imported.');
 		} catch (Exception $e) {
-			drupal_set_message('Error! '. $e->getMessage(), 'error');
+			$message = self::rollback();
+			drupal_set_message('Error! '. $e->getMessage(). ' '. $message, 'error');
 		}
 	}
 	
@@ -51,6 +52,8 @@ class ProjectImporterController {
 			self::addTagToMapper($tag['name'], $term->id());
 			self::addTagChildParents($tag['name'], $tag['parents']);
 			
+			array_push(self::$entities, $term);
+			
 			// \Drupal::service('path.alias_storage')->save('/taxonomy/term/' . $term->id(), '/tags/my-tag', 'de');
 		}
 	}
@@ -60,11 +63,12 @@ class ProjectImporterController {
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		
 		$vocabulary = Vocabulary::create([
-			'name' => $name,
+			'name'   => $name,
 			'weight' => 0,
-			'vid' => $vid
+			'vid'    => $vid
 		]);
 		$vocabulary->save();
+		array_push(self::$entities, $vocabulary);
 		
 		return $vocabulary;
 	}
@@ -77,7 +81,7 @@ class ProjectImporterController {
 			'title'    => $params['title'],
 			'langcode' => 'de',
 			'status'   => 1,
-			'uid'      => self::$userId,
+			'uid'      => \Drupal::currentUser()->id(),
 			'body'     => [
 				'value'   => $params['content'],
 				'summary' => $params['summary'],
@@ -92,6 +96,7 @@ class ProjectImporterController {
 			'id'    => $node->id(),
 			'alias' => $params['alias']
 		]);
+		array_push(self::$entities, $node);
 		
 		return $node;
 	}
@@ -100,11 +105,12 @@ class ProjectImporterController {
 		if (!$uri) throw new Exception('Error: parameter $uri missing');
 		
 		$file = File::create([
-			'uid'    => self::$userId,
+			'uid'    => \Drupal::currentUser()->id(),
 			'uri'    => $uri,
 			'status' => 1,
 		]);
 		$file->save();
+		array_push(self::$entities, $file);
 			
 		return $file;
 	}
@@ -176,4 +182,12 @@ class ProjectImporterController {
 		return $data;
 	}
 	
+	private function rollback() {
+		$message = 'Rolling back... ';
+		foreach (self::$entities as $entity) {
+			// $message .= 'Entity: '. $entity->label(). ' (ID: '. $entity->id(). ') deleted.';
+			$entity->delete();
+		}
+		return $message;
+	}
 }
