@@ -11,7 +11,7 @@ The module will then import all contained information with the Drupal 8 API.
 * projects become nodes of type 'article'
 * the project classification becomes one (or multiple) hierachical vocabulary
 
-Supporter import formats:
+Supported import formats:
 * JSON
 
 ## How to install:
