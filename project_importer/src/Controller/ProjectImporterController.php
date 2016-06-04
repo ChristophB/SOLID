@@ -163,7 +163,7 @@ class ProjectImporterController {
 	private function setTaxonomyParents() {
 		foreach (self::$tagChildParents as $child => $parents) {
 			if (empty($parents)) next;
-			$childEntity = entity_load('taxonomy_term', self::mapTagNamesToTids([$child])[0]);
+			$childEntity = Term::load(self::mapTagNamesToTids([$child])[0]);
 			
 			$childEntity->parent->setValue(self::mapTagNamesToTids($parents));
 			$childEntity->save();
