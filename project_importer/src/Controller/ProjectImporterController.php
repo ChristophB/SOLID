@@ -13,9 +13,12 @@ class ProjectImporterController {
 	private static $tagMapper       = []; // [ 'Name1' => 'ID1', 'Name2' => 'ID2', ...]
 	private static $tagChildParents = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
 	private static $entities        = []; // for rolling back on error
+	private static $overwrite       = false;
 	
 	
-	public function import($fid) {
+	public static function import($fid, $overwrite = false) {
+		if ($overwrite) self::$overwrite = true;
+		
 		try {
 			$data = self::handleJsonFile($fid);
 			
@@ -35,7 +38,7 @@ class ProjectImporterController {
 		}
 	}
 	
-	private function createTaxonomy($params) {
+	private static function createTaxonomy($params) {
 		if (!$params['vid']) throw new Exception('Error: named parameter "vid" missing');
 		if (!$params['name']) throw new Exception('Error: named parameter "name" missing');
 		if (empty($params['tags'])) throw new Exception('Error: named parameter "tags" missing');
@@ -58,9 +61,20 @@ class ProjectImporterController {
 		}
 	}
 	
-	private function createVocabulary($vid, $name) {
+	private static function createVocabulary($vid, $name) {
 		if (!$vid) throw new Exception('Error: parameter $vid missing');
 		if (!$name) throw new Exception('Error: parameter $name missing');
+		
+		if ($id = self::searchVocabularyByVid($vid)) {
+			if (self::$overwrite) {
+				Vocabulary::load($id)->delete();
+			} else {
+				throw new Exception(
+					'Error: vocabulary with vid "'. $vid. '" already exists. '
+					. 'Tick "overwrite" if you want to replace it and try again.'
+				);
+			}
+		}
 		
 		$vocabulary = Vocabulary::create([
 			'name'   => $name,
@@ -73,8 +87,21 @@ class ProjectImporterController {
 		return $vocabulary;
 	}
 	
-	private function createProject($params) {
+	private static function createProject($params) {
 		if (!$params['title']) throw new Exception('Error: named parameter "title" missing');
+
+		if (!empty($ids = self::searchNodesByTitle($params['title']))) {
+			if (self::$overwrite) {
+				foreach ($ids as $id) {
+					Node::load($id)->delete();
+				}
+			} else {
+				throw new Exception(
+					'Project with title "'. $params['title']. '" already exists. '
+					. 'Tick "overwrite" if you want to replace it and try again.'
+				);
+			}
+		}
 
 		$node = Node::create([
 			'type'     => 'article',
@@ -101,7 +128,7 @@ class ProjectImporterController {
 		return $node;
 	}
 	
-	private function createFile($uri) {
+	private static function createFile($uri) {
 		if (!$uri) throw new Exception('Error: parameter $uri missing');
 		
 		$file = File::create([
@@ -115,7 +142,7 @@ class ProjectImporterController {
 		return $file;
 	}
 	
-	private function addAlias($params) {
+	private static function addAlias($params) {
 		if (!$params['id']) throw new Exception('Error: named parameter "id" missing');
 		if (!$params['alias']) throw new Exception('Error: named parameter "alias" missing');
 		
@@ -126,14 +153,14 @@ class ProjectImporterController {
 		);
 	}
 	
-	private function addTagToMapper($name, $tid) {
+	private static function addTagToMapper($name, $tid) {
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		if (!$tid) throw new Exception('Error: parameter $tid missing');
 		
 		self::$tagMapper[$name] = $tid;
 	}
 	
-	private function mapTagNamesToTids($tags) {
+	private static function mapTagNamesToTids($tags) {
 		if (empty($tags)) return [];
 		
 		return array_map(
@@ -142,7 +169,7 @@ class ProjectImporterController {
 		);
 	}
 	
-	private function constructFieldImage($img) {
+	private static function constructFieldImage($img) {
 		if (!$img) return [];
 		
 		$file = self::createFile($img['uri']);
@@ -154,15 +181,15 @@ class ProjectImporterController {
 		];
 	}
 	
-	private function addTagChildParents($child, $parents) {
+	private static function addTagChildParents($child, $parents) {
 		if (empty($parents)) return;
 		
 		self::$tagChildParents[$child] = $parents;
 	}
 	
-	private function setTaxonomyParents() {
+	private static function setTaxonomyParents() {
 		foreach (self::$tagChildParents as $child => $parents) {
-			if (empty($parents)) next;
+			if (empty($parents)) continue;
 			$childEntity = Term::load(self::mapTagNamesToTids([$child])[0]);
 			
 			$childEntity->parent->setValue(self::mapTagNamesToTids($parents));
@@ -170,7 +197,7 @@ class ProjectImporterController {
 		}
 	}
 	
-	private function handleJsonFile($fid) {
+	private static function handleJsonFile($fid) {
 		$json_file = \Drupal\file\Entity\File::load($fid);
 		$data = file_get_contents(drupal_realpath($json_file->getFileUri()));
 		file_delete($json_file->id());
@@ -182,12 +209,43 @@ class ProjectImporterController {
 		return $data;
 	}
 	
-	private function rollback() {
+	private static function rollback() {
 		$message = 'Rolling back... ';
 		foreach (self::$entities as $entity) {
 			// $message .= 'Entity: '. $entity->label(). ' (ID: '. $entity->id(). ') deleted.';
 			$entity->delete();
 		}
 		return $message;
+	}
+	
+	private static function searchNodesByTitle($title) {
+		if (!$title) throw new Exception('Error: parameter $title missing');
+		
+		return self::searchEntity([
+			'title'       => $title,
+			'entity_type' => 'node',
+		]);
+	}
+	
+	private static function searchVocabularyByVid($vid) {
+		if (!$vid) throw new Exception('Error: parameter $vid missing');
+		
+		return array_values(self::searchEntity([
+			'vid'          => $vid,
+			'entity_type' => 'taxonomy_vocabulary',
+		]))[0];
+	}
+	
+	private static function searchEntity($params) {
+		if (!$params['entity_type']) throw new Exception('Error: named parameter "entity_type" missing');
+		
+		$query = \Drupal::entityQuery($params['entity_type']);
+		
+		foreach ($params as $key => $value) {
+			if ($key == 'entity_type') continue;
+			$query->condition($key, $value);
+		}
+		
+		return $query->execute();
 	}
 }
