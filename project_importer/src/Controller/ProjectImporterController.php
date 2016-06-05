@@ -249,3 +249,5 @@ class ProjectImporterController {
 		return $query->execute();
 	}
 }
+
+?>

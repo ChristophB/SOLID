@@ -20,7 +20,6 @@ class JSONForm extends FormBase {
         $form['json_file'] = [
             '#type'   => 'managed_file',
             '#title'  => $this->t('JSON file.'),
-            '#theme'  => 'advimagearray_thumb_upload', // @todo: use another theme to avoid warning
             '#upload_location'   => 'public://page',
             '#upload_validators' => [
 		        'file_validate_extensions' => [ 'json' ],
@@ -46,11 +45,11 @@ class JSONForm extends FormBase {
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
-        $file = file_save_upload('json_file', [], FALSE, 0);
-        
         return \Drupal\project_importer\Controller\ProjectImporterController::import(
-            $file->id(), 
+            $form_state->getValue('json_file')[0], 
             $form_state->getValue('overwrite')
         ); // @todo: calling the controller is a bit uggly
     }
 }
+
+?>
