@@ -1,14 +1,7 @@
-project_importer.import:
-    path: '/project_importer/import'
+project_importer_json_form:
+    path: 'project_importer'
     defaults:
-        _controller: '\Drupal\project_importer\Controller\ProjectImporterController::import'
-    requirements:
-        _permission: 'access content'
-
-project_importer.json_form:
-  path: '/project_importer'
-  defaults:
         _title: 'ProjectImporter'
         _form: '\Drupal\project_importer\Form\JSONForm'
-  requirements:
-    _permission: 'access content'
+    requirements:
+        _permission: 'access content'

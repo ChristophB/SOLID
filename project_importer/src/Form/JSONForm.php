@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\project_importer\Form\JOSNForm.
+ */
+
 namespace Drupal\project_importer\Form;
 
 use Exception;
@@ -7,19 +12,19 @@ use Exception;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-use Drupal\project_importer\Controller;
+use Drupal\project_importer\Importer\ProjectImporter;
 
 class JSONForm extends FormBase {
     
     public function getFormId() {
-        return 'JSONForm';
+        return 'project_importer_json_form';
     }
   
     public function buildForm(array $form, FormStateInterface $form_state) {
 
         $form['json_file'] = [
             '#type'   => 'managed_file',
-            '#title'  => $this->t('JSON file.'),
+            '#title'  => t('JSON file.'),
             '#upload_location'   => 'public://page',
             '#upload_validators' => [
 		        'file_validate_extensions' => [ 'json' ],
@@ -29,12 +34,12 @@ class JSONForm extends FormBase {
         
         $form['overwrite'] = [
             '#type' => 'checkbox',
-            '#title' => $this->t('overwrite'),
+            '#title' => t('overwrite'),
         ];
 
         $form['submit'] = array(
             '#type'  => 'submit',
-            '#value' => $this->t('Submit')
+            '#value' => t('Submit')
         );
 
         return $form;
@@ -45,10 +50,10 @@ class JSONForm extends FormBase {
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
-        return \Drupal\project_importer\Controller\ProjectImporterController::import(
+        return (new ProjectImporter())->import(
             $form_state->getValue('json_file')[0], 
             $form_state->getValue('overwrite')
-        ); // @todo: calling the controller is a bit uggly
+        );
     }
 }
 

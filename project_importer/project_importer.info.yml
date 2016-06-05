@@ -1,5 +1,6 @@
 name: Project Importer
 type: module
-description: Imports Projects
+description: Imports Projects from a JSON file.
 package: Custom
 core: 8.x
+hidden: false
