@@ -1,19 +1,50 @@
 {
+	"fields": [
+		{ 
+			"field_name": "field_verantwortlicher", 
+			"label": "Verantwortlicher", 
+			"description": "E-Mail Adresse des Projektverantwortlichen",
+			"type": "email",
+			"required": true,
+			"placeholder": "user@example.com"
+		},
+		{
+			"field_name": "field_kosten",
+			"label": "Angesetzte Gesammtkosten",
+			"description": "in Eurocent",
+			"type": "decimal",
+			"required": false,
+			"storrage_settings": {
+				"precision": 10,
+				"scale": 2
+			},
+			"field_settings": {
+				"min": 0,
+				"prefix": "",
+				"suffix": "€"
+			},
+			"placeholder": "1.00"
+		},
+		{
+			"field_name": "field_projektziel",
+			"label": "Projektziel",
+			"type": "string_long",
+			"required": true,
+			"placeholder": "Projektziel"
+		}
+	],
 	"vocabularies": [
 		{
-			"vid": "[maschienenlesbare ID]",
-			"name": "[Anzeigename]",
+			"vid": "[maschienenlesbarer Name]",
+			"name": "[Anzeigename der Taxonomie]",
 			"tags": [
 				{ 
-					"name": "[Anzeigename]", 
+					"name": "[Anzeigename des Tags]",
 					"parents": [ 
 						"[Anzeigename eines übergeordneten Tags]", 
 						"[Weiterer übergeordneter Tag]" 
 					] 
-				},
-				{ "name": "Test 1", "parents": [ ] },
-				{ "name": "Test 2", "parents": [ "Test 1", "Test 3" ] },
-				{ "name": "Test 3", "parents": [ ] }
+				}
 			]
 		}
 	],
@@ -23,15 +54,14 @@
 			"content": "[Projektbeschreibung]",
 			"summary": "[Zusammenfassung]",
 			"alias": "[Alias]",
+			"field_kosten": 10167.87,
 			"img": {
 				"alt": "[Alt]",
 				"title": "[Titel]",
 				"uri": "[Dateiname]" 
 			},
 			"tags": [
-				"[Anzeigename eines Tags]",
-				"Test 2", 
-				"Test 3" 
+				"[Anzeigename eines Tags]" 
 			]
 		}    
 	]
