@@ -14,6 +14,8 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 class ProjectImporter {
 	private $tagMapper       = []; // [ 'Name1' => 'ID1', 'Name2' => 'ID2', ...]
@@ -24,15 +26,25 @@ class ProjectImporter {
 		'vocabulary' => 0,
 		'tag'        => 0,
 		'node'       => 0,
+		'field'      => 0,
 	];
 	
 	public function ProjectImporter() {}
 	
 	public function import($fid, $overwrite = false) {
 		if ($overwrite) $this->overwrite = true;
-		
+
 		try {
+			function exception_error_handler($errno, $errstr, $errfile, $errline ) {
+    			throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+			}
+			set_error_handler('exception_error_handler');
+		
 			$data = $this->handleJsonFile($fid);
+			
+			foreach ($data['fields'] as $field) {
+				$this->createField($field);
+			}
 			
 			foreach ($data['vocabularies'] as $vocabulary) {
 				$this->createTaxonomy($vocabulary);
@@ -45,10 +57,11 @@ class ProjectImporter {
 			
 			drupal_set_message(
 				sprintf(
-					t('Success! %d vocabularies with %d terms and %d projects imported.'),
+					t('Success! %d vocabularies with %d terms, %d projects and %d fields imported.'),
 					$this->counter['vocabulary'],
 					$this->counter['term'],
-					$this->counter['node']
+					$this->counter['node'],
+					$this->counter['field']
 				)
 			);
 		} catch (Exception $e) {
@@ -62,7 +75,7 @@ class ProjectImporter {
 		if (!$params['vid']) throw new Exception('Error: named parameter "vid" missing');
 		if (!$params['name']) throw new Exception('Error: named parameter "name" missing');
 		if (empty($params['tags'])) throw new Exception('Error: named parameter "tags" missing');
-	 
+	
 		$vocabulary = $this->createVocabulary($params['vid'], $params['name']);
 		
 		foreach ($params['tags'] as $tag) {
@@ -139,6 +152,12 @@ class ProjectImporter {
 			'field_tags'  => $this->mapTagNamesToTids($params['tags']),
 			'field_image' => $this->constructFieldImage($params['img']),
 		]);
+		
+		foreach ($params as $key => $value) {
+			if (strpos($key, 'field_') === false) continue;
+			
+			$node->get($key)->value = $value;
+		}
 		$node->save();
 		
 		$this->addAlias([
@@ -163,6 +182,50 @@ class ProjectImporter {
 		array_push($this->entities, $file);
 			
 		return $file;
+	}
+	
+	private function createField($params) {
+		if (!$params['field_name']) throw new Exception('Error: named parameter "field_name" missing');
+		if (!$params['type']) throw new Exception('Error: named parameter "type" missing');
+		
+		if ($exists = FieldStorageConfig::loadByName('node', $params['field_name'])) {
+			// throw new Exception('Error: a field with field_name: "'. $params['field_name']. '" already exists.');
+			return;
+		}
+      
+		$fieldStorageConfig = FieldStorageConfig::create([
+		   	'field_name'  => $params['field_name'],
+		   	'entity_type' => 'node',
+		    'type'        => $params['type'],
+		    'settings'    => ($params['storrage_settings'] ? $params['storrage_settings'] : []),
+		]);
+		$fieldStorageConfig->save();
+			
+		$fieldConfig = FieldConfig::create([
+		    'field_name'  => $params['field_name'],
+		    'label'       => $params['label'],
+		    'description' => $params['description'],
+		    'settings'    => ($params['field_settings'] ? $params['field_settings'] : []),
+		    'entity_type' => 'node',
+		    'bundle'      => 'article',
+		]);
+		$fieldConfig->save();
+			
+		entity_get_form_display('node', 'article', 'default')->setComponent(
+			$params['field_name'], 
+			[
+		        'type'     => $this->getFormDisplayType($params['type']),
+		        'settings' => [ 'placeholder' => $params['placeholder'] ],
+		    ]
+		)->save();
+			    
+		entity_get_display('node', 'article', 'default')->setComponent(
+			$params['field_name'], 
+			[ 'type' => $this->getDisplayType($params['type']) ]
+		)->save();
+		
+		$this->counter['field']++;
+		array_push($this->entities, $fieldStorageConfig);//, $fieldConfig);
 	}
 	
 	private function addAlias($params) {
@@ -221,7 +284,7 @@ class ProjectImporter {
 	}
 	
 	private function handleJsonFile($fid) {
-		$json_file = \Drupal\file\Entity\File::load($fid);
+		$json_file = File::load($fid);
 		$data = file_get_contents(drupal_realpath($json_file->getFileUri()));
 		file_delete($json_file->id());
 		
@@ -235,7 +298,6 @@ class ProjectImporter {
 	private function rollback() {
 		$message = 'Rolling back... ';
 		foreach ($this->entities as $entity) {
-			// $message .= 'Entity: '. $entity->label(). ' (ID: '. $entity->id(). ') deleted.';
 			$entity->delete();
 		}
 		return $message;
@@ -277,7 +339,32 @@ class ProjectImporter {
 			'vocabulary' => 0,
 			'tag'        => 0,
 			'node'       => 0,
+			'field'      => 0,
 		];
+	}
+	
+	private function getDisplayType($type) {
+		switch ($type) {
+			case 'decimal'    : return 'number_decimal';
+			case 'integer'    : return 'number_integer';
+			case 'email'      : return 'email_mailto';
+			case 'boolean'    : return 'boolean';
+			case 'string'     : return null;
+			case 'string_long': return null;
+			default: throw new Exception("Error: field_type '$type' is not supported.");
+		}
+	}
+	
+	private function getFormDisplayType($type) {
+		switch ($type) {
+			case 'decimal'    : return 'number';
+			case 'integer'    : return 'number';
+			case 'email'      : return 'email_default';
+			case 'boolean'    : return 'boolean_checkbox';
+			case 'string'     : return 'string_textfield';
+			case 'string_long': return 'string_textarea';
+			default: throw new Exception("Error: field_type '$type' is not supported.");
+		}
 	}
 }
 
