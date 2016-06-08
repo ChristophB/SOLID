@@ -31,6 +31,24 @@
 			"type": "string_long",
 			"required": true,
 			"placeholder": "Projektziel"
+		},
+		{
+			"field_name": "field_projektreferenz",
+			"label": "Projektreferenz",
+			"storrage_settings": { 
+				"target_type": "node"
+			},
+			"cardinality": -1,
+			"type": "entity_reference",
+			"required": false,
+			"field_settings": {
+				"handler": "default",
+				"handler_settings": {
+					"target_bundles": [
+						"article"	
+					]
+				}
+			}
 		}
 	],
 	"vocabularies": [
@@ -55,6 +73,9 @@
 			"summary": "[Zusammenfassung]",
 			"alias": "[Alias]",
 			"field_kosten": 10167.87,
+			"field_projektreferenz": [
+				77, 79
+			],
 			"img": {
 				"alt": "[Alt]",
 				"title": "[Titel]",

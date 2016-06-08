@@ -152,14 +152,18 @@ class ProjectImporter {
 			'field_tags'  => $this->mapTagNamesToTids($params['tags']),
 			'field_image' => $this->constructFieldImage($params['img']),
 		]);
-		
+		$node->save();
 		foreach ($params as $key => $value) {
 			if (strpos($key, 'field_') === false) continue;
 			
-			$node->get($key)->value = $value;
+			if ($key == 'field_projektreferenz') {
+				$node->get($key)->setValue($value);
+			} else {
+				$node->get($key)->setValue($value);
+			}
 		}
 		$node->save();
-		
+			
 		$this->addAlias([
 			'id'    => $node->id(),
 			'alias' => $params['alias']
@@ -198,6 +202,7 @@ class ProjectImporter {
 		   	'entity_type' => 'node',
 		    'type'        => $params['type'],
 		    'settings'    => ($params['storrage_settings'] ? $params['storrage_settings'] : []),
+		    'cardinality' => $params['cardinality'],
 		]);
 		$fieldStorageConfig->save();
 			
@@ -225,7 +230,7 @@ class ProjectImporter {
 		)->save();
 		
 		$this->counter['field']++;
-		array_push($this->entities, $fieldStorageConfig);//, $fieldConfig);
+		array_push($this->entities, $fieldStorageConfig);
 	}
 	
 	private function addAlias($params) {
@@ -345,27 +350,30 @@ class ProjectImporter {
 	
 	private function getDisplayType($type) {
 		switch ($type) {
-			case 'decimal'    : return 'number_decimal';
-			case 'integer'    : return 'number_integer';
-			case 'email'      : return 'email_mailto';
-			case 'boolean'    : return 'boolean';
-			case 'string'     : return null;
-			case 'string_long': return null;
+			case 'decimal'         : return 'number_decimal';
+			case 'integer'         : return 'number_integer';
+			case 'email'           : return 'email_mailto';
+			case 'boolean'         : return 'boolean';
+			case 'string'          : return null;
+			case 'string_long'     : return null;
+			case 'entity_reference': return null;
 			default: throw new Exception("Error: field_type '$type' is not supported.");
 		}
 	}
 	
 	private function getFormDisplayType($type) {
 		switch ($type) {
-			case 'decimal'    : return 'number';
-			case 'integer'    : return 'number';
-			case 'email'      : return 'email_default';
-			case 'boolean'    : return 'boolean_checkbox';
-			case 'string'     : return 'string_textfield';
-			case 'string_long': return 'string_textarea';
+			case 'decimal'         : return 'number';
+			case 'integer'         : return 'number';
+			case 'email'           : return 'email_default';
+			case 'boolean'         : return 'boolean_checkbox';
+			case 'string'          : return 'string_textfield';
+			case 'string_long'     : return 'string_textarea';
+			case 'entity_reference': return 'entity_reference_autocomplete';
 			default: throw new Exception("Error: field_type '$type' is not supported.");
 		}
 	}
+	
 }
 
 ?>
