@@ -68,14 +68,10 @@
 	],
 	"projects": [
 		{
-			"title": "[Projekttitel]",
+			"title": "[Projekttitel1]",
 			"content": "[Projektbeschreibung]",
 			"summary": "[Zusammenfassung]",
 			"alias": "[Alias]",
-			"field_kosten": 10167.87,
-			"field_projektreferenz": [
-				77, 79
-			],
 			"img": {
 				"alt": "[Alt]",
 				"title": "[Titel]",
@@ -83,7 +79,22 @@
 			},
 			"tags": [
 				"[Anzeigename eines Tags]" 
+			],
+			"custom_fields": [
+				{
+					"field_name": "field_kosten",
+					"value": 10167.87
+				},
+				{
+					"field_name": "field_projektreferenz",
+					"value": [ "[Projekttitel2]" ],
+					"references": "node"
+				}
 			]
-		}    
+		},
+		{
+			"title": "[Projekttitel2]",
+			"content": "[Projektbeschreibung]"
+		}
 	]
 }

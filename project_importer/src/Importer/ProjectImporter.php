@@ -18,16 +18,10 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
 class ProjectImporter {
-	private $tagMapper       = []; // [ 'Name1' => 'ID1', 'Name2' => 'ID2', ...]
-	private $tagChildParents = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
-	private $entities        = []; // for rolling back on error
-	private $overwrite       = false;
-	private $counter         = [
-		'vocabulary' => 0,
-		'tag'        => 0,
-		'node'       => 0,
-		'field'      => 0,
-	];
+	private $tagChildParents   = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
+	private $entities          = [ 'tag' => [], 'vocabulary' => [], 'node' => [], 'file' => [], 'field' => [] ]; // for rolling back on error
+	private $projectReferences = []; // [ 'ProjectID' => [ 'field_name' => [ 'refEntityType' => [ 'EntityTitle', ... ] ] ] ]
+	private $overwrite         = false;
 	
 	public function ProjectImporter() {}
 	
@@ -54,21 +48,21 @@ class ProjectImporter {
 			foreach ($data['projects'] as $project) {
 				$this->createProject($project);
 			}
+			$this->insertProjectReferences();
 			
 			drupal_set_message(
 				sprintf(
 					t('Success! %d vocabularies with %d terms, %d projects and %d fields imported.'),
-					$this->counter['vocabulary'],
-					$this->counter['term'],
-					$this->counter['node'],
-					$this->counter['field']
+					sizeof($this->entities['vocabulary']),
+					sizeof($this->entities['tag']),
+					sizeof($this->entities['node']),
+					sizeof($this->entities['field'])
 				)
 			);
 		} catch (Exception $e) {
 			$message = $this->rollback();
 			drupal_set_message(t($e->getMessage()). ' '. t($message), 'error');
 		}
-		$this->resetCounters();
 	}
 	
 	private function createTaxonomy($params) {
@@ -85,11 +79,9 @@ class ProjectImporter {
 			]);
 			$term->save();
 			
-			$this->addTagToMapper($tag['name'], $term->id());
 			$this->addTagChildParents($tag['name'], $tag['parents']);
 			
-			array_push($this->entities, $term);
-			$this->counter['term']++;
+			array_push($this->entities['tag'], $term);
 			
 			// \Drupal::service('path.alias_storage')->save('/taxonomy/term/' . $term->id(), '/tags/my-tag', 'de');
 		}
@@ -99,16 +91,7 @@ class ProjectImporter {
 		if (!$vid) throw new Exception('Error: parameter $vid missing');
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		
-		if ($id = $this->searchVocabularyByVid($vid)) {
-			if ($this->overwrite) {
-				Vocabulary::load($id)->delete();
-			} else {
-				throw new Exception(
-					'Error: vocabulary with vid "'. $vid. '" already exists. '
-					. 'Tick "overwrite" if you want to replace it and try again.'
-				);
-			}
-		}
+		$this->deleteVocabularyIfExists($vid);
 		
 		$vocabulary = Vocabulary::create([
 			'name'   => $name,
@@ -116,8 +99,7 @@ class ProjectImporter {
 			'vid'    => $vid
 		]);
 		$vocabulary->save();
-		array_push($this->entities, $vocabulary);
-		$this->counter['vocabulary']++;
+		array_push($this->entities['vocabulary'], $vocabulary);
 		
 		return $vocabulary;
 	}
@@ -125,18 +107,7 @@ class ProjectImporter {
 	private function createProject($params) {
 		if (!$params['title']) throw new Exception('Error: named parameter "title" missing');
 
-		if (!empty($ids = $this->searchNodesByTitle($params['title']))) {
-			if ($this->overwrite) {
-				foreach ($ids as $id) {
-					Node::load($id)->delete();
-				}
-			} else {
-				throw new Exception(
-					'Project with title "'. $params['title']. '" already exists. '
-					. 'Tick "overwrite" if you want to replace it and try again.'
-				);
-			}
-		}
+		$this->deleteProjectIfExists($params['title']);
 
 		$node = Node::create([
 			'type'     => 'article',
@@ -153,25 +124,76 @@ class ProjectImporter {
 			'field_image' => $this->constructFieldImage($params['img']),
 		]);
 		$node->save();
-		foreach ($params as $key => $value) {
-			if (strpos($key, 'field_') === false) continue;
-			
-			if ($key == 'field_projektreferenz') {
-				$node->get($key)->setValue($value);
-			} else {
-				$node->get($key)->setValue($value);
-			}
-		}
+		$this->insertCustomFields($node, $params['custom_fields']);
 		$node->save();
 			
 		$this->addAlias([
 			'id'    => $node->id(),
 			'alias' => $params['alias']
 		]);
-		array_push($this->entities, $node);
-		$this->counter['node']++;
+		array_push($this->entities['node'], $node);
 		
 		return $node;
+	}
+	
+	private function insertCustomFields($node, $customFields) {
+		if (empty($customFields)) return;
+		
+		foreach ($customFields as $fieldContent) {
+			if ($refEntityType = $fieldContent['references']) {
+				$this->projectReferences[$node->id()][$fieldContent['field_name']][$refEntityType]
+					= $fieldContent['value'];
+			} else {
+				$node->get($fieldContent['field_name'])->setValue($fieldContent['value']);
+			}
+		}
+	}
+	
+	private function insertProjectReferences() {
+		foreach ($this->projectReferences as $pid => $field) {
+			foreach ($field as $fieldName => $reference) { // assumption: only one entitytype per field
+				foreach ($reference as $entityType => $entityNames) {
+					$entityIds = [];
+					
+					switch ($entityType) {
+						case 'tag': 
+							$entityIds = $this->mapTagNamesToTids($entityNames);
+							break;
+						case 'node':
+							$entityIds = $this->mapNodeTitlesToNids($entityNames);
+							break;
+						case 'file':
+							$entityIds = $this->mapFileUrisToFids($entityNames);
+							break;
+						default:
+							throw new Exception("Error: unsupported entity type '$entityType' in reference found");
+					}
+					$node = Node::load($pid);
+					$node->get($fieldName)->setValue($entityIds);
+					$node->save();
+				}
+			}
+		}
+	}
+	
+	private function mapNodeTitlesToNids($titles) {
+		if (empty($titles)) return [];
+		
+		return array_map(
+			function($title) { return $this->mapNodeTitleToNid($title); }, 
+			$titles
+		);
+	}
+	
+	private function mapNodeTitleToNid($title) {
+		if (!$title) return null;
+		
+		foreach ($this->entities['node'] as $node) {
+			if ($node->label() == $title) 
+				return $node->id();
+		}
+		
+		return null;
 	}
 	
 	private function createFile($uri) {
@@ -183,7 +205,7 @@ class ProjectImporter {
 			'status' => 1,
 		]);
 		$file->save();
-		array_push($this->entities, $file);
+		array_push($this->entities['file'], $file);
 			
 		return $file;
 	}
@@ -229,13 +251,12 @@ class ProjectImporter {
 			[ 'type' => $this->getDisplayType($params['type']) ]
 		)->save();
 		
-		$this->counter['field']++;
-		array_push($this->entities, $fieldStorageConfig);
+		array_push($this->entities['field'], $fieldStorageConfig);
 	}
 	
 	private function addAlias($params) {
 		if (!$params['id']) throw new Exception('Error: named parameter "id" missing');
-		if (!$params['alias']) throw new Exception('Error: named parameter "alias" missing');
+		if (!$params['alias']) return;
 		
 		\Drupal::service('path.alias_storage')->save(
 			'/node/'. $params['id'], 
@@ -244,26 +265,32 @@ class ProjectImporter {
 		);
 	}
 	
-	private function addTagToMapper($name, $tid) {
-		if (!$name) throw new Exception('Error: parameter $name missing');
-		if (!$tid) throw new Exception('Error: parameter $tid missing');
-		
-		$this->tagMapper[$name] = $tid;
-	}
-	
 	private function mapTagNamesToTids($tags) {
 		if (empty($tags)) return [];
 		
 		return array_map(
-			function($name) { return $this->tagMapper[$name]; }, 
+			function($name) { return $this->mapTagNameToTid($name); }, 
 			$tags
 		);
+	}
+	
+	private function mapTagNameToTid($name) {
+		if (!$name) return null;
+		
+		foreach ($this->entities['tag'] as $tag) {
+			if ($tag->label() == $name)
+				return $tag->id();
+		}
+		
+		return null;
 	}
 	
 	private function constructFieldImage($img) {
 		if (!$img) return [];
 		
 		$file = $this->createFile($img['uri']);
+		
+		array_push($this->entities['file'], $file);
 		
 		return [
 			'target_id' => $file->id(),
@@ -281,7 +308,7 @@ class ProjectImporter {
 	private function setTaxonomyParents() {
 		foreach ($this->tagChildParents as $child => $parents) {
 			if (empty($parents)) continue;
-			$childEntity = Term::load($this->mapTagNamesToTids([$child])[0]);
+			$childEntity = Term::load($this->mapTagNameToTid($child));
 			
 			$childEntity->parent->setValue($this->mapTagNamesToTids($parents));
 			$childEntity->save();
@@ -291,7 +318,7 @@ class ProjectImporter {
 	private function handleJsonFile($fid) {
 		$json_file = File::load($fid);
 		$data = file_get_contents(drupal_realpath($json_file->getFileUri()));
-		file_delete($json_file->id());
+		// file_delete($json_file->id());
 		
 		$data = json_decode($data, TRUE);
 		
@@ -302,8 +329,10 @@ class ProjectImporter {
 	
 	private function rollback() {
 		$message = 'Rolling back... ';
-		foreach ($this->entities as $entity) {
-			$entity->delete();
+		foreach ($this->entities as $type => $entities) {
+			foreach ($entities as $entity) {
+				$entity->delete();
+			}
 		}
 		return $message;
 	}
@@ -339,15 +368,6 @@ class ProjectImporter {
 		return $query->execute();
 	}
 	
-	private function resetCounters() {
-		$this->counter = [
-			'vocabulary' => 0,
-			'tag'        => 0,
-			'node'       => 0,
-			'field'      => 0,
-		];
-	}
-	
 	private function getDisplayType($type) {
 		switch ($type) {
 			case 'decimal'         : return 'number_decimal';
@@ -371,6 +391,34 @@ class ProjectImporter {
 			case 'string_long'     : return 'string_textarea';
 			case 'entity_reference': return 'entity_reference_autocomplete';
 			default: throw new Exception("Error: field_type '$type' is not supported.");
+		}
+	}
+	
+	private function deleteProjectIfExists($title) {
+		if (!empty($ids = $this->searchNodesByTitle($title))) {
+			if ($this->overwrite) {
+				foreach ($ids as $id) {
+					Node::load($id)->delete();
+				}
+			} else {
+				throw new Exception(
+					"Project with title '$title' already exists. "
+					. 'Tick "overwrite" if you want to replace it and try again.'
+				);
+			}
+		}
+	}
+	
+	private function deleteVocabularyIfExists($vid) {
+		if ($id = $this->searchVocabularyByVid($vid)) {
+			if ($this->overwrite) {
+				Vocabulary::load($id)->delete();
+			} else {
+				throw new Exception(
+					"Error: vocabulary with vid '$vid' already exists. "
+					. 'Tick "overwrite" if you want to replace it and try again.'
+				);
+			}
 		}
 	}
 	
