@@ -1,56 +1,4 @@
 {
-	"fields": [
-		{ 
-			"field_name": "field_verantwortlicher", 
-			"label": "Verantwortlicher", 
-			"description": "E-Mail Adresse des Projektverantwortlichen",
-			"type": "email",
-			"required": true,
-			"placeholder": "user@example.com"
-		},
-		{
-			"field_name": "field_kosten",
-			"label": "Angesetzte Gesammtkosten",
-			"description": "in Eurocent",
-			"type": "decimal",
-			"required": false,
-			"storrage_settings": {
-				"precision": 10,
-				"scale": 2
-			},
-			"field_settings": {
-				"min": 0,
-				"prefix": "",
-				"suffix": "€"
-			},
-			"placeholder": "1.00"
-		},
-		{
-			"field_name": "field_projektziel",
-			"label": "Projektziel",
-			"type": "string_long",
-			"required": true,
-			"placeholder": "Projektziel"
-		},
-		{
-			"field_name": "field_projektreferenz",
-			"label": "Projektreferenz",
-			"storrage_settings": { 
-				"target_type": "node"
-			},
-			"cardinality": -1,
-			"type": "entity_reference",
-			"required": false,
-			"field_settings": {
-				"handler": "default",
-				"handler_settings": {
-					"target_bundles": [
-						"article"	
-					]
-				}
-			}
-		}
-	],
 	"vocabularies": [
 		{
 			"vid": "[maschienenlesbarer Name]",
@@ -62,11 +10,14 @@
 						"[Anzeigename eines übergeordneten Tags]", 
 						"[Weiterer übergeordneter Tag]" 
 					] 
+				},
+				{
+					"name": "[Anzeigename eines übergeordneten Tags]"
 				}
 			]
 		}
 	],
-	"projects": [
+	"nodes": [
 		{
 			"title": "[Projekttitel1]",
 			"content": "[Projektbeschreibung]",
@@ -78,7 +29,7 @@
 				"uri": "[Dateiname]" 
 			},
 			"tags": [
-				"[Anzeigename eines Tags]" 
+				{ "vid": "[maschienenlesbarer Name]", "name": "[Anzeigename des Tags]" } 
 			],
 			"custom_fields": [
 				{
