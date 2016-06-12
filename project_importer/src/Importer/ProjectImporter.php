@@ -19,7 +19,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 
 class ProjectImporter {
 	private $tagChildParents   = []; // [ 'child' => [ 'parent 1', 'parent 2' ], ... ]
-	private $entities          = [ 'tag' => [], 'vocabulary' => [], 'node' => [], 'file' => [], 'field' => [] ]; // for rolling back on error
+	private $entities          = [ 'tag' => [], 'vocabulary' => [], 'node' => [], 'file' => [] ]; // for rolling back on error
 	private $projectReferences = []; // [ 'ProjectID' => [ 'field_name' => [ 'refEntityType' => [ 'EntityTitle', ... ] ] ] ]
 	private $overwrite         = false;
 	
@@ -36,10 +36,6 @@ class ProjectImporter {
 		
 			$data = $this->handleJsonFile($fid);
 			
-			foreach ($data['fields'] as $field) {
-				$this->createField($field);
-			}
-			
 			foreach ($data['vocabularies'] as $vocabulary) {
 				$this->createTaxonomy($vocabulary);
 				$this->setTaxonomyParents();
@@ -52,11 +48,10 @@ class ProjectImporter {
 			
 			drupal_set_message(
 				sprintf(
-					t('Success! %d vocabularies with %d terms, %d projects and %d fields imported.'),
+					t('Success! %d vocabularies with %d terms and %d projects imported.'),
 					sizeof($this->entities['vocabulary']),
 					sizeof($this->entities['tag']),
-					sizeof($this->entities['node']),
-					sizeof($this->entities['field'])
+					sizeof($this->entities['node'])
 				)
 			);
 		} catch (Exception $e) {
@@ -210,50 +205,6 @@ class ProjectImporter {
 		return $file;
 	}
 	
-	private function createField($params) {
-		if (!$params['field_name']) throw new Exception('Error: named parameter "field_name" missing');
-		if (!$params['type']) throw new Exception('Error: named parameter "type" missing');
-		
-		if ($exists = FieldStorageConfig::loadByName('node', $params['field_name'])) {
-			// throw new Exception('Error: a field with field_name: "'. $params['field_name']. '" already exists.');
-			return;
-		}
-      
-		$fieldStorageConfig = FieldStorageConfig::create([
-		   	'field_name'  => $params['field_name'],
-		   	'entity_type' => 'node',
-		    'type'        => $params['type'],
-		    'settings'    => ($params['storrage_settings'] ? $params['storrage_settings'] : []),
-		    'cardinality' => $params['cardinality'],
-		]);
-		$fieldStorageConfig->save();
-			
-		$fieldConfig = FieldConfig::create([
-		    'field_name'  => $params['field_name'],
-		    'label'       => $params['label'],
-		    'description' => $params['description'],
-		    'settings'    => ($params['field_settings'] ? $params['field_settings'] : []),
-		    'entity_type' => 'node',
-		    'bundle'      => 'article',
-		]);
-		$fieldConfig->save();
-			
-		entity_get_form_display('node', 'article', 'default')->setComponent(
-			$params['field_name'], 
-			[
-		        'type'     => $this->getFormDisplayType($params['type']),
-		        'settings' => [ 'placeholder' => $params['placeholder'] ],
-		    ]
-		)->save();
-			    
-		entity_get_display('node', 'article', 'default')->setComponent(
-			$params['field_name'], 
-			[ 'type' => $this->getDisplayType($params['type']) ]
-		)->save();
-		
-		array_push($this->entities['field'], $fieldStorageConfig);
-	}
-	
 	private function addAlias($params) {
 		if (!$params['id']) throw new Exception('Error: named parameter "id" missing');
 		if (!$params['alias']) return;
@@ -366,32 +317,6 @@ class ProjectImporter {
 		}
 		
 		return $query->execute();
-	}
-	
-	private function getDisplayType($type) {
-		switch ($type) {
-			case 'decimal'         : return 'number_decimal';
-			case 'integer'         : return 'number_integer';
-			case 'email'           : return 'email_mailto';
-			case 'boolean'         : return 'boolean';
-			case 'string'          : return null;
-			case 'string_long'     : return null;
-			case 'entity_reference': return null;
-			default: throw new Exception("Error: field_type '$type' is not supported.");
-		}
-	}
-	
-	private function getFormDisplayType($type) {
-		switch ($type) {
-			case 'decimal'         : return 'number';
-			case 'integer'         : return 'number';
-			case 'email'           : return 'email_default';
-			case 'boolean'         : return 'boolean_checkbox';
-			case 'string'          : return 'string_textfield';
-			case 'string_long'     : return 'string_textarea';
-			case 'entity_reference': return 'entity_reference_autocomplete';
-			default: throw new Exception("Error: field_type '$type' is not supported.");
-		}
 	}
 	
 	private function deleteProjectIfExists($title) {
