@@ -1,51 +1,49 @@
 {
 	"vocabularies": [
 		{
-			"vid": "[maschienenlesbarer Name]",
-			"name": "[Anzeigename der Taxonomie]",
+			"vid": "[machine-readable name]",
+			"name": "[display name of the taxonomy]",
 			"tags": [
 				{ 
-					"name": "[Anzeigename des Tags]",
+					"name": "[display name of the tag]",
 					"parents": [ 
-						"[Anzeigename eines übergeordneten Tags]", 
-						"[Weiterer übergeordneter Tag]" 
+						"[display name of a parental tag]"
 					] 
 				},
 				{
-					"name": "[Anzeigename eines übergeordneten Tags]"
+					"name": "[display name of a parental tag]"
 				}
 			]
 		}
 	],
 	"nodes": [
 		{
-			"title": "[Projekttitel1]",
-			"content": "[Projektbeschreibung]",
-			"summary": "[Zusammenfassung]",
-			"alias": "[Alias]",
+			"title": "[article title]",
+			"content": "[some text which describes this article]",
+			"summary": "[abstract]",
+			"alias": "[alias]",
 			"img": {
-				"alt": "[Alt]",
-				"title": "[Titel]",
-				"uri": "[Dateiname].jpg" 
+				"alt": "[alternative text if the image could not be loaded]",
+				"title": "[title]",
+				"uri": "[filename].jpg" 
 			},
 			"tags": [
-				{ "vid": "[maschienenlesbarer Name]", "name": "[Anzeigename des Tags]" } 
+				{ "vid": "[machine-readable name]", "name": "[display name of the tag]" } 
 			],
 			"custom_fields": [
 				{
-					"field_name": "field_kosten",
+					"field_name": "field_custom1",
 					"value": 10167.87
 				},
 				{
-					"field_name": "field_projektreferenz",
-					"value": [ "[Projekttitel2]" ],
+					"field_name": "field_custom2",
+					"value": [ "[second article title]" ],
 					"references": "node"
 				}
 			]
 		},
 		{
-			"title": "[Projekttitel2]",
-			"content": "[Projektbeschreibung]"
+			"title": "[second article title]"
 		}
 	]
 }
