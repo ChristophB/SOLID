@@ -13,7 +13,6 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
 
-// use Drupal\project_importer\Importer\ProjectImporter;
 use Drupal\project_importer\Importer\VocabularyImporter;
 use Drupal\project_importer\Importer\NodeImporter;
 
@@ -88,6 +87,7 @@ class JSONForm extends FormBase {
 		
 		return $data;
 	}
+	
 }
 
 ?>

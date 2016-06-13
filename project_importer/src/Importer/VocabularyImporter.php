@@ -110,28 +110,6 @@ class VocabularyImporter extends AbstractImporter {
 		}
 	}
 	
-// 	private function mapTagNamesToTids($vid, $tags) {
-// 	    if (!$vid) throw new Exception('Error: parameter $vid missing');
-// 		if (empty($tags)) return [];
-		
-// 		return array_map(
-// 			function($name) use($vid) { return $this->mapTagNameToTid($vid, $name); }, 
-// 			$tags
-// 		);
-// 	}
-	
-// 	private function mapTagNameToTid($vid, $name) {
-// 		if (!$vid) throw new Exception('Error: parameter $vid missing');
-// 		if (!$name) throw new Exception('Error: parameter $name missing');
-		
-// 		foreach ($this->entities['tag'] as $tag) {
-// 			if ($tag->getVocabularyId() == $vid && $tag->label() == $name)
-// 				return $tag->id();
-// 		}
-		
-// 		return null;
-// 	}
-	
 }
  
 ?>
