@@ -27,7 +27,6 @@ class JSONForm extends FormBase {
         $form['json_file'] = [
             '#type'   => 'managed_file',
             '#title'  => t('JSON file.'),
-            '#upload_location'   => 'public://page',
             '#upload_validators' => [
 		        'file_validate_extensions' => [ 'json' ],
 	        ],

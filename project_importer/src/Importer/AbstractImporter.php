@@ -38,11 +38,15 @@ abstract class AbstractImporter {
 	    if (!$vid) throw new Exception('Error: parameter $vid missing');
 	    if (!$name) throw new Exception('Error: parameter $name missing');
 	    
-	    return array_values($this->searchEntityIds([
+	    $result = $this->searchEntityIds([
 	        'entity_type' => 'taxonomy_term',
 	        'vid'         => $vid,
 	        'name'        => $name
-	    ]))[0];
+	    ]);
+	    
+	    if (!$result) return null;
+	    
+	    return array_values($result)[0];
 	}
 	
 	protected function searchTagIdsByNames($tags) {

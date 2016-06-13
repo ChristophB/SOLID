@@ -50,22 +50,24 @@ class NodeImporter extends AbstractImporter {
 			'status'   => 1,
 			'uid'      => \Drupal::currentUser()->id(),
 			'body'     => [
-				'value'   => $params['content'],
-				'summary' => $params['summary'],
+				'value'   => (array_key_exists('content', $params) ? $params['content'] : null),
+				'summary' => (array_key_exists('summary', $params) ? $params['summary'] : null),
 				'format'  => 'basic_html',
 			],
-			'field_tags'  => $this->searchTagIdsByNames($params['tags']),
-			'field_image' => $this->constructFieldImage($params['img']),
+			'field_tags'  => (array_key_exists('tags', $params) ? $this->searchTagIdsByNames($params['tags']) : null),
+			'field_image' => (array_key_exists('img', $params) ? $this->constructFieldImage($params['img']) : null),
 		]);
 		
 		$node->save();
-		$this->insertCustomFields($node, $params['custom_fields']);
+		if (array_key_exists('custom_fields', $params))
+			$this->insertCustomFields($node, $params['custom_fields']);
 		$node->save();
 			
-		$this->addAlias([
-			'id'    => $node->id(),
-			'alias' => $params['alias']
-		]);
+		if (array_key_exists('alias', $params))
+			$this->addAlias([
+				'id'    => $node->id(),
+				'alias' => $params['alias']
+			]);
 		array_push($this->entities['node'], $node);
 		
 		return $node;
@@ -75,9 +77,10 @@ class NodeImporter extends AbstractImporter {
 		if (!$uri) throw new Exception('Error: parameter $uri missing');
 		if (!file_exists(drupal_realpath(file_default_scheme(). '://'. $uri)))
 			throw new Exception('Error: file '. drupal_realpath(file_default_scheme(). '://'. $uri). ' could not be found');
+		
 		$file = File::create([
 			'uid'    => \Drupal::currentUser()->id(),
-			'uri'    => $uri,
+			'uri'    => file_default_scheme(). '://'. $uri,
 			'status' => 1,
 		]);
 		$file->save();
@@ -126,7 +129,7 @@ class NodeImporter extends AbstractImporter {
 		if (empty($customFields)) return;
 		
 		foreach ($customFields as $fieldContent) {
-			if ($refEntityType = $fieldContent['references']) {
+			if (array_key_exists('references', $fieldContent) && $refEntityType = $fieldContent['references']) {
 				$this->nodeReferences[$node->id()][$fieldContent['field_name']][$refEntityType]
 					= $fieldContent['value'];
 			} else {
