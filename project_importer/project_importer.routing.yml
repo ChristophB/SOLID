@@ -4,4 +4,4 @@ project_importer_json_form:
         _title: 'ProjectImporter'
         _form: '\Drupal\project_importer\Form\JSONForm'
     requirements:
-        _permission: 'access content'
+        _role: 'administrator'
