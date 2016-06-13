@@ -17,11 +17,11 @@ Supported import formats:
 ## How to install:
 
 * Download one of our releases and extract it to a random location.
-* Each release contains this readme file, a templates and a folder "project_importer".
+* Each release contains this readme file, a template and a folder "project_importer".
 * Copy the folder "project_importer" into your Drupal 8 installation folder - into "/[drupal-root-folder]/modules".
 * Log into your Drupal 8 Webpage as administrator and navigate to the menu "Extend".
-* On the extend page you will see a list of available and installed modules. Search for the module "Project Importer" and select it.
-* Click "Install" on the botom of the page.
+* On the "Extend" page you will see a list of available and installed modules. Search for the module "Project Importer" and select it.
+* Click "Install" on the bottom of the page.
 
 ## How to use:
 
@@ -30,4 +30,4 @@ Supported import formats:
 * Place the previously created file into the form and click "Import".
 * There will be a message indicating the success/failure of the import process.
 * The module automatically undos all changes if an error occured.
-* If one of your declared nodes references an image, you have to place that image in the specified folder first.
+* If one of your declared nodes references an image or file, you have to place that image in the specified folder first.
