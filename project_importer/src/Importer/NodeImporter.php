@@ -73,7 +73,8 @@ class NodeImporter extends AbstractImporter {
 	
 	private function createFile($uri) {
 		if (!$uri) throw new Exception('Error: parameter $uri missing');
-		
+		if (!file_exists(drupal_realpath(file_default_scheme(). '://'. $uri)))
+			throw new Exception('Error: file '. drupal_realpath(file_default_scheme(). '://'. $uri). ' could not be found');
 		$file = File::create([
 			'uid'    => \Drupal::currentUser()->id(),
 			'uri'    => $uri,
