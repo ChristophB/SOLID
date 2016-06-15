@@ -15,6 +15,7 @@ use Drupal\file\Entity\File;
 
 use Drupal\project_importer\Importer\VocabularyImporter;
 use Drupal\project_importer\Importer\NodeImporter;
+use Drupal\project_importer\FileHandler\FileHandlerFactory;
 
 class JSONForm extends FormBase {
     
@@ -26,9 +27,9 @@ class JSONForm extends FormBase {
 
         $form['json_file'] = [
             '#type'   => 'managed_file',
-            '#title'  => t('JSON file.'),
+            '#title'  => t('File:'),
             '#upload_validators' => [
-		        'file_validate_extensions' => [ 'json' ],
+		        'file_validate_extensions' => [ 'json owl' ],
 	        ],
             '#required' => true,
         ];
@@ -55,11 +56,11 @@ class JSONForm extends FormBase {
         $nodeImporter = new NodeImporter();
             
         try {
-            $data = $this->handleJsonFile($form_state->getValue('json_file')[0]);
+            $fileHandler = FileHandlerFactory::createFileHandler($form_state->getValue('json_file')[0]);
             $overwrite = $form_state->getValue('overwrite');
             
-            $vocabularyImporter->import($data['vocabularies'], $overwrite);
-            $nodeImporter->import($data['nodes'], $overwrite);
+            $vocabularyImporter->import($fileHandler->getVocabularies(), $overwrite);
+            $nodeImporter->import($fileHandler->getNodes(), $overwrite);
             
             drupal_set_message(
 				sprintf(
@@ -75,17 +76,6 @@ class JSONForm extends FormBase {
 			drupal_set_message(t($e->getMessage()). ' '. t('Rolling back...'), 'error');
         }
     }
-    
-    private function handleJsonFile($fid) {
-		$json_file = File::load($fid);
-		$data = file_get_contents(drupal_realpath($json_file->getFileUri()));
-		
-		$data = json_decode($data, TRUE);
-		
-		if (json_last_error() != 0) throw new Exception('Error: Could not decode the json file.');
-		
-		return $data;
-	}
 	
 }
 
