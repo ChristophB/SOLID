@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.lha.org/project_ontology#"
+     xml:base="http://www.lha.org/project_ontology"
+     xmlns:project_ontology="http://www.lha.org/project_ontology#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.lha.org/project_ontology"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/project_ontology#alias -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#alias"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#alt -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#alt"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#content -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#content"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#name -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#name"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#summary -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#summary"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#title -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#title"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#uri -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#uri"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/project_ontology#has_img -->
+
+    <owl:ObjectProperty rdf:about="http://www.lha.org/project_ontology#has_img"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Doc -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Doc">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#File"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#File -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#File"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Img -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Img">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#File"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Project -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Project"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag11 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag11">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary1"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag111 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag111">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag11"/>
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag12"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag1111 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag1111">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag11111 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag11111">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag1111"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag112 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag112">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag11"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag12 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag12">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary1"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag121 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag121">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag12"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag21 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag21">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary2"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag22 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag22">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary2"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Tag221 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag221">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag22"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Vocabulary -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary"/>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Vocabulary1 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary1">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Vocabulary2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/project_ontology#img1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#img1">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Img"/>
+        <alt>alt img1</alt>
+        <title>img1</title>
+        <uri>uri/img1</uri>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#img2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#img2">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Img"/>
+        <alt>alt img2</alt>
+        <title>img2</title>
+        <uri>uri/img2</uri>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#project1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project1">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag11111"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag121"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag221"/>
+        <has_img rdf:resource="http://www.lha.org/project_ontology#img1"/>
+        <alias>Alias1</alias>
+        <content>Projektbeschreibung1</content>
+        <summary>Zusammenfassung1</summary>
+        <title>Projekttitel1</title>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#project2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project2">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag21"/>
+        <has_img rdf:resource="http://www.lha.org/project_ontology#img2"/>
+        <alias>Alias2</alias>
+        <content>Projektbeschreibung2</content>
+        <summary>Zusammenfassung2</summary>
+        <title>Projekttitel2</title>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.5.20160517-0735) https://github.com/owlcs/owlapi -->
+
