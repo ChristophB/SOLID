@@ -116,7 +116,7 @@
 
     <!-- http://www.lha.org/project_ontology#Project -->
 
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Project"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Node"/>
     
 
 
@@ -259,7 +259,7 @@
     <!-- http://www.lha.org/project_ontology#project1 -->
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project1">
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Node"/>
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag11111"/>
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag121"/>
@@ -276,7 +276,7 @@
     <!-- http://www.lha.org/project_ontology#project2 -->
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project2">
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Node"/>
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag21"/>
         <has_img rdf:resource="http://www.lha.org/project_ontology#img2"/>

@@ -24,9 +24,9 @@ class VocabularyImporter extends AbstractImporter {
     }
     
     public function import($data, $overwrite = false) {
-         if ($overwrite) $this->overwrite = true;
-         if (empty($data)) return;
-         
+        if ($overwrite) $this->overwrite = true;
+        if (empty($data)) return;
+        
         foreach ($data as $vocabulary) {
             $this->createVocabulary($vocabulary['vid'], $vocabulary['name']);
             $this->createTags($vocabulary['vid'], $vocabulary['tags']);

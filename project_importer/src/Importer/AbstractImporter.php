@@ -7,6 +7,8 @@
 
 namespace Drupal\project_importer\Importer;
 
+use Exception;
+
 abstract class AbstractImporter {
     protected $entities = [];
     protected $overwrite = false;
