@@ -3,7 +3,7 @@
 ## General information:
 
 This is a Drupal 8 Module to import projects and taxonomies into Drupal, using the available API.
-The module is still in development but is already capable of importing a JSON file.
+The module is still in development but is already capable of importing a JSON or OWL file.
 
 Idea is to enable users to upload a file containing all information about projects and their relations.
 The module will then import all contained information with the Drupal 8 API.
@@ -13,6 +13,7 @@ The module will then import all contained information with the Drupal 8 API.
 
 Supported import formats:
 * JSON
+* OWL
 
 ## How to install:
 
