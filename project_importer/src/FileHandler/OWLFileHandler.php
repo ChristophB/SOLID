@@ -19,6 +19,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private $summaryUri;
 	private $titleUri;
 	private $uriUri;
+	private $hasImgUri;
 	
 	public function getData() {
 		return $this->data;
@@ -49,9 +50,10 @@ class OWLFileHandler extends AbstractFileHandler {
 		$this->altUri = $this->getAnnotationPropertyUri('alt');
 		$this->contentUri = $this->getAnnotationPropertyUri('content');
 		$this->nameUri = $this->getAnnotationPropertyUri('name');
-		$this->summaryUri = $this->getAnnotationPropertyUri('summary');
+		$this->summaryUri = $this->getAnnotationPropertyUri('summary'); // better as one array to store additional data?
 		$this->titleUri = $this->getAnnotationPropertyUri('title');
 		$this->uriUri = $this->getAnnotationPropertyUri('uri');
+		$this->hasImgUri = $this->getObjectPropertyUri('has_img');
 	}
 	
 	private function setVocabularyData() {
@@ -86,16 +88,43 @@ class OWLFileHandler extends AbstractFileHandler {
 				continue;
 				
 			$properties = $this->getIndividualPropertiesAsArray($individual);
+			$img = $this->getIndividualByUri($properties[$this->hasImgUri]);
+			$img_properties = $img ? $this->getIndividualPropertiesAsArray($img) : null;
 			
 			$node = [
-				'title'         => $properties[$this->titleUri],
-				'content'       => $properties[$this->contentUri],
-				'summary'       => $properties[$this->summaryUri],
-				'alias'         => $properties[$this->aliasUri],
-				'img'           => [],
-				'tags'          => [],
-				'custom_fields' => []
+				'title'  => $properties[$this->titleUri],
+				'type'   => 'article', // gather from OWL file
+				'alias'  => $properties[$this->aliasUri],
+				'fields' => [
+					[
+						'field_name' => 'body', 
+						'value'      => [ 
+							'value'   => $properties[$this->contentUri],
+							'summary' => $properties[$this->summaryUri]
+						]
+					],
+					[
+						'field_name' => 'field_tags',
+						'value'      => [], // @TODO
+						'references' => 'taxonomy_term'
+					] // @toto: handle all fields
+				]
 			];
+			
+			if ($img_properties) {
+				array_push(
+					$node['fields'], 
+					[
+						'field_name' => 'field_image',
+						'value'      => [
+							'alt'   => $img_properties[$this->altUri],
+							'title' => $img_properties[$this->titleUri],
+							'uri'   => $img_properties[$this->uriUri]
+						],
+						'entity' => 'file'
+					]
+				);
+			}
 			
 			array_push($this->data['nodes'], $node);
 		}
@@ -109,8 +138,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 		for ( $i = 1; $i < sizeof($properties); $i++) {
 			if ($i % 2 == 0) continue;
-			$array[$properties[$i]] = preg_replace('/(^\s*")|("\s*$)/', '', $properties[$i + 1]);
-			
+			$array[$properties[$i]] = trim(preg_replace('/(^\s*")|("\s*$)/', '', $properties[$i + 1]));
 		}
 		
 		return $array;
@@ -124,8 +152,23 @@ class OWLFileHandler extends AbstractFileHandler {
 		return $this->graph->allOfType('owl:Class');
 	}
 	
+	private function getIndividualByUri($uri) {
+		if (!$uri) throw new Exception('Error: parameter $uri missing');
+		
+		foreach ($this->getIndividuals() as $individual) {
+			if ($individual->getUri() == $uri)
+				return $individual;
+		}
+		
+		return null;
+	}
+	
 	private function getAnnotationProperties() {
 		return $this->graph->allOfType('owl:AnnotationProperty');
+	}
+	
+	private function getObjectProperties() {
+		return $this->graph->allOfType('owl:ObjectProperty');
 	}
 	
 	private function findAllSubClassesOf($class) {
@@ -180,18 +223,27 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function getClassUri($name) {
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		
-		foreach ($this->getClasses() as $class) {
-			if ($class->localName() == $name)
-				return $class->getUri();
-		}
+		return $this->getResourceUri($name, $this->getClasses());
 	}
 	
 	private function getAnnotationPropertyUri($name) {
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		
-		foreach ($this->getAnnotationProperties() as $ap) {
-			if ($ap->localName() == $name)
-				return $ap->getUri();
+		return $this->getResourceUri($name, $this->getAnnotationProperties());
+	}
+	
+	private function getObjectPropertyUri($name) {
+		if (!$name) throw new Exception('Error: parameter $name missing');
+		
+		return $this->getResourceUri($name, $this->getObjectProperties());
+	}
+	
+	private function getResourceUri($name, $resources) {
+		if (!$name) throw new Exception('Error: parameter $name missing');
+		
+		foreach ($resources as $resource) {
+			if ($resource->localName() == $name)
+				return $resource->getUri();
 		}
 	}
 }

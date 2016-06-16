@@ -240,7 +240,7 @@
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Img"/>
         <alt>alt img1</alt>
         <title>img1</title>
-        <uri>uri/img1</uri>
+        <uri>[filename].jpg</uri>
     </owl:NamedIndividual>
     
 
@@ -251,7 +251,7 @@
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Img"/>
         <alt>alt img2</alt>
         <title>img2</title>
-        <uri>uri/img2</uri>
+        <uri>[filename].jpg</uri>
     </owl:NamedIndividual>
     
 

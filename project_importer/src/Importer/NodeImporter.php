@@ -44,23 +44,23 @@ class NodeImporter extends AbstractImporter {
 		$this->deleteNodeIfExists($params['title']);
 
 		$node = Node::create([
-			'type'     => 'article',
+			'type'     => ($params['type'] ? $params['type'] : 'article'),
 			'title'    => $params['title'],
 			'langcode' => 'de',
 			'status'   => 1,
-			'uid'      => \Drupal::currentUser()->id(),
-			'body'     => [
-				'value'   => (array_key_exists('content', $params) ? $params['content'] : null),
-				'summary' => (array_key_exists('summary', $params) ? $params['summary'] : null),
-				'format'  => 'basic_html',
-			],
-			'field_tags'  => (array_key_exists('tags', $params) ? $this->searchTagIdsByNames($params['tags']) : null),
-			'field_image' => (array_key_exists('img', $params) ? $this->constructFieldImage($params['img']) : null),
+			'uid'      => \Drupal::currentUser()->id()
+			// 'body'     => [
+			// 	'value'   => (array_key_exists('content', $params) ? $params['content'] : null),
+			// 	'summary' => (array_key_exists('summary', $params) ? $params['summary'] : null),
+			// 	'format'  => 'basic_html',
+			// ],
+			// 'field_tags'  => (array_key_exists('tags', $params) ? $this->searchTagIdsByNames($params['tags']) : null),
+			// 'field_image' => (array_key_exists('img', $params) ? $this->constructFieldImage($params['img']) : null),
 		]);
 		
 		$node->save();
-		if (array_key_exists('custom_fields', $params))
-			$this->insertCustomFields($node, $params['custom_fields']);
+		if (array_key_exists('fields', $params))
+			$this->insertFields($node, $params['fields']);
 		$node->save();
 			
 		if (array_key_exists('alias', $params))
@@ -113,29 +113,49 @@ class NodeImporter extends AbstractImporter {
 		]);
 	}
 	
-	private function constructFieldImage($img) {
-		if (!$img) return [];
+	// private function constructFieldImage($img) {
+	// 	if (!$img) return [];
 		
-		$file = $this->createFile($img['uri']);
+	// 	$file = $this->createFile($img['uri']);
 		
-		return [
-			'target_id' => $file->id(),
-			'alt'       => $img['alt'],
-			'title'     => $img['title'],
-		];
-	}
+	// 	return [
+	// 		'target_id' => $file->id(),
+	// 		'alt'       => $img['alt'],
+	// 		'title'     => $img['title'],
+	// 	];
+	// }
 	
-	private function insertCustomFields($node, $customFields) {
-		if (empty($customFields)) return;
+	private function insertFields($node, $fields) {
+		if (!$node) throw new Exception('Error: parameter $node missing');
+		if (empty($fields)) return;
 		
-		foreach ($customFields as $fieldContent) {
-			if (array_key_exists('references', $fieldContent) && $refEntityType = $fieldContent['references']) {
-				$this->nodeReferences[$node->id()][$fieldContent['field_name']][$refEntityType]
+		foreach ($fields as $fieldContent) {
+			if (!$this->nodeHasField($node, $fieldContent['field_name']))
+				continue;
+			
+			if (array_key_exists('references', $fieldContent) && $fieldContent['references']) {
+				$this->nodeReferences[$node->id()][$fieldContent['field_name']][$fieldContent['references']]
 					= $fieldContent['value'];
 			} else {
+				if ($fieldContent['entity'] == 'file') {
+					$file = $this->createFile($fieldContent['value']['uri']);
+					$fieldContent['value']['target_id'] = $file->id();
+				}
 				$node->get($fieldContent['field_name'])->setValue($fieldContent['value']);
 			}
 		}
+	}
+	
+	private function nodeHasField($node, $fieldName) {
+		if (!$node) throw new Exception('Error: parameter $node missing');
+		if (!$fieldName) throw new Exception('Error: parameter $fieldName missing');
+		
+		try {
+			$node->get($fieldName);	
+		} catch (Exception $e) {
+			return false;
+		}
+		return true;
 	}
 	
 	private function addAlias($params) {
@@ -156,7 +176,7 @@ class NodeImporter extends AbstractImporter {
 					$entityIds = [];
 					
 					switch ($entityType) {
-						case 'tag': 
+						case 'taxonomy_term': 
 							$entityIds = $this->searchTagIdsByNames($entityNames);
 							break;
 						case 'node':

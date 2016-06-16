@@ -19,18 +19,32 @@
 	"nodes": [
 		{
 			"title": "[article title]",
-			"content": "[some text which describes this article]",
-			"summary": "[abstract]",
+			"type": "article",
 			"alias": "[alias]",
-			"img": {
-				"alt": "[alternative text if the image could not be loaded]",
-				"title": "[title]",
-				"uri": "[filename].jpg" 
-			},
-			"tags": [
-				{ "vid": "[machine-readable name]", "name": "[display name of the tag]" } 
-			],
-			"custom_fields": [
+			"fields": [
+				{
+					"field_name": "body",
+					"value": {
+						"value": "[some text which describes this article]",
+						"summary": "[abstract]"
+					}
+				},
+				{
+					"field_name": "field_image",
+					"value": {
+						"alt": "[alternative text if the image could not be loaded]",
+						"title": "[title]",
+						"uri": "[filename].jpg" 
+					},
+					"entity": "file"
+				},
+				{ 
+					"field_name": "field_tags",
+					"value": [
+						{ "vid": "[machine-readable name]", "name": "[display name of the tag]" } 
+					],
+					"references": "taxonomy_term"
+				},
 				{
 					"field_name": "field_custom1",
 					"value": 10167.87
