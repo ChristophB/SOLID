@@ -57,11 +57,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	private function setVocabularyData() {
-		foreach ($this->getClasses() as $class) {
-			if (!$class->hasProperty('rdfs:subClassOf') 
-				|| $class->getResource('rdfs:subClassOf')->localName() != 'Vocabulary'
-			) continue;
-			
+		foreach ($this->getVocabularyClasses() as $class) {
 			$tags = [];
 			
 			foreach ($this->findAllSubClassesOf($class) as $subClass) {
@@ -82,6 +78,20 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 	}
 	
+	private function getVocabularyClasses() {
+		$result = [];
+		
+		foreach ($this->getClasses() as $class) {
+			if (!$class->hasProperty('rdfs:subClassOf') 
+				|| $class->getResource('rdfs:subClassOf')->localName() != 'Vocabulary'
+			) continue;
+			
+			array_push($result, $class);
+		}
+		
+		return $result;
+	}
+	
 	private function setNodeData() {
 		foreach ($this->getIndividuals() as $individual) {
 			if (!$individual->isA($this->nodeClassUri))
@@ -91,9 +101,26 @@ class OWLFileHandler extends AbstractFileHandler {
 			$img = $this->getIndividualByUri($properties[$this->hasImgUri]);
 			$img_properties = $img ? $this->getIndividualPropertiesAsArray($img) : null;
 			
+			$fieldTags = [];
+			foreach ($individual->allResources('rdf:type') as $class) {
+				if ($class->getUri() == $this->nodeClassUri
+					|| $class->localName() == 'NamedIndividual')
+					continue;
+				$vocabulary = $this->getVocabularyForTag($class);
+				
+				array_push(
+					$fieldTags,
+					[
+						'vid'  => $vocabulary->localName(),
+						'name' => $class->localName()
+					]
+				);
+			}
+			
+			
 			$node = [
 				'title'  => $properties[$this->titleUri],
-				'type'   => 'article', // gather from OWL file
+				'type'   => 'article', // @todo: gather from OWL file
 				'alias'  => $properties[$this->aliasUri],
 				'fields' => [
 					[
@@ -105,11 +132,13 @@ class OWLFileHandler extends AbstractFileHandler {
 					],
 					[
 						'field_name' => 'field_tags',
-						'value'      => [], // @TODO
+						'value'      => $fieldTags,
 						'references' => 'taxonomy_term'
-					] // @toto: handle all fields
+					] 
+					// @toto: handle all fields
 				]
 			];
+			
 			
 			if ($img_properties) {
 				array_push(
@@ -128,6 +157,18 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			array_push($this->data['nodes'], $node);
 		}
+	}
+	
+	private function getVocabularyForTag($tag) {
+		if (!$tag) throw new Exception('Error: parameter $tag missing');
+		
+		foreach ($this->getVocabularyClasses() as $vocabulary) {
+			foreach ($this->findAllSubClassesOf($vocabulary) as $subClass) {
+				if ($subClass->getUri() == $tag->getUri())
+					return $vocabulary;
+			}
+		}
+		throw new Exception("Error: tag: '$tag->localName()' could not be found.");
 	}
 	
 	private function getIndividualPropertiesAsArray($individual) {
