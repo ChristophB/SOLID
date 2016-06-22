@@ -230,7 +230,11 @@ class OWLFileHandler extends AbstractFileHandler {
 							$this->graph->resource($refType)->localName()
 						);
 						break;
-					default: throw new Exception('Could not determine target fields, because no ref_type was given.');
+					default:
+						throw new Exception(
+							'Could not determine target fields, because no '
+							. 'ref_type or ref_type is not supported was given.'
+						);
 				}
 				array_push($field['value'], $value);
 			}
