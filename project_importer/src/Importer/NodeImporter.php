@@ -49,13 +49,6 @@ class NodeImporter extends AbstractImporter {
 			'langcode' => 'de',
 			'status'   => 1,
 			'uid'      => \Drupal::currentUser()->id()
-			// 'body'     => [
-			// 	'value'   => (array_key_exists('content', $params) ? $params['content'] : null),
-			// 	'summary' => (array_key_exists('summary', $params) ? $params['summary'] : null),
-			// 	'format'  => 'basic_html',
-			// ],
-			// 'field_tags'  => (array_key_exists('tags', $params) ? $this->searchTagIdsByNames($params['tags']) : null),
-			// 'field_image' => (array_key_exists('img', $params) ? $this->constructFieldImage($params['img']) : null),
 		]);
 		
 		$node->save();
@@ -131,13 +124,13 @@ class NodeImporter extends AbstractImporter {
 		
 		foreach ($fields as $fieldContent) {
 			if (!$this->nodeHasField($node, $fieldContent['field_name']))
-				continue;
+				throw new Exception('Error: field '. $fieldContent['field_name']. ' does not exists in '. $node['type']); // continue;
 			
 			if (array_key_exists('references', $fieldContent) && $fieldContent['references']) {
 				$this->nodeReferences[$node->id()][$fieldContent['field_name']][$fieldContent['references']]
 					= $fieldContent['value'];
 			} else {
-				if ($fieldContent['entity'] == 'file') {
+				if (array_key_exists('entity', $fieldContent) && $fieldContent['entity'] == 'file') {
 					$file = $this->createFile($fieldContent['value']['uri']);
 					$fieldContent['value']['target_id'] = $file->id();
 				}

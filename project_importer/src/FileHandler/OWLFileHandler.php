@@ -19,7 +19,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	const ALIAS      = 'http://www.lha.org/drupal_ontology#alias';
 	const CONTENT    = 'http://www.lha.org/drupal_ontology#content';
 	const SUMMARY    = 'http://www.lha.org/drupal_ontology#summary';
-	const REF_NUM    = 'http://www.lha.org/drupal_ontology#ref_num';
+	const REF_INDEX  = 'http://www.lha.org/drupal_ontology#ref_index';
 	const REF_TYPE   = 'http://www.lha.org/drupal_ontology#ref_type';
 	const FIELD      = 'http://www.lha.org/drupal_ontology#field';
 	
@@ -104,7 +104,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			
 			// @todo: add image
-			// $img = $this->getIndividualByUri($properties[$this->hasImgUri]);
+			// $img = $this->graph->resource($properties[$this->hasImgUri]);
 			// $img_properties = $img ? $this->getPropertiesAsArray($img) : null;
 			// if ($img_properties) {
 			// 	array_push(
@@ -176,7 +176,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				continue;
 			
 			if ($field = $this->createNodeField($individual, $property))
-				array_push($node['fields'], $field);
+				array_push($fields, $field);
 		}
 		
 		return $fields;
@@ -195,7 +195,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				function ($x) { return $x->getValue(); }, 
 				$literals
 			);
-		} elseif ($resources = $individual->allResources($property)) { // @todo use ref_num to sort values if available
+		} elseif ($resources = $individual->allResources($property)) { 
 			$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
 			$field['value'] = [];
@@ -212,7 +212,13 @@ class OWLFileHandler extends AbstractFileHandler {
 						$field['value'],
 						$this->getProperty($target, self::TITLE)
 					);
-					$field['references'] = $this->getProperty($axiom, self::REF_TYPE); // @todo: translate to 'node', 'file' or 'tag'
+				}
+				
+				if ($refType = $this->getProperty($axiom, self::REF_TYPE)) {
+					$field['references'] = preg_replace(
+						'/_ref/', '',
+						$this->graph->resource($refType)->localName()
+					);
 				}
 			}
 		} else {
@@ -226,7 +232,11 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$entity) throw new Exception('Error: parameter $entity missing');
 		if (!$uri) throw new Exception('Error: parameter $uri missing');
 		
-		return $this->getPropertiesAsArray($entity)[$uri];
+		$properties = $this->getPropertiesAsArray($entity);
+		if (!array_key_exists($uri, $property))
+			return null;
+		
+		return $property[$uri];
 	}
 	
 	private function parseNodeContent($node, $content) {
@@ -250,7 +260,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			$properties = $this->getPropertiesAsArray($axiom);
 			
 			if ($axiom->hasProperty('owl:annotatedSource', $individual) 
-				&& $properties[self::REF_NUM] == $num. '"^^xsd:integer'
+				&& $properties[self::REF_INDEX] == $num. '"^^xsd:integer'
 			) {
 				$target = $this->graph->resource($properties['owl:annotatedTarget']);
 				$alias = $this->getProperty($target, self::ALIAS);
@@ -274,9 +284,9 @@ class OWLFileHandler extends AbstractFileHandler {
 			if ($axiom->hasProperty('owl:annotatedSource', $individual)
 				&& $axiom->hasProperty('owl:annotatedProperty', $property)
 			)
-				array_push($result, $axiom);
+				$result[preg_replace('/"\^\^xsd:integer/', '', $this->getProperty($axiom, self::REF_INDEX))] = $axiom;
 		}
-		
+		ksort($result);
 		return $result;
 	}
 	
@@ -321,12 +331,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function getIndividualByUri($uri) {
 		if (!$uri) throw new Exception('Error: parameter $uri missing');
 		
-		foreach ($this->getIndividuals() as $individual) {
-			if ($individual->getUri() == $uri)
-				return $individual;
-		}
-		
-		return null;
+		return $this->graph->resource($uri);
 	}
 	
 	private function getAnnotationProperties() {
