@@ -66,7 +66,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				'name' => $class->localName(),
 				'tags' => $tags
 			];
-			die(var_dump($vocabulary));
+			
 			array_push($this->data['vocabularies'], $vocabulary);
 		}
 	}
