@@ -124,15 +124,22 @@ class NodeImporter extends AbstractImporter {
 		
 		foreach ($fields as $fieldContent) {
 			if (!$this->nodeHasField($node, $fieldContent['field_name']))
-				throw new Exception('Error: field '. $fieldContent['field_name']. ' does not exists in '. $node['type']); // continue;
+				throw new Exception('Error: field '. $fieldContent['field_name']. ' does not exists in '. $node->bundle());
 			
 			if (array_key_exists('references', $fieldContent) && $fieldContent['references']) {
 				$this->nodeReferences[$node->id()][$fieldContent['field_name']][$fieldContent['references']]
 					= $fieldContent['value'];
 			} else {
 				if (array_key_exists('entity', $fieldContent) && $fieldContent['entity'] == 'file') {
-					$file = $this->createFile($fieldContent['value']['uri']);
-					$fieldContent['value']['target_id'] = $file->id();
+					if (array_key_exists('uri', $fieldContent['value'])) {
+						$file = $this->createFile($fieldContent['value']['uri']);
+						$fieldContent['value']['target_id'] = $file->id();
+					} else {
+						for ($i = 0; $i < sizeof($fieldContent['value']); $i++) {
+							$file = $this->createFile($fieldContent['value'][$i]['uri']);
+							$fieldContent['value'][$i]['target_id'] = $file->id();
+						}
+					}
 				}
 				$node->get($fieldContent['field_name'])->setValue($fieldContent['value']);
 			}
@@ -175,6 +182,7 @@ class NodeImporter extends AbstractImporter {
 						case 'node':
 							$entityIds = $this->mapNodeTitlesToNids($entityNames);
 							break;
+						case 'image':
 						case 'file':
 							$entityIds = $this->mapFileUrisToFids($entityNames);
 							break;
