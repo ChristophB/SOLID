@@ -340,6 +340,7 @@
         <owl:annotatedTarget rdf:resource="http://www.lha.org/template#author2"/>
         <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:datatype="http://www.lha.org/drupal_ontology#entity_ref"/>
     </owl:Axiom>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
@@ -347,6 +348,7 @@
         <owl:annotatedTarget rdf:resource="http://www.lha.org/template#author1"/>
         <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:datatype="http://www.lha.org/drupal_ontology#entity_ref"/>
     </owl:Axiom>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
