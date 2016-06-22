@@ -103,7 +103,7 @@
 
     <!-- http://www.lha.org/project_ontology#Data_set -->
 
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Data_set">
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Dataset">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
     </owl:Class>
     

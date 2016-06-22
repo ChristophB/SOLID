@@ -18,6 +18,7 @@ class NodeImporter extends AbstractImporter {
     function __construct() {
         $this->entities['node'] = [];
         $this->entities['file'] = [];
+        $this->antities['path'] = [];
     }
     
     public function import($data, $overwrite = false) {
@@ -86,6 +87,7 @@ class NodeImporter extends AbstractImporter {
 		if (!empty($ids = $this->searchNodesByTitle($title))) {
 			if ($this->overwrite) {
 				foreach ($ids as $id) {
+					\Drupal::service('path.alias_storage')->delete(array('source' => '/node/'. $id));
 					Node::load($id)->delete();
 				}
 			} else {
@@ -105,18 +107,6 @@ class NodeImporter extends AbstractImporter {
 			'entity_type' => 'node',
 		]);
 	}
-	
-	// private function constructFieldImage($img) {
-	// 	if (!$img) return [];
-		
-	// 	$file = $this->createFile($img['uri']);
-		
-	// 	return [
-	// 		'target_id' => $file->id(),
-	// 		'alt'       => $img['alt'],
-	// 		'title'     => $img['title'],
-	// 	];
-	// }
 	
 	private function insertFields($node, $fields) {
 		if (!$node) throw new Exception('Error: parameter $node missing');
@@ -162,11 +152,13 @@ class NodeImporter extends AbstractImporter {
 		if (!$params['id']) throw new Exception('Error: named parameter "id" missing');
 		if (!$params['alias']) return;
 		
-		\Drupal::service('path.alias_storage')->save(
+		$path = \Drupal::service('path.alias_storage')->save(
 			'/node/'. $params['id'], 
 			'/'. $params['alias'], 
 			'de'
 		);
+		
+		array_push($this->entities['path'], $path);
 	}
 	
 	private function insertNodeReferences() {

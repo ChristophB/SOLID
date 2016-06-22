@@ -92,13 +92,22 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$node = [
 				'title'  => $this->getProperty($individual, self::TITLE),
-				'type'   => 'article', // @todo: gather from OWL file
+				'type'   => $this->getBundle($individual),
 				'alias'  => $this->getProperty($individual, self::ALIAS),
 				'fields' => $this->createNodeFields($individual)
 			];
 			
 			array_push($this->data['nodes'], $node);
 		}
+	}
+	
+	private function getBundle($node) {
+		if (!$node) throw new Exception('Error: parameter $node missing');
+	
+		return strtolower(array_values(array_filter(
+			$node->typesAsResources(),
+			function($x) { return $this->hasDirectSuperClass($x, self::NODE); }
+		))[0]->localName());
 	}
 	
 	private function createFieldTags($individual) {
