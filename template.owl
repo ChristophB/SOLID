@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<rdf:RDF xmlns="http://www.lha.org/template#"
-     xml:base="http://www.lha.org/template"
-     xmlns:template="http://www.lha.org/template#"
+<rdf:RDF xmlns="http://www.lha.org/project_ontology#"
+     xml:base="http://www.lha.org/project_ontology"
+     xmlns:project_ontology="http://www.lha.org/project_ontology#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:drupal_ontology="http://www.lha.org/drupal_ontology#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://www.lha.org/template">
+    <owl:Ontology rdf:about="http://www.lha.org/project_ontology">
         <owl:imports rdf:resource="http://www.lha.org/drupal_ontology"/>
     </owl:Ontology>
     
@@ -23,44 +23,60 @@
      -->
 
     
-    <!-- http://www.lha.org/template#field_test -->
-
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/template#field_test">
-        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
-    </owl:AnnotationProperty>
 
 
-    <!-- http://www.lha.org/template#field_author -->
+    <!-- http://www.lha.org/project_ontology#field_author -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/template#field_author">
-        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
-    </owl:AnnotationProperty>
-
-    
-    <!-- http://www.lha.org/template#field_project_ref -->
-
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/template#field_project_ref">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_author">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
-    
-    <!-- http://www.lha.org/template#field_document_ref -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/template#field_document_ref">
+
+    <!-- http://www.lha.org/project_ontology#field_custom1 -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_custom1">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
-    
-    <!-- http://www.lha.org/template#field_image -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/template#field_image">
+
+    <!-- http://www.lha.org/project_ontology#field_document_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_document_ref">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
-    
-    <!-- http://www.lha.org/template#field_custom1 -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/template#field_custom1">
+
+    <!-- http://www.lha.org/project_ontology#field_image -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_image">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_project_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_project_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_publication -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_publication">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+        <rdfs:range rdf:resource="http://www.lha.org/project_ontology#Publication"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_test -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_test">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
@@ -77,146 +93,146 @@
     
 
 
-    <!-- http://www.lha.org/template#Author -->
+    <!-- http://www.lha.org/project_ontology#Author -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Author">
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Author">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Data_set -->
+    <!-- http://www.lha.org/project_ontology#Data_set -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Data_set">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Page"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Data_set">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Institution -->
+    <!-- http://www.lha.org/project_ontology#Institution -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Institution">
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Institution">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Method -->
+    <!-- http://www.lha.org/project_ontology#Method -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Method">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Page"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Method">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Project -->
+    <!-- http://www.lha.org/project_ontology#Project -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Project">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Page"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Project">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Publication -->
+    <!-- http://www.lha.org/project_ontology#Publication -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Publication">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Page"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Publication">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag11 -->
+    <!-- http://www.lha.org/project_ontology#Tag11 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag11">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Vocabulary1"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag11">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary1"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag111 -->
+    <!-- http://www.lha.org/project_ontology#Tag111 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag111">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag11"/>
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag12"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag111">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag11"/>
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag12"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag1111 -->
+    <!-- http://www.lha.org/project_ontology#Tag1111 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag1111">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag111"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag1111">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag11111 -->
+    <!-- http://www.lha.org/project_ontology#Tag11111 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag11111">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag1111"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag11111">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag1111"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag112 -->
+    <!-- http://www.lha.org/project_ontology#Tag112 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag112">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag11"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag112">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag11"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag12 -->
+    <!-- http://www.lha.org/project_ontology#Tag12 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag12">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Vocabulary1"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag12">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary1"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag121 -->
+    <!-- http://www.lha.org/project_ontology#Tag121 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag121">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag12"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag121">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag12"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag21 -->
+    <!-- http://www.lha.org/project_ontology#Tag21 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag21">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Vocabulary2"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag21">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary2"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag22 -->
+    <!-- http://www.lha.org/project_ontology#Tag22 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag22">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Vocabulary2"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag22">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary2"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Tag221 -->
+    <!-- http://www.lha.org/project_ontology#Tag221 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Tag221">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/template#Tag22"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag221">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag22"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Vocabulary1 -->
+    <!-- http://www.lha.org/project_ontology#Vocabulary1 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Vocabulary1">
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary1">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/template#Vocabulary2 -->
+    <!-- http://www.lha.org/project_ontology#Vocabulary2 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template#Vocabulary2">
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary2">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
     </owl:Class>
     
@@ -233,29 +249,61 @@
     
 
 
-    <!-- http://www.lha.org/template#author1 -->
+    <!-- http://www.lha.org/project_ontology#Publication1 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#author1">
-        <rdf:type rdf:resource="http://www.lha.org/template#Author"/>
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#Publication1">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Publication"/>
+        <drupal_ontology:alias>publication1</drupal_ontology:alias>
+        <drupal_ontology:content>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.   
+
+Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.   
+
+Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.   
+
+Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.   
+
+Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.   
+
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.   
+
+Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.   
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.   
+
+Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.   
+
+Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.   
+
+Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo</drupal_ontology:content>
+        <drupal_ontology:summary>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</drupal_ontology:summary>
+        <drupal_ontology:title>Publication1</drupal_ontology:title>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#author1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#author1">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Author"/>
         <drupal_ontology:address>address1</drupal_ontology:address>
         <drupal_ontology:name>name1</drupal_ontology:name>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.lha.org/template#author2 -->
+    <!-- http://www.lha.org/project_ontology#author2 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#author2">
-        <rdf:type rdf:resource="http://www.lha.org/template#Author"/>
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#author2">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Author"/>
         <drupal_ontology:address>address2</drupal_ontology:address>
         <drupal_ontology:name>name2</drupal_ontology:name>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.lha.org/template#doc1 -->
+    <!-- http://www.lha.org/project_ontology#doc1 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#doc1">
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#doc1">
         <rdf:type rdf:resource="http://www.lha.org/drupal_ontology#Doc"/>
         <drupal_ontology:title>doc1</drupal_ontology:title>
         <drupal_ontology:uri>doc1.txt</drupal_ontology:uri>
@@ -263,9 +311,9 @@
     
 
 
-    <!-- http://www.lha.org/template#doc2 -->
+    <!-- http://www.lha.org/project_ontology#doc2 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#doc2">
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#doc2">
         <rdf:type rdf:resource="http://www.lha.org/drupal_ontology#Doc"/>
         <drupal_ontology:title>doc2</drupal_ontology:title>
         <drupal_ontology:uri>doc2.txt</drupal_ontology:uri>
@@ -273,9 +321,9 @@
     
 
 
-    <!-- http://www.lha.org/template#img1 -->
+    <!-- http://www.lha.org/project_ontology#img1 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#img1">
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#img1">
         <rdf:type rdf:resource="http://www.lha.org/drupal_ontology#Img"/>
         <drupal_ontology:alt>alt img1</drupal_ontology:alt>
         <drupal_ontology:title>img1</drupal_ontology:title>
@@ -284,9 +332,9 @@
     
 
 
-    <!-- http://www.lha.org/template#img2 -->
+    <!-- http://www.lha.org/project_ontology#img2 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#img2">
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#img2">
         <rdf:type rdf:resource="http://www.lha.org/drupal_ontology#Img"/>
         <drupal_ontology:alt>alt img2</drupal_ontology:alt>
         <drupal_ontology:title>img2</drupal_ontology:title>
@@ -295,96 +343,101 @@
     
 
 
-    <!-- http://www.lha.org/template#project1 -->
+    <!-- http://www.lha.org/project_ontology#project1 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#project1">
-        <rdf:type rdf:resource="http://www.lha.org/template#Project"/>
-        <rdf:type rdf:resource="http://www.lha.org/template#Tag111"/>
-        <rdf:type rdf:resource="http://www.lha.org/template#Tag11111"/>
-        <rdf:type rdf:resource="http://www.lha.org/template#Tag121"/>
-        <rdf:type rdf:resource="http://www.lha.org/template#Tag221"/>
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project1">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag11111"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag121"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag221"/>
         <drupal_ontology:alias>Alias1</drupal_ontology:alias>
         <drupal_ontology:content>Projektbeschreibung1 &lt;&lt;7&gt;&gt;  bla bla.</drupal_ontology:content>
         <drupal_ontology:summary>Zusammenfassung1</drupal_ontology:summary>
         <drupal_ontology:title>Projekttitel1</drupal_ontology:title>
-        <field_document_ref rdf:resource="http://www.lha.org/template#doc1"/>
-        <field_document_ref rdf:resource="http://www.lha.org/template#doc2"/>
-        <field_project_ref rdf:resource="http://www.lha.org/template#project2"/>
-        <field_author rdf:resource="http://www.lha.org/template#author2"/>
-        <field_author rdf:resource="http://www.lha.org/template#author1"/>
-        <field_image rdf:resource="http://www.lha.org/template#img2"/>
-        <field_image rdf:resource="http://www.lha.org/template#img1"/>
-        <field_test>test</field_test>
+        <field_author rdf:resource="http://www.lha.org/project_ontology#author1"/>
+        <field_author rdf:resource="http://www.lha.org/project_ontology#author2"/>
         <field_custom1>10301.42</field_custom1>
+        <field_document_ref rdf:resource="http://www.lha.org/project_ontology#doc1"/>
+        <field_document_ref rdf:resource="http://www.lha.org/project_ontology#doc2"/>
+        <field_image rdf:resource="http://www.lha.org/project_ontology#img1"/>
+        <field_image rdf:resource="http://www.lha.org/project_ontology#img2"/>
+        <field_project_ref rdf:resource="http://www.lha.org/project_ontology#project2"/>
+        <field_test>test</field_test>
     </owl:NamedIndividual>
-    
-    
-    
     <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_image"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#img2"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#image_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_image"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#img1"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#image_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_author"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#author2"/>
-        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:datatype="http://www.lha.org/drupal_ontology#entity_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_author"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#author1"/>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_author"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#author1"/>
         <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:datatype="http://www.lha.org/drupal_ontology#entity_ref"/>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
     </owl:Axiom>
     <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_document_ref"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#doc1"/>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_author"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#author2"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_document_ref"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#doc1"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</drupal_ontology:ref_num>
         <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#file_ref"/>
     </owl:Axiom>
     <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_document_ref"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#doc2"/>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_document_ref"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#doc2"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</drupal_ontology:ref_num>
         <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#file_ref"/>
     </owl:Axiom>
     <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/template#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/template#field_project_ref"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/template#project2"/>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_image"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#img1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#image_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_image"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#img2"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#image_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_project_ref"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#project2"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</drupal_ontology:ref_num>
         <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#node_ref"/>
     </owl:Axiom>
     
 
 
-    <!-- http://www.lha.org/template#project2 -->
+    <!-- http://www.lha.org/project_ontology#project2 -->
 
-    <owl:NamedIndividual rdf:about="http://www.lha.org/template#project2">
-        <rdf:type rdf:resource="http://www.lha.org/template#Project"/>
-        <rdf:type rdf:resource="http://www.lha.org/template#Tag111"/>
-        <rdf:type rdf:resource="http://www.lha.org/template#Tag21"/>
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project2">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag21"/>
         <drupal_ontology:alias>Alias2</drupal_ontology:alias>
         <drupal_ontology:content>Projektbeschreibung2</drupal_ontology:content>
         <drupal_ontology:summary>Zusammenfassung2</drupal_ontology:summary>
         <drupal_ontology:title>Projekttitel2</drupal_ontology:title>
+        <field_publication rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
     </owl:NamedIndividual>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project2"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_publication"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#node_ref"/>
+    </owl:Axiom>
 </rdf:RDF>
 
 

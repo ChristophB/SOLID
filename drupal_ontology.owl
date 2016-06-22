@@ -82,6 +82,20 @@
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#ref_type"/>
     </owl:AnnotationProperty>
     
+    
+    <!-- http://www.lha.org/drupal_ontology#image_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/drupal_ontology#image_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#ref_type"/>
+    </owl:AnnotationProperty>
+    
+    
+    <!-- http://www.lha.org/drupal_ontology#node_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/drupal_ontology#node_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#ref_type"/>
+    </owl:AnnotationProperty>
+    
 
 
     <!-- http://www.lha.org/drupal_ontology#name -->
@@ -89,13 +103,6 @@
     <owl:AnnotationProperty rdf:about="http://www.lha.org/drupal_ontology#name">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
-    
-
-
-    <!-- http://www.lha.org/drupal_ontology#ref -->
-
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/drupal_ontology#ref"/>
-    
 
 
     <!-- http://www.lha.org/drupal_ontology#ref_index -->
@@ -132,7 +139,7 @@
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
-
+    
 
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -173,9 +180,9 @@
     
 
 
-    <!-- http://www.lha.org/drupal_ontology#Page -->
+    <!-- http://www.lha.org/drupal_ontology#Node -->
 
-    <owl:Class rdf:about="http://www.lha.org/drupal_ontology#Page"/>
+    <owl:Class rdf:about="http://www.lha.org/drupal_ontology#Node"/>
     
 
 

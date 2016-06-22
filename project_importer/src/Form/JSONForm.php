@@ -64,7 +64,7 @@ class JSONForm extends FormBase {
             
             drupal_set_message(
 				sprintf(
-					t('Success! %d vocabularies with %d terms and %d projects imported.'),
+					t('Success! %d vocabularies with %d terms and %d nodes imported.'),
 					$vocabularyImporter->countCreatedVocabularies(),
 					$vocabularyImporter->countCreatedTags(),
 					$nodeImporter->countCreatedNodes()

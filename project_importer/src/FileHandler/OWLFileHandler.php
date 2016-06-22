@@ -10,23 +10,23 @@ namespace Drupal\project_importer\FileHandler;
 use Exception;
 
 class OWLFileHandler extends AbstractFileHandler {
-	const VOCABULARY = 'http://www.lha.org/drupal_ontology#Vocabulary';
-	const NODE       = 'http://www.lha.org/drupal_ontology#Page'; // Node?
-	const IMG        = 'http://www.lha.org/drupal_ontology#Img';
-	const ENTITY     = 'http://www.lha.org/drupal_ontology#Entity';
-	const DOC        = 'http://www.lha.org/drupal_ontology#Doc';
-	const TITLE      = 'http://www.lha.org/drupal_ontology#title';
-	const ALIAS      = 'http://www.lha.org/drupal_ontology#alias';
-	const CONTENT    = 'http://www.lha.org/drupal_ontology#content';
-	const SUMMARY    = 'http://www.lha.org/drupal_ontology#summary';
-	const REF_NUM    = 'http://www.lha.org/drupal_ontology#ref_num';
-	const REF_TYPE   = 'http://www.lha.org/drupal_ontology#ref_type';
-	const NODE_REF   = 'http://www.lha.org/drupal_ontology#node_ref';
-	const FILE_REF   = 'http://www.lha.org/drupal_ontology#file_ref';
-	const IMAGE_REF  = 'http://www.lha.org/drupal_ontology#image_ref';
-	const FIELD      = 'http://www.lha.org/drupal_ontology#field';
-	const URI        = 'http://www.lha.org/drupal_ontology#uri';
-	const ALT        = 'http://www.lha.org/drupal_ontology#alt';
+	const VOCABULARY       = 'http://www.lha.org/drupal_ontology#Vocabulary';
+	const NODE             = 'http://www.lha.org/drupal_ontology#Node';
+	const IMG              = 'http://www.lha.org/drupal_ontology#Img';
+	const ENTITY           = 'http://www.lha.org/drupal_ontology#Entity';
+	const DOC              = 'http://www.lha.org/drupal_ontology#Doc';
+	const TITLE            = 'http://www.lha.org/drupal_ontology#title';
+	const ALIAS            = 'http://www.lha.org/drupal_ontology#alias';
+	const CONTENT          = 'http://www.lha.org/drupal_ontology#content';
+	const SUMMARY          = 'http://www.lha.org/drupal_ontology#summary';
+	const REF_NUM          = 'http://www.lha.org/drupal_ontology#ref_num';
+	const REF_TYPE         = 'http://www.lha.org/drupal_ontology#ref_type';
+	const NODE_REF         = 'http://www.lha.org/drupal_ontology#node_ref';
+	const FILE_REF         = 'http://www.lha.org/drupal_ontology#file_ref';
+	const IMAGE_REF        = 'http://www.lha.org/drupal_ontology#image_ref';
+	const FIELD            = 'http://www.lha.org/drupal_ontology#field';
+	const URI              = 'http://www.lha.org/drupal_ontology#uri';
+	const ALT              = 'http://www.lha.org/drupal_ontology#alt';
 	const NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 	
 	protected function setData() {
