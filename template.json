@@ -19,7 +19,7 @@
 	"nodes": [
 		{
 			"title": "[article title]",
-			"type": "article",
+			"type": "project",
 			"alias": "[alias]",
 			"fields": [
 				{
@@ -38,6 +38,14 @@
 					},
 					"entity": "file"
 				},
+				{
+					"field_name": "field_document_ref",
+					"value": [
+						{ "title": "[title]", "uri": "[filename].jpg" },
+						{ "title": "[title]", "uri": "[filename].jpg" }
+					],
+					"entity": "file"
+				},
 				{ 
 					"field_name": "field_tags",
 					"value": [
@@ -50,14 +58,15 @@
 					"value": 10167.87
 				},
 				{
-					"field_name": "field_custom2",
-					"value": [ "[second article title]" ],
+					"field_name": "field_publication",
+					"value": [ "Publication1" ],
 					"references": "node"
 				}
 			]
 		},
 		{
-			"title": "[second article title]"
+			"title": "Publication1",
+			"type": "publication"
 		}
 	]
 }
