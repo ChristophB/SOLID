@@ -31,8 +31,9 @@ Supported import formats:
 * Place the previously created file into the form and click "Import".
 * There will be a message indicating the success/failure of the import process.
 * The module automatically undos all changes if an error occured.
-* If one of your declared nodes references an image or file, you have to place that image in the specified folder first.
+
 
 ## Troubleshooting/Importent notes
 
-* After the import of a vocabulary you have to assigne it to fields where you want to use the tags.
+* After the import of a vocabulary you have to assigne it to the fields, where you want to use the tags.
+* If one of your declared nodes references an image or file, you have to place that image in the specified folder before importing the node.

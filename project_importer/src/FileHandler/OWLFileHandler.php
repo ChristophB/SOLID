@@ -66,7 +66,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				'name' => $class->localName(),
 				'tags' => $tags
 			];
-			
+			die(var_dump($vocabulary));
 			array_push($this->data['vocabularies'], $vocabulary);
 		}
 	}
@@ -170,7 +170,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function createNodeField($individual, $property) {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
-			
+		
 		if ($literals = $individual->allLiterals($property)) {
 			$field = [
 				'value' => array_map(
@@ -399,9 +399,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function getParentTags($class) {
 		if (!$class) throw new Exception('Error: parameter $class missing');
 		
-		return array_filter(
-			$class->allResources('rdfs:subClassOf'),
-			function($x) { return $this->hasDirectSuperClass($x, self::VOCABULARY); }
+		return array_map(
+			function($x) { return $x->localName(); },
+			array_filter(
+				$class->allResources('rdfs:subClassOf'),
+				function($x) { return !$this->hasDirectSuperClass($x, self::VOCABULARY); }
+			)
 		);
 	}
 	
