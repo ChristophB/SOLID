@@ -18,7 +18,7 @@ class NodeImporter extends AbstractImporter {
     function __construct() {
         $this->entities['node'] = [];
         $this->entities['file'] = [];
-        $this->antities['path'] = [];
+        $this->entities['path'] = [];
     }
     
     public function import($data, $overwrite = false) {

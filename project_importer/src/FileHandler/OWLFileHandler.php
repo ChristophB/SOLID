@@ -212,7 +212,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			$refType = array_key_exists(self::REF_TYPE, $axiomProperties) ?
 				$axiomProperties[self::REF_TYPE] : null;
 				
-			if ($targetField = $axiomProperties[self::FIELD]) {
+			if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
 				array_push(
 					$field['value'], 
 					$targetProperties[$targetField]
