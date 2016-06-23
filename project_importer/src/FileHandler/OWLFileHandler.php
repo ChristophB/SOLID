@@ -24,6 +24,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	const NODE_REF         = 'http://www.lha.org/drupal_ontology#node_ref';
 	const FILE_REF         = 'http://www.lha.org/drupal_ontology#file_ref';
 	const IMAGE_REF        = 'http://www.lha.org/drupal_ontology#image_ref';
+	const TERM_REF         = 'http://www.lha.org/drupal_ontology#taxonomy_term_ref';
 	const FIELD            = 'http://www.lha.org/drupal_ontology#field';
 	const URI              = 'http://www.lha.org/drupal_ontology#uri';
 	const ALT              = 'http://www.lha.org/drupal_ontology#alt';
@@ -96,7 +97,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				'alias'  => $this->getProperty($individual, self::ALIAS),
 				'fields' => $this->createNodeFields($individual)
 			];
-			
+			// if ($node['title'] == 'Projekttitel') die(var_dump($node));
 			array_push($this->data['nodes'], $node);
 		}
 	}
@@ -239,10 +240,20 @@ class OWLFileHandler extends AbstractFileHandler {
 							$this->graph->resource($refType)->localName()
 						);
 						break;
+					case self::TERM_REF:
+						$value = [
+							'vid'  => $this->getVocabularyForTag($target)->localName(),
+							'name' => $target->localName()
+						];
+						$field['references'] = preg_replace(
+							'/_ref/', '',
+							$this->graph->resource($refType)->localName()
+						);
+						break;
 					default:
 						throw new Exception(
 							'Could not determine target fields, because no '
-							. 'ref_type or ref_type is not supported was given.'
+							. 'ref_type was given or ref_type is not supported.'
 						);
 				}
 				array_push($field['value'], $value);
