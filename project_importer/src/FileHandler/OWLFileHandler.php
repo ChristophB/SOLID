@@ -145,17 +145,19 @@ class OWLFileHandler extends AbstractFileHandler {
 			[
 				'field_name' => 'body', 
 				'value'      => [ 
-					'value'   => $this->parseNodeContent($individual, $properties[self::CONTENT]),
+					'value'   => $properties[self::CONTENT], // $this->parseNodeContent() ?
 					'summary' => $properties[self::SUMMARY],
 					'format'  => 'full_html'
 				]
-			],
-			[
+			]
+		];
+		
+		if ($this->isATransitive($individual, self::VOCABULARY))
+			array_push($fields, [
 				'field_name' => 'field_tags',
 				'value'      => $this->createFieldTags($individual),
 				'references' => 'taxonomy_term'
-			] 
-		];
+			]);
 			
 		foreach ($this->getAnnotationProperties() as $property) {
 			if (!$individual->hasProperty($property))
@@ -172,6 +174,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
+		$field = null;
+		
 		if ($literals = $individual->allLiterals($property)) {
 			$field = [
 				'value' => array_map(
@@ -182,8 +186,6 @@ class OWLFileHandler extends AbstractFileHandler {
 			];
 		} elseif ($individual->allResources($property)) { 
 			$field = $this->getResourceValuesForNodeField($individual, $property);
-		} else {
-			return null;
 		}
 		
 		return $field;
@@ -202,6 +204,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			'value' => [],
 			'field_name' => $property->localName()
 		];
+		
 		foreach ($axioms as $axiom) {
 			$target = $axiom->getResource('owl:annotatedTarget');
 			$axiomProperties  = $this->getPropertiesAsArray($axiom);
@@ -385,12 +388,12 @@ class OWLFileHandler extends AbstractFileHandler {
 		return array_unique($result);
 	}
 	
-	private function isATransitive($class, $superClass) {
-		if (!$class) throw new Exception('Error: parameter $class missing');
+	private function isATransitive($individual, $superClass) {
+		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$superClass) throw new Exception('Error: parameter $superClass missing');
 		
 		foreach ($this->findAllSubClassesOf($superClass) as $curSubClass) {
-			if ($class->isA($curSubClass->getUri()))
+			if ($individual->isA($curSubClass->getUri()))
 				return true;
 		}
 		

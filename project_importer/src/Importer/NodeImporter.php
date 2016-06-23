@@ -41,6 +41,7 @@ class NodeImporter extends AbstractImporter {
     
     private function createNode($params) {
 		if (!$params['title']) throw new Exception('Error: named parameter "title" missing');
+		if (!$params['type']) throw new Exception('Error: named parameter "type" missing');
 
 		$this->deleteNodeIfExists($params['title']);
 

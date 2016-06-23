@@ -25,58 +25,129 @@
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_author -->
+    <!-- http://www.lha.org/project_ontology#field_ansprechpartner -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_author">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_ansprechpartner">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_custom1 -->
+    <!-- http://www.lha.org/project_ontology#field_autoren -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_custom1">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_autoren">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_document_ref -->
+    <!-- http://www.lha.org/project_ontology#field_benutzerhandbuch -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_document_ref">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_benutzerhandbuch">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_image -->
+    <!-- http://www.lha.org/project_ontology#field_entwicklungsumgebung -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_image">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_entwicklungsumgebung">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_project_ref -->
+    <!-- http://www.lha.org/project_ontology#field_foerderer -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_project_ref">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_foerderer">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_publication -->
+    <!-- http://www.lha.org/project_ontology#field_gruendungsjahr -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_publication">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_gruendungsjahr">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
-        <rdfs:range rdf:resource="http://www.lha.org/project_ontology#Publication"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.lha.org/project_ontology#field_test -->
+    <!-- http://www.lha.org/project_ontology#field_id -->
 
-    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_test">
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_id">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_identifier_typ -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_identifier_typ">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_institutionen -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_institutionen">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_krankheit -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_krankheit">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_kurztitel -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_kurztitel">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_motivation -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_motivation">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_programmiersprache -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_programmiersprache">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_publikationen -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_publikationen">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_publikationsdatum -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_publikationsdatum">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#field_publisher -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/project_ontology#field_publisher">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
@@ -101,10 +172,50 @@
     
 
 
-    <!-- http://www.lha.org/project_ontology#Data_set -->
+    <!-- http://www.lha.org/project_ontology#Contact -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Contact">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Dataset -->
 
     <owl:Class rdf:about="http://www.lha.org/project_ontology#Dataset">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#E00-E07_-_Krankheiten_der_Schilddrüse -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#E00-E07_-_Krankheiten_der_Schilddrüse">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#E00-E90_-_Endokrine,_Ernährungs-_und_Stoffwechselkrankheiten"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#E10-E14_-_Diabetes_mellitus -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#E10-E14_-_Diabetes_mellitus">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#E00-E90_-_Endokrine,_Ernährungs-_und_Stoffwechselkrankheiten"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#F00-F99_-_Psychische_und_Verhaltensstörungen -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#F00-F99_-_Psychische_und_Verhaltensstörungen">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Krankheiten"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#IDE -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#IDE">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
     </owl:Class>
     
 
@@ -117,10 +228,26 @@
     
 
 
+    <!-- http://www.lha.org/project_ontology#Krankheiten -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Krankheiten">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.lha.org/project_ontology#Method -->
 
     <owl:Class rdf:about="http://www.lha.org/project_ontology#Method">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#ProgrammingLanguage -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#ProgrammingLanguage">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
     </owl:Class>
     
 
@@ -141,59 +268,10 @@
     
 
 
-    <!-- http://www.lha.org/project_ontology#Tag11 -->
+    <!-- http://www.lha.org/project_ontology#Publisher -->
 
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag11">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary1"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.lha.org/project_ontology#Tag111 -->
-
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag111">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag11"/>
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag12"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.lha.org/project_ontology#Tag1111 -->
-
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag1111">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.lha.org/project_ontology#Tag11111 -->
-
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag11111">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag1111"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.lha.org/project_ontology#Tag112 -->
-
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag112">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag11"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.lha.org/project_ontology#Tag12 -->
-
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag12">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Vocabulary1"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.lha.org/project_ontology#Tag121 -->
-
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Tag121">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Tag12"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Publisher">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
     </owl:Class>
     
 
@@ -222,18 +300,42 @@
     
 
 
-    <!-- http://www.lha.org/project_ontology#Vocabulary1 -->
+    <!-- http://www.lha.org/project_ontology#Vocabulary2 -->
 
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary1">
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary2">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
     </owl:Class>
     
 
 
-    <!-- http://www.lha.org/project_ontology#Vocabulary2 -->
+    <!-- http://www.lha.org/project_ontology#E00-E90_-_Endokrine,_Ernährungs-_und_Stoffwechselkrankheiten -->
 
-    <owl:Class rdf:about="http://www.lha.org/project_ontology#Vocabulary2">
-        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#E00-E90_-_Endokrine,_Ernährungs-_und_Stoffwechselkrankheiten">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#Krankheiten"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#E10-E14_-_Diabetes_mellitus"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#E11_-_Diabetes_mellitus,_Typ_2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#E11_-_Diabetes_mellitus,_Typ_2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#E10-E14_-_Diabetes_mellitus"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#F00-F09_-_Organische,_einschließlich_symptomatischer_psychischer_Störungen -->
+
+    <owl:Class rdf:about="http://www.lha.org/project_ontology#F00-F09_-_Organische,_einschließlich_symptomatischer_psychischer_Störungen">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/project_ontology#F00-F99_-_Psychische_und_Verhaltensstörungen"/>
     </owl:Class>
     
 
@@ -246,6 +348,172 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Cornelsen -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#Cornelsen">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Publisher"/>
+        <drupal_ontology:address>Mecklenburgische Straße 53, 14197 Berlin</drupal_ontology:address>
+        <drupal_ontology:name>Cornelsen</drupal_ontology:name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Förderer -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#Förderer">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Institution"/>
+        <drupal_ontology:name>Förderer</drupal_ontology:name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#IMISE -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#IMISE">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Contact"/>
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Institution"/>
+        <drupal_ontology:address>Härtelstraße 16-18, 04107 Leipzig</drupal_ontology:address>
+        <drupal_ontology:name>Institut für Medizinische Informatik, Statistik und Epidemiologie</drupal_ontology:name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Java -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#Java">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#ProgrammingLanguage"/>
+        <drupal_ontology:name>Java</drupal_ontology:name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Methode1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#Methode1">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Method"/>
+        <drupal_ontology:content>Beschreibung...</drupal_ontology:content>
+        <drupal_ontology:summary>Zusammenfassung...</drupal_ontology:summary>
+        <drupal_ontology:title>Methode1</drupal_ontology:title>
+        <field_ansprechpartner rdf:resource="http://www.lha.org/project_ontology#IMISE"/>
+        <field_autoren rdf:resource="http://www.lha.org/project_ontology#author1"/>
+        <field_autoren rdf:resource="http://www.lha.org/project_ontology#author2"/>
+        <field_benutzerhandbuch rdf:resource="http://www.lha.org/project_ontology#doc1"/>
+        <field_entwicklungsumgebung rdf:resource="http://www.lha.org/project_ontology#VSCode"/>
+        <field_foerderer rdf:resource="http://www.lha.org/project_ontology#SAB"/>
+        <field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0815</field_id>
+        <field_institutionen rdf:resource="http://www.lha.org/project_ontology#IMISE"/>
+        <field_krankheit rdf:resource="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1"/>
+        <field_programmiersprache rdf:resource="http://www.lha.org/project_ontology#Java"/>
+        <field_programmiersprache rdf:resource="http://www.lha.org/project_ontology#Perl"/>
+        <field_publikationen rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
+        <field_publikationsdatum>2000-01-01</field_publikationsdatum>
+        <field_publisher rdf:resource="http://www.lha.org/project_ontology#Cornelsen"/>
+    </owl:NamedIndividual>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_ansprechpartner"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#IMISE"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_programmiersprache"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Perl"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_publikationen"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#node_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_publisher"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Cornelsen"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_autoren"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#author1"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_autoren"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#author2"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_benutzerhandbuch"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#doc1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">20</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#file_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_entwicklungsumgebung"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#VSCode"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_foerderer"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#SAB"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_institutionen"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#IMISE"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_krankheit"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#taxonomy_term_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Methode1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_programmiersprache"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Java"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#Perl -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#Perl">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#ProgrammingLanguage"/>
+        <drupal_ontology:name>Perl</drupal_ontology:name>
+    </owl:NamedIndividual>
     
 
 
@@ -277,6 +545,33 @@ Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lo
 Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo</drupal_ontology:content>
         <drupal_ontology:summary>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</drupal_ontology:summary>
         <drupal_ontology:title>Publication1</drupal_ontology:title>
+        <field_krankheit rdf:resource="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1"/>
+    </owl:NamedIndividual>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_krankheit"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#taxonomy_term_ref"/>
+    </owl:Axiom>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#SAB -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#SAB">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Institution"/>
+        <drupal_ontology:name>Sächsische Aufbaubank - Förderbank</drupal_ontology:name>
+        <field_gruendungsjahr rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1991</field_gruendungsjahr>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/project_ontology#VSCode -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#VSCode">
+        <rdf:type rdf:resource="http://www.lha.org/project_ontology#IDE"/>
+        <drupal_ontology:name>Visual Studio Code</drupal_ontology:name>
     </owl:NamedIndividual>
     
 
@@ -347,73 +642,48 @@ Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming 
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project1">
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag11111"/>
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag121"/>
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag221"/>
-        <drupal_ontology:alias>Alias1</drupal_ontology:alias>
-        <drupal_ontology:content>Projektbeschreibung1 &lt;&lt;7&gt;&gt;  bla bla.</drupal_ontology:content>
-        <drupal_ontology:summary>Zusammenfassung1</drupal_ontology:summary>
-        <drupal_ontology:title>Projekttitel1</drupal_ontology:title>
-        <field_author rdf:resource="http://www.lha.org/project_ontology#author1"/>
-        <field_author rdf:resource="http://www.lha.org/project_ontology#author2"/>
-        <field_custom1>10301.42</field_custom1>
-        <field_document_ref rdf:resource="http://www.lha.org/project_ontology#doc1"/>
-        <field_document_ref rdf:resource="http://www.lha.org/project_ontology#doc2"/>
-        <field_image rdf:resource="http://www.lha.org/project_ontology#img1"/>
-        <field_image rdf:resource="http://www.lha.org/project_ontology#img2"/>
-        <field_project_ref rdf:resource="http://www.lha.org/project_ontology#project2"/>
-        <field_test>test</field_test>
+        <drupal_ontology:alias>Alias</drupal_ontology:alias>
+        <drupal_ontology:content>s. Homepage Projekt</drupal_ontology:content>
+        <drupal_ontology:summary>Zusammenfassung</drupal_ontology:summary>
+        <drupal_ontology:title>Projekttitel</drupal_ontology:title>
+        <field_ansprechpartner>IMISE</field_ansprechpartner>
+        <field_ansprechpartner>Test</field_ansprechpartner>
+        <field_foerderer rdf:resource="http://www.lha.org/project_ontology#Förderer"/>
+        <field_foerderer rdf:resource="http://www.lha.org/project_ontology#SAB"/>
+        <field_gruendungsjahr rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2000</field_gruendungsjahr>
+        <field_krankheit rdf:resource="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1"/>
+        <field_kurztitel>Kurztitel</field_kurztitel>
+        <field_motivation>s. Projektwebseite</field_motivation>
+        <field_publikationen rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
     </owl:NamedIndividual>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_author"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#author1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_foerderer"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Förderer"/>
         <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_author"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#author2"/>
-        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_document_ref"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#doc1"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#file_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_document_ref"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#doc2"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#file_ref"/>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_image"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#img1"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#image_ref"/>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
     </owl:Axiom>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_image"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#img2"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_foerderer"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#SAB"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/drupal_ontology#name"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#entity_ref"/>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_krankheit"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#E10_-_Diabetes_mellitus,_Typ_1"/>
         <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#image_ref"/>
+        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#taxonomy_term_ref"/>
     </owl:Axiom>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project1"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_project_ref"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#project2"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</drupal_ontology:ref_num>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_publikationen"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
         <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#node_ref"/>
     </owl:Axiom>
     
@@ -423,21 +693,11 @@ Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming 
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/project_ontology#project2">
         <rdf:type rdf:resource="http://www.lha.org/project_ontology#Project"/>
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag111"/>
-        <rdf:type rdf:resource="http://www.lha.org/project_ontology#Tag21"/>
         <drupal_ontology:alias>Alias2</drupal_ontology:alias>
         <drupal_ontology:content>Projektbeschreibung2</drupal_ontology:content>
         <drupal_ontology:summary>Zusammenfassung2</drupal_ontology:summary>
         <drupal_ontology:title>Projekttitel2</drupal_ontology:title>
-        <field_publication rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
     </owl:NamedIndividual>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://www.lha.org/project_ontology#project2"/>
-        <owl:annotatedProperty rdf:resource="http://www.lha.org/project_ontology#field_publication"/>
-        <owl:annotatedTarget rdf:resource="http://www.lha.org/project_ontology#Publication1"/>
-        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8</drupal_ontology:ref_num>
-        <drupal_ontology:ref_type rdf:resource="http://www.lha.org/drupal_ontology#node_ref"/>
-    </owl:Axiom>
 </rdf:RDF>
 
 
