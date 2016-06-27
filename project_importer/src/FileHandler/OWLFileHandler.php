@@ -179,7 +179,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if ($literals = $individual->allLiterals($property)) {
 			$field = [
 				'value' => array_map(
-					function ($x) { return $x->getValue(); }, 
+					function ($x) { return $this->parseNodeContent($x->getValue()); }, 
 					$literals
 				),
 				'field_name' => $property->localName()
@@ -215,7 +215,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
 				array_push(
 					$field['value'], 
-					$targetProperties[$targetField]
+					$this->parseNodeContent($targetProperties[$targetField])
 				);
 			} else {
 				$value;
@@ -277,18 +277,10 @@ class OWLFileHandler extends AbstractFileHandler {
 		return $properties[$uri];
 	}
 	
-	private function parseNodeContent($node, $content) {
+	private function parseNodeContent($content) {
 		if (!$content) return null;
 		
-		if (preg_match('/<<.*>>/', $content, $matches)) {
-			foreach ($matches as $match) {
-				$num = preg_replace('/<|>/', '', $match);
-				$url = $this->createUrlForAxiom($node, $num);
-				$content = preg_replace("/<<$num>>/", $url, $content);
-			}
-		}
-			
-		return $content;
+		return preg_replace('/"?^^.*$/', '', $content);
 	}
 	
 	private function createUrlForAxiom($individual, $num) {
@@ -377,8 +369,8 @@ class OWLFileHandler extends AbstractFileHandler {
 	
 	private function findAllSubClassesOf($class) { // recursive
 		$result = [];
-	
-		foreach ($this->getClasses() as $subClass) {
+		
+		foreach ($this->graph->resourcesMatching('rdfs:subClassOf', $this->graph->resource($class)) as $subClass) { // $this->getClasses() as $subClass) { // @todo: bad performance
 			if (!$this->hasDirectSuperClass($subClass, $class))
 				continue;
 			array_push($result, $subClass);

@@ -34,9 +34,19 @@ class JSONForm extends FormBase {
             '#required' => true,
         ];
         
+        $form['import_vocabularies'] = [
+            '#type'  => 'checkbox',
+            '#title' => t('Import Vocabularies'),
+        ];
+        
+        $form['import_nodes'] = [
+            '#type'  => 'checkbox',
+            '#title' => t('Import Nodes'),
+        ];
+        
         $form['overwrite'] = [
-            '#type' => 'checkbox',
-            '#title' => t('overwrite'),
+            '#type'  => 'checkbox',
+            '#title' => t('Overwrite'),
         ];
 
         $form['submit'] = array(
@@ -59,8 +69,10 @@ class JSONForm extends FormBase {
             $fileHandler = FileHandlerFactory::createFileHandler($form_state->getValue('json_file')[0]);
             $overwrite = $form_state->getValue('overwrite');
             
-            $vocabularyImporter->import($fileHandler->getVocabularies(), $overwrite);
-            $nodeImporter->import($fileHandler->getNodes(), $overwrite);
+            if ($form_state->getValue('import_vocabularies'))
+                $vocabularyImporter->import($fileHandler->getVocabularies(), $overwrite);
+            if ($form_state->getValue('import_nodes'))
+                $nodeImporter->import($fileHandler->getNodes(), $overwrite);
             
             drupal_set_message(
 				sprintf(
