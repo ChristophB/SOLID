@@ -99,6 +99,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			];
 			array_push($this->data['nodes'], $node);
 		}
+		die(var_dump($this->data['nodes']));
 	}
 	
 	private function getBundle($node) {
@@ -199,17 +200,17 @@ class OWLFileHandler extends AbstractFileHandler {
 		$resources = $individual->allResources($property);
 		if (!$resources || empty($resources)) return null;
 		
-		$axioms = $this->getAxiomsForIndividual($individual, $property);
-		
 		$field = [
 			'value' => [],
 			'field_name' => $property->localName()
 		];
 		
-		foreach ($axioms as $axiom) {
+		foreach ($this->getAxiomsForIndividual($individual, $property) as $axiom) {
 			$target = $axiom->getResource('owl:annotatedTarget');
 			$axiomProperties  = $this->getPropertiesAsArray($axiom);
 			$targetProperties = $this->getPropertiesAsArray($target);
+			
+			// @TODO: get ref_type from superclass of target
 			$refType = array_key_exists(self::REF_TYPE, $axiomProperties) ?
 				$axiomProperties[self::REF_TYPE] : null;
 				
@@ -315,12 +316,17 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
 		$result = [];
+		$prevIndex = 0;
 		
 		foreach ($this->getAxioms() as $axiom) {
 			if ($axiom->hasProperty('owl:annotatedSource', $individual)
 				&& $axiom->hasProperty('owl:annotatedProperty', $property)
-			)
-				$result[preg_replace('/"\^\^xsd:integer/', '', $this->getProperty($axiom, self::REF_NUM))] = $axiom;
+			) {
+				$curIndex = preg_replace('/"\^\^xsd:integer/', '', $this->getProperty($axiom, self::REF_NUM));
+				if (!$curIndex) $curIndex = $prevIndex + 1;
+				$result[$curIndex] = $axiom;
+				$prevIndex = $curIndex;	
+			}	
 		}
 		ksort($result);
 		return $result;
