@@ -15,6 +15,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	const IMG              = 'http://www.lha.org/drupal_ontology#Img';
 	const ENTITY           = 'http://www.lha.org/drupal_ontology#Entity';
 	const DOC              = 'http://www.lha.org/drupal_ontology#Doc';
+	const FILE             = 'http://www.lha.org/drupal_ontology#File';
 	const TITLE            = 'http://www.lha.org/drupal_ontology#title';
 	const ALIAS            = 'http://www.lha.org/drupal_ontology#alias';
 	const CONTENT          = 'http://www.lha.org/drupal_ontology#content';
@@ -25,6 +26,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	const FILE_REF         = 'http://www.lha.org/drupal_ontology#file_ref';
 	const IMAGE_REF        = 'http://www.lha.org/drupal_ontology#image_ref';
 	const TERM_REF         = 'http://www.lha.org/drupal_ontology#taxonomy_term_ref';
+	const DOC_REF          = 'http://www.lha.org/drupal_ontology#doc_ref';
 	const FIELD            = 'http://www.lha.org/drupal_ontology#field';
 	const URI              = 'http://www.lha.org/drupal_ontology#uri';
 	const ALT              = 'http://www.lha.org/drupal_ontology#alt';
@@ -99,7 +101,6 @@ class OWLFileHandler extends AbstractFileHandler {
 			];
 			array_push($this->data['nodes'], $node);
 		}
-		die(var_dump($this->data['nodes']));
 	}
 	
 	private function getBundle($node) {
@@ -210,59 +211,42 @@ class OWLFileHandler extends AbstractFileHandler {
 			$axiomProperties  = $this->getPropertiesAsArray($axiom);
 			$targetProperties = $this->getPropertiesAsArray($target);
 			
-			// @TODO: get ref_type from superclass of target
-			$refType = array_key_exists(self::REF_TYPE, $axiomProperties) ?
-				$axiomProperties[self::REF_TYPE] : null;
-				
-			if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
-				array_push(
-					$field['value'], 
-					$this->parseNodeContent($targetProperties[$targetField])
-				);
-			} else {
-				$value;
-			
-				switch($refType) {
-					case self::FILE_REF:
-						$value = [
-							'uri'   => $targetProperties[self::URI],
-							'title' => $targetProperties[self::TITLE]
-						];
-						$field['entity'] = 'file';
-						break;
-					case self::IMAGE_REF:
-						$value = [
-							'alt'   => $targetProperties[self::ALT],
-							'title' => $targetProperties[self::TITLE],
-							'uri'   => $targetProperties[self::URI]
-						];
-						$field['entity'] = 'file';
-						break;
-					case self::NODE_REF: 
-						$value = $targetProperties[self::TITLE];
-						$field['references'] = preg_replace(
-							'/_ref/', '',
-							$this->graph->resource($refType)->localName()
-						);
-						break;
-					case self::TERM_REF:
-						$value = [
-							'vid'  => $this->getVocabularyForTag($target)->localName(),
-							'name' => $target->localName()
-						];
-						$field['references'] = preg_replace(
-							'/_ref/', '',
-							$this->graph->resource($refType)->localName()
-						);
-						break;
-					default:
-						throw new Exception(
-							'Could not determine target fields, because no '
-							. 'ref_type was given or ref_type is not supported.'
-						);
+			$value;
+			if ($this->isATransitive($target, self::NODE)) {
+				$value = $targetProperties[self::TITLE];
+				$field['references'] = 'node';
+			} elseif ($this->isATransitive($target, self::ENTITY)) {
+				if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
+					$value = $this->parseNodeContent($targetProperties[$targetField]);
+				} else {
+					throw new Exception('Error: Entity references but no field given');
 				}
-				array_push($field['value'], $value);
+			} elseif ($this->isATransitive($target, self::IMG)) {
+				$value = [
+					'alt'   => $targetProperties[self::ALT],
+					'title' => $targetProperties[self::TITLE],
+					'uri'   => $targetProperties[self::URI]
+				];
+				$field['entity'] = 'file';
+			} elseif ($this->isATransitive($target, self::FILE)) {
+				$value = [
+					'uri'   => $targetProperties[self::URI],
+					'title' => $targetProperties[self::TITLE]
+				];
+				$field['entity'] = 'file';
+			} elseif ($this->isATransitive($target, self::DOC)) {
+				$refType = self::DOC_REF;
+			} elseif ($this->getVocabularyForTag($target) != null) {
+				$value = [
+					'vid'  => $this->getVocabularyForTag($target)->localName(),
+					'name' => $target->localName()
+				];
+				$field['references'] = 'taxonomy_term';
+			} else {
+				throw new Exception('Could not determine target fields.');
 			}
+			
+			array_push($field['value'], $value);
 		}
 		
 		return $field;
@@ -345,7 +329,9 @@ class OWLFileHandler extends AbstractFileHandler {
 					return $vocabulary;
 			}
 		}
-		throw new Exception("Error: tag: '$tag->localName()' could not be found.");
+		
+		return null;
+		// throw new Exception("Error: tag: '$tag->localName()' could not be found.");
 	}
 	
 	private function getPropertiesAsArray($individual) {
