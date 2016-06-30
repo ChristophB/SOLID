@@ -281,7 +281,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function parseNodeContent($content) {
 		if (!$content) return null;
 		
-		return preg_replace('/"?^^.*$/', '', $content);
+		return preg_replace('/"?\^\^.*$/', '', $content);
 	}
 	
 	private function createUrlForAxiom($individual, $num) {
