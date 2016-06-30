@@ -64,7 +64,7 @@ class JSONForm extends FormBase {
     public function submitForm(array &$form, FormStateInterface $form_state) {
         $vocabularyImporter = new VocabularyImporter();
         $nodeImporter = new NodeImporter();
-            
+          
         try {
             $fileHandler = FileHandlerFactory::createFileHandler($form_state->getValue('json_file')[0]);
             $overwrite = $form_state->getValue('overwrite');
@@ -73,7 +73,7 @@ class JSONForm extends FormBase {
                 $vocabularyImporter->import($fileHandler->getVocabularies(), $overwrite);
             if ($form_state->getValue('import_nodes'))
                 $nodeImporter->import($fileHandler->getNodes(), $overwrite);
-            
+        
             drupal_set_message(
 				sprintf(
 					t('Success! %d vocabularies with %d terms and %d nodes imported.'),
