@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\project_importer\Form\JOSNForm.
+ * Contains \Drupal\project_importer\Form\Form.
  */
 
 namespace Drupal\project_importer\Form;
@@ -17,7 +17,7 @@ use Drupal\project_importer\Importer\VocabularyImporter;
 use Drupal\project_importer\Importer\NodeImporter;
 use Drupal\project_importer\FileHandler\FileHandlerFactory;
 
-class JSONForm extends FormBase {
+class Form extends FormBase {
     
     public function getFormId() {
         return 'project_importer_json_form';
@@ -25,7 +25,7 @@ class JSONForm extends FormBase {
   
     public function buildForm(array $form, FormStateInterface $form_state) {
 
-        $form['json_file'] = [
+        $form['file'] = [
             '#type'   => 'managed_file',
             '#title'  => t('File:'),
             '#upload_validators' => [
@@ -66,7 +66,7 @@ class JSONForm extends FormBase {
         $nodeImporter = new NodeImporter();
           
         try {
-            $fileHandler = FileHandlerFactory::createFileHandler($form_state->getValue('json_file')[0]);
+            $fileHandler = FileHandlerFactory::createFileHandler($form_state->getValue('file')[0]);
             $overwrite = $form_state->getValue('overwrite');
             
             if ($form_state->getValue('import_vocabularies'))

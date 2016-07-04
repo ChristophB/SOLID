@@ -1,6 +1,6 @@
 name: Project Importer
 type: module
-description: Imports Projects from a JSON file.
+description: Imports Projects from JSON and OWL file.
 version: 0.92.1
 package: Custom
 core: 8.x
