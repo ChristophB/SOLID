@@ -85,7 +85,7 @@ class JSONForm extends FormBase {
         } catch (Exception $e) {
             $nodeImporter->rollback();
             $vocabularyImporter->rollback();
-			drupal_set_message(t($e->getMessage())/* . $e->getTraceAsString() */. ' '. t('Rolling back...'), 'error');
+			drupal_set_message(t($e->getMessage())/* . $e->getTraceAsString() . */' '. t('Rolling back...'), 'error');
         }
     }
 	

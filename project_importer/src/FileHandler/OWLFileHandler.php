@@ -206,24 +206,16 @@ class OWLFileHandler extends AbstractFileHandler {
 			'field_name' => $property->localName()
 		];
 		
-		foreach ($this->getAxiomsForIndividual($individual, $property) as $axiom) {
-			$target = $axiom->getResource('owl:annotatedTarget');
-			$axiomProperties  = $this->getPropertiesAsArray($axiom);
+		$axioms = $this->getAxiomsForIndividual($individual, $property);
+		$resources = $this->sortByAxioms($resources, $axioms);
+		
+		foreach ($resources as $target) {
 			$targetProperties = $this->getPropertiesAsArray($target);
-			
 			$value;
+			
 			if ($this->isATransitive($target, self::NODE)) {
 				$value = $targetProperties[self::TITLE];
 				$field['references'] = 'node';
-			} elseif ($this->isATransitive($target, self::ENTITY)) {
-				if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
-					$value = $this->parseNodeContent($targetProperties[$targetField]);
-				} else {
-					throw new Exception(
-						'Error: Entity '. $target->localName(). ' referenced but no field given. '
-						. '('. $property->localName(). ')'
-					);
-				}
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [
 					'alt'   => $targetProperties[self::ALT],
@@ -245,6 +237,18 @@ class OWLFileHandler extends AbstractFileHandler {
 					'name' => $target->localName()
 				];
 				$field['references'] = 'taxonomy_term';
+			} elseif ($this->isATransitive($target, self::ENTITY)) {
+				$axiom = $this->getAxiomWithTargetFromAxioms($target, $axioms);
+				$axiomProperties = $this->getPropertiesAsArray($axiom);
+				
+				if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
+					$value = $this->parseNodeContent($targetProperties[$targetField]);
+				} else {
+					throw new Exception(
+						'Error: Entity '. $target->localName(). ' referenced but no field given. '
+						. '('. $property->localName(). ')'
+					);
+				}
 			} else {
 				throw new Exception('Could not determine target fields.');
 			}
@@ -253,6 +257,31 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $field;
+	}
+	
+	private function sortByAxioms($resources, $axioms) {
+		$result = [];
+		
+		foreach ($axioms as $axiom) {
+			array_push($result, $axiom->get('owl:annotatedTarget'));
+		}
+		
+		foreach ($resources as $resource) {
+			if (!in_array($resource, $result))
+				array_push($result, $resource);
+		}
+		
+		return $result;
+	}
+	
+	private function getAxiomWithTargetFromAxioms($target, $axioms) {
+		if (!$target) throw new Exception('Error: parameter $target missing');
+		if (!$axioms) throw new Exception('Error: parameter $axioms missing');
+		
+		foreach($axioms as $axiom) {
+			if ($axiom->get('owl:annotatedTarget')->getUri() == $target->getUri())
+				return $axiom;
+		}
 	}
 	
 	private function getProperty($entity, $uri) {
