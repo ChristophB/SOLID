@@ -219,7 +219,10 @@ class OWLFileHandler extends AbstractFileHandler {
 				if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
 					$value = $this->parseNodeContent($targetProperties[$targetField]);
 				} else {
-					throw new Exception('Error: Entity references but no field given');
+					throw new Exception(
+						'Error: Entity '. $target->localName(). ' referenced but no field given. '
+						. '('. $property->localName(). ')'
+					);
 				}
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [
