@@ -46,14 +46,18 @@ class VocabularyImporter extends AbstractImporter {
 		if (!$vid) throw new Exception('Error: parameter $vid missing');
 		if (!$name) throw new Exception('Error: parameter $name missing');
 		
-		$this->deleteVocabularyIfExists($vid);
 		
-		$vocabulary = Vocabulary::create([
-			'name'   => $name,
-			'weight' => 0,
-			'vid'    => $vid
-		]);
-		$vocabulary->save();
+		$exists = $this->clearVocabularyIfExists($vid);
+    	
+    	if (!$exists) {
+			$vocabulary = Vocabulary::create([
+				'name'   => $name,
+				'weight' => 0,
+				'vid'    => $vid
+			]);
+			$vocabulary->save();
+		}
+		
 		array_push($this->entities['vocabulary'], $vocabulary);
 	}
 	
@@ -72,17 +76,25 @@ class VocabularyImporter extends AbstractImporter {
 		}
 	}
 	
-	private function deleteVocabularyIfExists($vid) {
+	private function clearVocabularyIfExists($vid) {
 		if ($id = $this->searchVocabularyByVid($vid)) {
 			if ($this->overwrite) {
-				Vocabulary::load($id)->delete();
+				$tids = $this->searchEntityIds([
+	        		'entity_type' => 'taxonomy_term',
+	        		'vid'         => $vid
+	    		]);
+				foreach ($tids as $tid) {
+					Term::load($tid)->delete();
+				}
 			} else {
 				throw new Exception(
 					"Error: vocabulary with vid '$vid' already exists. "
 					. 'Tick "overwrite" if you want to replace it and try again.'
 				);
 	    	}
+	    	return true;
 	    }
+	    return false;
 	}
 	
 	private function searchVocabularyByVid($vid) {
