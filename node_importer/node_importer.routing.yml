@@ -1,0 +1,7 @@
+node_importer_form:
+    path: 'node_importer'
+    defaults:
+        _title: 'NodeImporter'
+        _form: '\Drupal\node_importer\Form\Form'
+    requirements:
+        _role: 'administrator'

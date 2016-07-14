@@ -2,24 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\project_importer\FileHandler\JSONFileHandler.
+ * Contains \Drupal\node_importer\FileHandler\JSONFileHandler.
  */
 
-namespace Drupal\project_importer\FileHandler;
+namespace Drupal\node_importer\FileHandler;
 
+/**
+ * FileHandler which parses JSON files.
+ * 
+ * @author Christoph Beger
+ */
 class JSONFileHandler extends AbstractFileHandler {
-	
-	public function getData() {
-		return $this->data;
-	}
-	
-	public function getVocabularies() {
-	    return $this->data['vocabularies'];
-	}
-	
-	public function getNodes() {
-	    return $this->data['nodes'];
-	}
 	
 	protected function setData() {
 		$this->data = json_decode($this->fileContent, TRUE);

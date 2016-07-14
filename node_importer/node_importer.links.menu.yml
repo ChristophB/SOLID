@@ -1,5 +1,5 @@
-project_importer.form:
-  title: Project Importer
+node_importer.form:
+  title: Node Importer
   description: Import JSON/OWL files to automatically create nodes and vocabularies.
-  route_name: project_importer_form
+  route_name: node_importer_form
   parent: system.admin_config_content

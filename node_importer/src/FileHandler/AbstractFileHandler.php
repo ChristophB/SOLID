@@ -2,20 +2,31 @@
 
 /**
  * @file
- * Contains \Drupal\project_importer\FileHandler\AbstractFileHandler.
+ * Contains \Drupal\node_importer\FileHandler\AbstractFileHandler.
  */
 
-namespace Drupal\project_importer\FileHandler;
+namespace Drupal\node_importer\FileHandler;
 
 use Drupal\file\Entity\File;
 
+/**
+ * Abstract class which describes FileHandlers. All FileHandlers extend this class.
+ * A FileHandler parses a given file and translates the content to a php object.
+ * 
+ * @author Christoph Beger
+ */
 abstract class AbstractFileHandler {
 	protected $filePath;
 	protected $fileContent;
 	protected $data;
 	
 	public function __construct($fid) {
-		$this->data = [ 'vocabularies' => [], 'nodes' => [] ];
+		if (!$fid) throw new Exception('Error: parameter $fid missing.');
+		
+		$this->data = [
+			'vocabularies' => [],
+			'nodes'        => [], 
+		];
 		
 	    $file = File::load($fid);
 	    
@@ -24,11 +35,17 @@ abstract class AbstractFileHandler {
 	    $this->setData();
 	}
 	
-	abstract public function getData();
+	public function getData() {
+		return $this->data;
+	}
 	
-	abstract public function getVocabularies();
+	public function getVocabularies() {
+	    return $this->data['vocabularies'];
+	}
 	
-	abstract public function getNodes();
+	public function getNodes() {
+	    return $this->data['nodes'];
+	}
 	
 	abstract protected function setData();
 }

@@ -1,7 +1,0 @@
-project_importer_form:
-    path: 'project_importer'
-    defaults:
-        _title: 'ProjectImporter'
-        _form: '\Drupal\project_importer\Form\Form'
-    requirements:
-        _role: 'administrator'
