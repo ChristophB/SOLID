@@ -1,72 +1,89 @@
 {
 	"vocabularies": [
+		{ 
+			"vid": "Vocabulary1",
+			"name": "Vocabulary1",
+			"tags": []
+		},
 		{
-			"vid": "[machine-readable name]",
-			"name": "[display name of the taxonomy]",
+			"vid": "Vocabulary2",
+			"name": "Vocabulary2",
 			"tags": [
-				{ 
-					"name": "[display name of the tag]",
-					"parents": [ 
-						"[display name of a parental tag]"
-					] 
-				},
-				{
-					"name": "[display name of a parental tag]"
-				}
+				{ "name": "Term1", "parents": [] },
+				{ "name": "Term2", "parents": [] }
 			]
 		}
 	],
 	"nodes": [
 		{
-			"title": "[article title]",
-			"type": "project",
-			"alias": "[alias]",
+			"title": "Node1",
+			"type": "nodetype1",
+			"alias": null,
 			"fields": [
-				{
+				{ 
 					"field_name": "body",
-					"value": {
-						"value": "[some text which describes this article]",
-						"summary": "[abstract]"
+					"value": { 
+						"value": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+						"summary": null,
+						"format": "full_html"
 					}
 				},
 				{
-					"field_name": "field_image",
-					"value": {
-						"alt": "[alternative text if the image could not be loaded]",
-						"title": "[title]",
-						"uri": "[filename].jpg" 
-					},
-					"entity": "file"
+					"value": [ "Pers1", "Pers2" ],
+					"field_name": "field_authors"
 				},
 				{
-					"field_name": "field_document_ref",
 					"value": [
-						{ "title": "[title]", "uri": "[filename].jpg" },
-						{ "title": "[title]", "uri": "[filename].jpg" }
+						{
+							"vid": "Vocabulary2",
+							"name": "Term1"
+						}
 					],
-					"entity": "file"
-				},
-				{ 
-					"field_name": "field_tags",
-					"value": [
-						{ "vid": "[machine-readable name]", "name": "[display name of the tag]" } 
-					],
+					"field_name": "field_disease",
 					"references": "taxonomy_term"
 				},
-				{
-					"field_name": "field_custom1",
-					"value": 10167.87
+				{ 
+					"value": "1",
+				 	"field_name": "field_id"
 				},
 				{
-					"field_name": "field_publication",
-					"value": [ "Publication1" ],
-					"references": "node"
+					"value": "Example Address",
+					"field_name": "field_publisher"
 				}
 			]
 		},
 		{
-			"title": "Publication1",
-			"type": "publication"
+			"title": "Node2",
+			"type": "nodetype2",
+			"alias": "Node2",
+			"fields": [
+				{
+					"field_name": "body",
+					"value": {
+						"value": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+						"summary": null,
+						"format": "full_html"
+					}
+				},
+				{
+					"value": "Person #2",
+					"field_name": "field_authors"
+				},
+				{
+					"value": [
+						{ 
+							 "vid": "Vocabulary2",
+							 "name": "Term2"
+						}
+					],
+					"field_name": "field_disease",
+					"references": "taxonomy_term"
+				},
+				{
+					"value": "7",
+					"field_name": "field_id"
+				}
+			]
 		}
 	]
 }
