@@ -1,0 +1,287 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.lha.org/project_ontology#"
+     xml:base="http://www.lha.org/project_ontology"
+     xmlns:project_ontology="http://www.lha.org/project_ontology#"
+     xmlns:template_ontology="http://www.lha.org/template_ontology#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:drupal_ontology="http://www.lha.org/drupal_ontology#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.lha.org/template_ontology">
+        <owl:imports rdf:resource="http://www.lha.org/drupal_ontology"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_address -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_address">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_appreviation -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_appreviation">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_authors -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_authors">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_disease -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_disease">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_email -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_email">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_id -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_id">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_name -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_name">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_publisher -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_publisher">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
+    </owl:AnnotationProperty>
+    
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Nodetype1 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Nodetype1">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Nodetype2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Nodetype2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Node"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Object -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Object">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Organisation -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Organisation">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Person -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Person">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Term1 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Term1">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#Vocabulary2"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Term2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Term2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#Vocabulary2"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Vocabulary1 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Vocabulary1">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Vocabulary2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Vocabulary2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/drupal_ontology#Vocabulary"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Node1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Node1">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Nodetype1"/>
+        <drupal_ontology:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</drupal_ontology:content>
+        <drupal_ontology:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node1</drupal_ontology:title>
+        <template_ontology:field_authors rdf:resource="http://www.lha.org/template_ontology#Person1"/>
+        <template_ontology:field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
+        <template_ontology:field_disease rdf:resource="http://www.lha.org/template_ontology#Term1"/>
+        <template_ontology:field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</template_ontology:field_id>
+        <template_ontology:field_publisher rdf:resource="http://www.lha.org/template_ontology#Organisation1"/>
+    </owl:NamedIndividual>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/template_ontology#field_authors"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/template_ontology#Person1"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/template_ontology#field_appreviation"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/template_ontology#field_authors"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/template_ontology#Person2"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/template_ontology#field_appreviation"/>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</drupal_ontology:ref_num>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/template_ontology#field_publisher"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/template_ontology#Organisation1"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/template_ontology#field_address"/>
+    </owl:Axiom>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Node2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Node2">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Nodetype2"/>
+        <drupal_ontology:alias rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node2</drupal_ontology:alias>
+        <drupal_ontology:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</drupal_ontology:content>
+        <drupal_ontology:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node2</drupal_ontology:title>
+        <template_ontology:field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
+        <template_ontology:field_disease rdf:resource="http://www.lha.org/template_ontology#Term2"/>
+        <template_ontology:field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</template_ontology:field_id>
+    </owl:NamedIndividual>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node2"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/template_ontology#field_authors"/>
+        <owl:annotatedTarget rdf:resource="http://www.lha.org/template_ontology#Person2"/>
+        <drupal_ontology:field rdf:resource="http://www.lha.org/template_ontology#field_name"/>
+    </owl:Axiom>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Object1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Object1">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Object"/>
+        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Object1</template_ontology:field_name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Organisation1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Organisation1">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Organisation"/>
+        <template_ontology:field_address rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Example Address</template_ontology:field_address>
+        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Organisation Name</template_ontology:field_name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Person1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Person1">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Person"/>
+        <template_ontology:field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers1</template_ontology:field_appreviation>
+        <template_ontology:field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person1@example.com</template_ontology:field_email>
+        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #1</template_ontology:field_name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Person2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Person2">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Person"/>
+        <template_ontology:field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers2</template_ontology:field_appreviation>
+        <template_ontology:field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person2@example.com</template_ontology:field_email>
+        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #2</template_ontology:field_name>
+    </owl:NamedIndividual>
+
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.3.20160319-0906) https://github.com/owlcs/owlapi -->
+
