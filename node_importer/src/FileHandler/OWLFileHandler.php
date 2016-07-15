@@ -464,29 +464,14 @@ class OWLFileHandler extends AbstractFileHandler {
 		return $array;
 	}
 	
-	/**
-	 * Returns all individuals of the graph.
-	 * 
-	 * @return array of individual resources
-	 */
 	private function getIndividuals() {
 		return $this->graph->allOfType('owl:NamedIndividual');
 	}
 	
-	/**
-	 * Returns all classes of the graph.
-	 * 
-	 * @return array of class resources
-	 */
 	private function getClasses() {
 		return $this->graph->allOfType('owl:Class');
 	}
 	
-	/**
-	 * Returns all annotation properties of the graph.
-	 * 
-	 * @return array of annotation properties
-	 */
 	private function getAnnotationProperties() {
 		return $this->graph->allOfType('owl:AnnotationProperty');
 	}

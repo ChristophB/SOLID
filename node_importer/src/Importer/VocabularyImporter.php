@@ -12,6 +12,11 @@ use Exception;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 
+/**
+ * Importer for vocabularies
+ * 
+ * @author Christoph Beger
+ */
 class VocabularyImporter extends AbstractImporter {
     
     function __construct() {
@@ -42,10 +47,15 @@ class VocabularyImporter extends AbstractImporter {
         return sizeof($this->entities['tag']);
     }
     
+    /**
+     * Creates a vocabulary.
+     * 
+     * @param $vid vid of the vocabulary
+     * @param $name name of the vocabulary
+     */
     private function createVocabulary($vid, $name) {
-		if (!$vid) throw new Exception('Error: parameter $vid missing');
-		if (!$name) throw new Exception('Error: parameter $name missing');
-		
+		if (!$vid) throw new Exception('Error: parameter $vid missing.');
+		if (!$name) throw new Exception('Error: parameter $name missing.');
 		
 		$exists = $this->clearVocabularyIfExists($vid);
     	
@@ -56,13 +66,19 @@ class VocabularyImporter extends AbstractImporter {
 				'vid'    => $vid
 			]);
 			$vocabulary->save();
+			$this->entities['vocabulary'][] = $vocabulary;
 		}
-		
-		array_push($this->entities['vocabulary'], $vocabulary);
 	}
 	
+	/**
+	 * Creates a set of Drupal tags for given vocabulary.
+	 * Does not add parents to the tags, because they may not exit yet.
+	 * 
+	 * @param $vid vid of the vocabulary
+	 * @param $tags array of tags
+	 */
 	private function createTags($vid, $tags) {
-	    if (!$vid) throw new Exception('Error: parameter $vid missing');
+	    if (!$vid) throw new Exception('Error: parameter $vid missing.');
 	    if (empty($tags)) return;
 	    
 	    foreach ($tags as $tag) {
@@ -72,12 +88,20 @@ class VocabularyImporter extends AbstractImporter {
 			]);
 			$term->save();
 			
-			array_push($this->entities['tag'], $term);
+			$this->entities['tag'][] = $term;
 		}
 	}
 	
+	/**
+	 * Checks of a vocabulary with given vid already exists
+	 * and deletes all its tags if overwrite is true.
+	 * 
+	 * @param $vid vid of the vocabulary
+	 * 
+	 * @return boolean
+	 */
 	private function clearVocabularyIfExists($vid) {
-		if ($id = $this->searchVocabularyByVid($vid)) {
+		if ($this->vocabularyExists($vid)) {
 			if ($this->overwrite) {
 				$tids = $this->searchEntityIds([
 	        		'entity_type' => 'taxonomy_term',
@@ -88,7 +112,7 @@ class VocabularyImporter extends AbstractImporter {
 				}
 			} else {
 				throw new Exception(
-					"Error: vocabulary with vid '$vid' already exists. "
+					'Error: vocabulary with vid "'. $vid. '" already exists. '
 					. 'Tick "overwrite" if you want to replace it and try again.'
 				);
 	    	}
@@ -97,15 +121,30 @@ class VocabularyImporter extends AbstractImporter {
 	    return false;
 	}
 	
-	private function searchVocabularyByVid($vid) {
+	/**
+	 * Checks if a vocabulary with vid exists.
+	 * 
+	 * @param $vid vid to search for
+	 * 
+	 * @return boolean
+	 */
+	private function vocabularyExists($vid) {
 		if (!$vid) throw new Exception('Error: parameter $vid missing');
 		
-		return array_values($this->searchEntityIds([
+		$id = array_values($this->searchEntityIds([
 			'vid'         => $vid,
 			'entity_type' => 'taxonomy_vocabulary',
 		]))[0];
+		
+		return $id ? true : false;
 	}
 	
+	/**
+	 * Adds parents to all created tags.
+	 * 
+	 * @param $vid vid of the vocabulary to process
+	 * @param $tags all tags which were created previously
+	 */
 	private function setTagParents($vid, $tags) {
 		foreach ($tags as $tag) {
 			if (empty($tag['parents'])) continue;
@@ -114,7 +153,9 @@ class VocabularyImporter extends AbstractImporter {
 			
 			$tagEntity->parent->setValue($this->searchTagIdsByNames(
 			    array_map(
-			        function($parent) use($vid) { return [ 'vid' => $vid, 'name' => $parent ]; }, 
+			        function($parent) use($vid) { 
+			        	return [ 'vid' => $vid, 'name' => $parent ];
+			        }, 
 			        $tag['parents']
 			    )
 			));
