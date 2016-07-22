@@ -72,7 +72,7 @@ class NodeImporter extends AbstractImporter {
 		$node = Node::create([
 			'type'     => $params['type'] ?: 'article',
 			'title'    => $params['title'],
-			'langcode' => 'de',
+			'langcode' => 'en', // @todo get language from import file
 			'status'   => 1,
 			'uid'      => \Drupal::currentUser()->id()
 		]);
