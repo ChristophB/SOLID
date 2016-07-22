@@ -195,7 +195,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
-		if ($literals = $individual->allLiterals($property)) {
+		if ($literals = $individual->allLiterals($property)) { // @todo check if axiom exists and use ref_num
 			$field = [
 				'value' => array_map(
 					function ($x) { return $this->removeRdfsType($x->getValue()); }, 
@@ -352,6 +352,8 @@ class OWLFileHandler extends AbstractFileHandler {
 	 */
 	private function removeRdfsType($string) {
 		if (!$string) return null;
+		
+		if (!is_string($string)) return $string;
 		
 		return preg_replace('/"?\^\^.*$/', '', $string);
 	}
