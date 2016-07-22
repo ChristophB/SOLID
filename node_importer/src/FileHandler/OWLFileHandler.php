@@ -195,10 +195,10 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
-		if ($literals = $individual->allLiterals($property)) { // @todo check if axiom exists and use ref_num
+		if ($literals = $individual->allLiterals($property)) { // @todo check if axiom exists and use ref_num if available
 			$field = [
 				'value' => array_map(
-					function ($x) { return $this->removeRdfsType($x->getValue()); }, 
+					function ($x) { return $this->literalValueToString($x); },
 					$literals
 				),
 				'field_name' => $property->localName()
@@ -208,6 +208,21 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $field ?: null;
+	}
+	
+	/**
+	 * Returns the value of the literal as string. Dates are converted to strings, using format().
+	 * 
+	 * @param $literal literal
+	 * @return string
+	 */
+	private function literalValueToString($literal) {
+		if (!$literal) return null;
+		
+		if ($literal->getDatatype() == 'xsd:dateTime')
+			return $literal->format('Y-m-d');
+		
+		return $this->removeRdfsType($literal->getValue());
 	}
 	
 	/**
@@ -352,8 +367,6 @@ class OWLFileHandler extends AbstractFileHandler {
 	 */
 	private function removeRdfsType($string) {
 		if (!$string) return null;
-		
-		if (!is_string($string)) return $string;
 		
 		return preg_replace('/"?\^\^.*$/', '', $string);
 	}
