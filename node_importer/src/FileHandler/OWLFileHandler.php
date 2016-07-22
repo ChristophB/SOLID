@@ -195,7 +195,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
-		if ($literals = $individual->allLiterals($property)) { // @todo check if axiom exists and use ref_num if available
+		if ($literals = $this->getSortedLiterals($individual, $property)) {
 			$field = [
 				'value' => array_map(
 					function ($x) { return $this->literalValueToString($x); },
@@ -214,6 +214,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * Returns the value of the literal as string. Dates are converted to strings, using format().
 	 * 
 	 * @param $literal literal
+	 * 
 	 * @return string
 	 */
 	private function literalValueToString($literal) {
@@ -318,6 +319,22 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $result ?: [];
+	}
+	
+	/**
+	 * Returns an array of literals for a given individual and property.
+	 * 
+	 * @param $individual individual
+	 * @param $property property
+	 * 
+	 * @return array of literals sorted by ref_num if it exists
+	 */
+	private function getSortedLiterals($individual, $property) {
+		$literals = $individual->allLiterals($property);
+		$axioms = $this->getAxiomsForIndividual($individual, $property);
+		
+		return $this->sortByAxioms($literals, $axioms);
+		
 	}
 	
 	/**

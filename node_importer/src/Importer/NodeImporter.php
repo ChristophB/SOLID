@@ -35,7 +35,7 @@ class NodeImporter extends AbstractImporter {
     public function import($data, $overwrite = false) {
         if ($overwrite) $this->overwrite = true;
         if (empty($data)) return;
-        
+        //die(var_dump($data)); // ------------------- test
         foreach ($data as $node) {
 		    $this->createNode($node);
 	    }
