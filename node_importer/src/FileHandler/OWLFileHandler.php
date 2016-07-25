@@ -129,7 +129,10 @@ class OWLFileHandler extends AbstractFileHandler {
 			[
 				'field_name' => 'body', 
 				'value'      => [ 
-					'value'   => $this->removeRdfsType($properties[self::CONTENT]),
+					'value'   => $this->removeRdfsType(
+						array_key_exists(self::CONTENT, $properties) 
+						? $properties[self::CONTENT] : null
+					),
 					'summary' => $this->removeRdfsType(
 						array_key_exists(self::SUMMARY, $properties) 
 						? $properties[self::SUMMARY] : null
