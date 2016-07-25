@@ -68,7 +68,7 @@ class NodeImporter extends AbstractImporter {
 		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
 
 		$this->deleteNodeIfExists($params['title']);
-
+		
 		$node = Node::create([
 			'type'     => $params['type'] ?: 'article',
 			'title'    => $params['title'],
@@ -76,11 +76,10 @@ class NodeImporter extends AbstractImporter {
 			'status'   => 1,
 			'uid'      => \Drupal::currentUser()->id()
 		]);
-		
 		$node->save();
+		
 		if (array_key_exists('fields', $params))
 			$this->insertFields($node, $params['fields']);
-		$node->save();
 			
 		if (array_key_exists('alias', $params))
 			$this->addAlias([
@@ -194,6 +193,8 @@ class NodeImporter extends AbstractImporter {
 				$node->get($field['field_name'])->setValue($field['value']);
 			}
 		}
+		
+		$node->save();
 	}
 	
 	/**
