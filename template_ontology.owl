@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<rdf:RDF xmlns="http://www.lha.org/project_ontology#"
-     xml:base="http://www.lha.org/project_ontology"
+<rdf:RDF xmlns="http://www.lha.org/template_ontology#"
+     xml:base="http://www.lha.org/template_ontology"
      xmlns:project_ontology="http://www.lha.org/project_ontology#"
      xmlns:template_ontology="http://www.lha.org/template_ontology#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -88,6 +88,24 @@
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#field"/>
     </owl:AnnotationProperty>
     
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_test -->
+
+    <owl:DatatypeProperty rdf:about="http://www.lha.org/template_ontology#field_literal">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/drupal_ontology#literal_field"/>
+    </owl:DatatypeProperty>
     
 
 
@@ -189,14 +207,21 @@
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Node1">
         <rdf:type rdf:resource="http://www.lha.org/template_ontology#Nodetype1"/>
+        <field_literal rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</field_literal>
         <drupal_ontology:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</drupal_ontology:content>
         <drupal_ontology:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node1</drupal_ontology:title>
-        <template_ontology:field_authors rdf:resource="http://www.lha.org/template_ontology#Person1"/>
-        <template_ontology:field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
-        <template_ontology:field_disease rdf:resource="http://www.lha.org/template_ontology#Term1"/>
-        <template_ontology:field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</template_ontology:field_id>
-        <template_ontology:field_publisher rdf:resource="http://www.lha.org/template_ontology#Organisation1"/>
+        <field_authors rdf:resource="http://www.lha.org/template_ontology#Person1"/>
+        <field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
+        <field_disease rdf:resource="http://www.lha.org/template_ontology#Term1"/>
+        <field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</field_id>
+        <field_publisher rdf:resource="http://www.lha.org/template_ontology#Organisation1"/>
     </owl:NamedIndividual>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node1"/>
+        <owl:annotatedProperty rdf:resource="http://www.lha.org/template_ontology#field_literal"/>
+        <owl:annotatedTarget rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</owl:annotatedTarget>
+        <drupal_ontology:ref_num rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</drupal_ontology:ref_num>
+    </owl:Axiom>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node1"/>
         <owl:annotatedProperty rdf:resource="http://www.lha.org/template_ontology#field_authors"/>
@@ -227,9 +252,9 @@
         <drupal_ontology:alias rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node2</drupal_ontology:alias>
         <drupal_ontology:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</drupal_ontology:content>
         <drupal_ontology:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node2</drupal_ontology:title>
-        <template_ontology:field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
-        <template_ontology:field_disease rdf:resource="http://www.lha.org/template_ontology#Term2"/>
-        <template_ontology:field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</template_ontology:field_id>
+        <field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
+        <field_disease rdf:resource="http://www.lha.org/template_ontology#Term2"/>
+        <field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</field_id>
     </owl:NamedIndividual>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.lha.org/template_ontology#Node2"/>
@@ -244,7 +269,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Object1">
         <rdf:type rdf:resource="http://www.lha.org/template_ontology#Object"/>
-        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Object1</template_ontology:field_name>
+        <field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Object1</field_name>
     </owl:NamedIndividual>
     
 
@@ -253,8 +278,8 @@
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Organisation1">
         <rdf:type rdf:resource="http://www.lha.org/template_ontology#Organisation"/>
-        <template_ontology:field_address rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Example Address</template_ontology:field_address>
-        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Organisation Name</template_ontology:field_name>
+        <field_address rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Example Address</field_address>
+        <field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Organisation Name</field_name>
     </owl:NamedIndividual>
     
 
@@ -263,9 +288,9 @@
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Person1">
         <rdf:type rdf:resource="http://www.lha.org/template_ontology#Person"/>
-        <template_ontology:field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers1</template_ontology:field_appreviation>
-        <template_ontology:field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person1@example.com</template_ontology:field_email>
-        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #1</template_ontology:field_name>
+        <field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers1</field_appreviation>
+        <field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person1@example.com</field_email>
+        <field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #1</field_name>
     </owl:NamedIndividual>
     
 
@@ -274,11 +299,10 @@
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Person2">
         <rdf:type rdf:resource="http://www.lha.org/template_ontology#Person"/>
-        <template_ontology:field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers2</template_ontology:field_appreviation>
-        <template_ontology:field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person2@example.com</template_ontology:field_email>
-        <template_ontology:field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #2</template_ontology:field_name>
+        <field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers2</field_appreviation>
+        <field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person2@example.com</field_email>
+        <field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #2</field_name>
     </owl:NamedIndividual>
-
 </rdf:RDF>
 
 
