@@ -154,7 +154,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				continue;
 
 			if ($field = $this->createNodeField($individual, $property))
-				$fields[] =  $field;
+				$fields[] = $field;
 		}
 
 		return $fields;
@@ -293,7 +293,10 @@ class OWLFileHandler extends AbstractFileHandler {
 					);
 				}
 			} else {
-				throw new Exception('Could not determine target fields.');
+				throw new Exception(
+					'Could not determine target fields for "'
+					. $individual->localName(). '" and property "'. $property. '".'
+				);
 			}
 			
 			$field['value'][] = $value;
