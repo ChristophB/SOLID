@@ -131,12 +131,14 @@ class VocabularyImporter extends AbstractImporter {
 	private function vocabularyExists($vid) {
 		if (!$vid) throw new Exception('Error: parameter $vid missing');
 		
-		$id = array_values($this->searchEntityIds([
+		$array = array_values($this->searchEntityIds([
 			'vid'         => $vid,
 			'entity_type' => 'taxonomy_vocabulary',
-		]))[0];
+		]));
 		
-		return $id ? true : false;
+		if (!empty($array) && $array[0]) return true;
+		
+		return false;
 	}
 	
 	/**

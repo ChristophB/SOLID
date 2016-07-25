@@ -148,15 +148,15 @@ class OWLFileHandler extends AbstractFileHandler {
 				'value'      => $this->createFieldTags($individual),
 				'references' => 'taxonomy_term'
 			];
-			
+
 		foreach ($this->getAnnotationProperties() as $property) {
 			if (!$individual->hasProperty($property))
 				continue;
-			
+
 			if ($field = $this->createNodeField($individual, $property))
-				$fields[] = $field;
+				$fields[] =  $field;
 		}
-		
+
 		return $fields;
 	}
 	
@@ -281,7 +281,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				];
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
-				$axiom = $this->getAxiomWithTargetFromAxioms($target, $axioms);
+				$axiom = $this->getAxiomWithTargetForIndividual($individual, $property, $target);
 				$axiomProperties = $this->getPropertiesAsArray($axiom);
 				
 				if (array_key_exists(self::FIELD, $axiomProperties) && $targetField = $axiomProperties[self::FIELD]) {
@@ -315,8 +315,9 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
-		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		$resources = $individual->allResources($property);
+		if (empty($resources)) return null;
+		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
 		$result = [];
 		foreach ($axioms as $axiom) {
@@ -344,6 +345,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
 		$literals = $individual->allLiterals($property);
+		if (empty($literals)) return null;
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
 		$result = [];
@@ -363,15 +365,18 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * Returns a single axiom form a given set of axiom,
 	 * which targets a given resource.
 	 * 
-	 * @param $target resource on which the searched axiom targets
-	 * @param $axioms array of axioms
+	 * @param $individual individual references by the axiom
+	 * @param $property property of the axiom
+	 * @param $target target references by the axiom
 	 * 
-	 * @return axiom
+	 * @return resource axiom
 	 */
-	private function getAxiomWithTargetFromAxioms($target, $axioms) {
+	private function getAxiomWithTargetForIndividual($individual, $property, $target) {
+		if (!$individual) throw new Exception('Error: parameter $individual missing');
+		if (!$property) throw new Exception('Error: parameter $property missing');
 		if (!$target) throw new Exception('Error: parameter $target missing');
-		if (!$axioms) throw new Exception('Error: parameter $axioms missing');
 		
+		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		foreach($axioms as $axiom) {
 			if ($axiom->get('owl:annotatedTarget')->getUri() == $target->getUri())
 				return $axiom;
