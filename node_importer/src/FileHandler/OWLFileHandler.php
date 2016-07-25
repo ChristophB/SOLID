@@ -130,7 +130,10 @@ class OWLFileHandler extends AbstractFileHandler {
 				'field_name' => 'body', 
 				'value'      => [ 
 					'value'   => $this->removeRdfsType($properties[self::CONTENT]),
-					'summary' => $this->removeRdfsType($properties[self::SUMMARY]),
+					'summary' => $this->removeRdfsType(
+						array_key_exists(self::SUMMARY, $properties) 
+						? $properties[self::SUMMARY] : null
+					),
 					'format'  => 'full_html'
 				]
 			]
@@ -309,6 +312,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return array of targeted resources
 	 */
 	private function sortByAxioms($resources, $axioms) {
+		$result = [];
 		foreach ($axioms as $axiom) {
 			$result[] = $axiom->get('owl:annotatedTarget');
 		}
