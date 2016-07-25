@@ -244,16 +244,13 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		if (!$property) throw new Exception('Error: parameter $property missing');
 		
-		$resources = $individual->allResources($property);
+		$resources = $this->getSortedResources($individual, $property);
 		if (!$resources || empty($resources)) return null;
 		
 		$field = [
 			'value' => [],
 			'field_name' => $property->localName()
 		];
-		
-		$axioms = $this->getAxiomsForIndividual($individual, $property);
-		$resources = $this->sortByAxioms($resources, $axioms);
 		
 		foreach ($resources as $target) {
 			$targetProperties = $this->getPropertiesAsArray($target);
@@ -309,12 +306,18 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * Returns an array containing all annotated targets of the axioms and all
 	 * resources which have no assingned axiom. Axioms are prioriced.
 	 * 
-	 * @param $resources array of resources
-	 * @param $axioms array of axioms
+	 * @param $individual individual
+	 * @param $property property
 	 * 
 	 * @return array of targeted resources
 	 */
-	private function sortByAxioms($resources, $axioms) {
+	private function getSortedResources($individual, $property) {
+		if (!$individual) throw new Exception('Error: parameter $individual missing');
+		if (!$property) throw new Exception('Error: parameter $property missing');
+		
+		$axioms = $this->getAxiomsForIndividual($individual, $property);
+		$resources = $individual->allResources($property);
+		
 		$result = [];
 		foreach ($axioms as $axiom) {
 			$result[] = $axiom->get('owl:annotatedTarget');
@@ -325,7 +328,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				$result[] = $resource;
 		}
 		
-		return $result ?: [];
+		return $result;
 	}
 	
 	/**
@@ -337,11 +340,23 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return array of literals sorted by ref_num if it exists
 	 */
 	private function getSortedLiterals($individual, $property) {
+		if (!$individual) throw new Exception('Error: parameter $individual missing');
+		if (!$property) throw new Exception('Error: parameter $property missing');
+		
 		$literals = $individual->allLiterals($property);
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
-		return $this->sortByAxioms($literals, $axioms);
+		$result = [];
+		foreach ($axioms as $axiom) {
+			$result[] = $axiom->getLiteral('owl:annotatedTarget');
+		}
 		
+		foreach ($literals as $literal) {
+			if (!in_array($literal, $result))
+				$result[] = $literal;
+		}
+		
+		return $result;
 	}
 	
 	/**
