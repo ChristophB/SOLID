@@ -7,6 +7,7 @@
 
 namespace Drupal\node_importer\FileHandler;
 
+use Drupal\file\Entity\File;
 use Exception;
 
 /**
@@ -41,48 +42,38 @@ class OWLFileHandler extends AbstractFileHandler {
 	const ALT              = 'http://www.lha.org/drupal_ontology#alt';
 	const NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 	
-	protected function setData() {
+	public function __construct($fid, $vocabularyImporter, $nodeImporter) {
+		parent::__construct($fid, $vocabularyImporter, $nodeImporter);
+		
 		$this->graph = new \EasyRdf_Graph();
 		$this->graph->parse($this->fileContent);
-		
+	}
+	
+	public function setData() {
 		$this->setVocabularyData();
 		$this->setNodeData();
 	}
 	
-	private function setVocabularyData() {
+	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
-			$tags = [];
+			$vid = $class->localName();
+			$this->vocabularyImporter->createVocabulary($vid, $vid);
+			
+			foreach ($this->findAllSubClassesOf($class->getUri()) as $tag) {
+				$this->vocabularyImporter->createTag($vid, $tag->localName());
+			}
 			
 			foreach ($this->findAllSubClassesOf($class->getUri()) as $subClass) {
 				$tag = [
 					'name'    => $subClass->localName(),
 					'parents' => $this->getParentTags($subClass)
 				];
-				$tags[] = $tag;
-			} 
-			
-			$vocabulary = [
-				'vid'  => $class->localName(),
-				'name' => $class->localName(),
-				'tags' => $tags
-			];
-			
-			$this->data['vocabularies'][] = $vocabulary;
+				$this->vocabularyImporter->setTagParents($vid, [$tag]);
+			}
 		}
 	}
 	
-	/**
-	 * Returns an array with all classes under "Vocabulary".
-	 * 
-	 * @return array of classes
-	 */
-	private function getVocabularyClasses() {
-		return $this->graph->resourcesMatching(
-			'rdfs:subClassOf', $this->graph->resource(self::VOCABULARY)
-		); 
-	}
-	
-	private function setNodeData() {
+	public function setNodeData() {
 		foreach ($this->getIndividuals() as $individual) {
 			if (!$this->isATransitive($individual, self::NODE))
 				continue;
@@ -95,8 +86,21 @@ class OWLFileHandler extends AbstractFileHandler {
 				'alias'  => $this->getProperty($individual, self::ALIAS),
 				'fields' => $this->createNodeFields($individual)
 			];
-			$this->data['nodes'][] = $node;
+			
+			$this->nodeImporter->createNode($node);
 		}
+		$this->nodeImporter->insertNodeReferences();
+	}
+	
+	/**
+	 * Returns an array with all classes under "Vocabulary".
+	 * 
+	 * @return array of classes
+	 */
+	private function getVocabularyClasses() {
+		return $this->graph->resourcesMatching(
+			'rdfs:subClassOf', $this->graph->resource(self::VOCABULARY)
+		); 
 	}
 
 	/** 
@@ -180,7 +184,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		
 		$fieldTags = [];
-		throw new Exception('test');
+		
 		foreach ($individual->allResources('rdf:type') as $tag) {
 			if (!$this->hasTransitiveSubClass(self::VOCABULARY, $tag))
 				continue;

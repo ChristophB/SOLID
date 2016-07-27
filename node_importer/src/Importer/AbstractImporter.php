@@ -28,15 +28,21 @@ abstract class AbstractImporter {
      * @param $data php object with the data to be imported
      * @param $overwrite specifies overwrite, default: false
      */
-    abstract public function import($data, $overwrite = false);
+    abstract public function import($data);
     
     /**
-     * Deletes all created entities if overwrite is true.
+     * Deletes all created entities.
      */
     public function rollback() {
-         foreach ($this->entities as $type => $entities) {
-			foreach ($entities as $entity) {
-				$entity->delete();
+         foreach ($this->entities as $type => $ids) {
+			foreach ($ids as $id) {
+				if ($type == 'path') {
+					\Drupal::service('path.alias_storage')->delete([ 'pid' => $id ]);
+				} else {
+					$entity_manager = \Drupal::entityManager();
+					$entity = $entity_manager->getStorage($type)->load($id);
+					$entity->delete();
+				}
 			}
 		}
      }

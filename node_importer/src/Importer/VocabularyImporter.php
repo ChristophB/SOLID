@@ -19,17 +19,14 @@ use Drupal\taxonomy\Entity\Term;
  */
 class VocabularyImporter extends AbstractImporter {
     
-    function __construct() {
-        $this->entities['vocabulary'] = [];
-        $this->entities['tag'] = [];
-    }
-    
-    public function getTags() {
-        return $this->entities['tag'];
-    }
-    
-    public function import($data, $overwrite = false) {
+    function __construct($overwrite = false) {
+        $this->entities['taxonomy_vocabulary'] = [];
+        $this->entities['taxonomy_term'] = [];
+        
         if ($overwrite) $this->overwrite = true;
+    }
+    
+    public function import($data) {
         if (empty($data)) return;
         
         foreach ($data as $vocabulary) {
@@ -40,11 +37,11 @@ class VocabularyImporter extends AbstractImporter {
     }
     
     public function countCreatedVocabularies() {
-        return sizeof($this->entities['vocabulary']);
+        return sizeof($this->entities['taxonomy_vocabulary']);
     }
     
     public function countCreatedTags() {
-        return sizeof($this->entities['tag']);
+        return sizeof($this->entities['taxonomy_term']);
     }
     
     /**
@@ -53,7 +50,7 @@ class VocabularyImporter extends AbstractImporter {
      * @param $vid vid of the vocabulary
      * @param $name name of the vocabulary
      */
-    private function createVocabulary($vid, $name) {
+    public function createVocabulary($vid, $name) {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
@@ -66,7 +63,7 @@ class VocabularyImporter extends AbstractImporter {
 				'vid'    => $vid
 			]);
 			$vocabulary->save();
-			$this->entities['vocabulary'][] = $vocabulary;
+			$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
 		}
 	}
 	
@@ -77,7 +74,7 @@ class VocabularyImporter extends AbstractImporter {
 	 * @param $vid vid of the vocabulary
 	 * @param $tags array of tags
 	 */
-	private function createTags($vid, $tags) {
+	public function createTags($vid, $tags) {
 	    if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 	    if (empty($tags)) return;
 	    
@@ -88,8 +85,28 @@ class VocabularyImporter extends AbstractImporter {
 			]);
 			$term->save();
 			
-			$this->entities['tag'][] = $term;
+			$this->entities['taxonomy_term'][] = $term;
 		}
+	}
+	
+	/**
+	 * Creates a single Drupal tag for given vocabulary.
+	 * Does not add parents to the tags, because they may not exit yet.
+	 * 
+	 * @param $vid vid of the vocabulary
+	 * @param $name name of the tag
+	 */
+	public function createTag($vid, $name) {
+		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
+	    if (empty($name)) return;
+	    
+	    $term = Term::create([
+			'name' => $name,
+			'vid'  => $vid,
+		]);
+		$term->save();
+			
+		$this->entities['taxonomy_term'][] = $term->id();
 	}
 	
 	/**
@@ -148,7 +165,7 @@ class VocabularyImporter extends AbstractImporter {
 	 * @param $vid vid of the vocabulary to process
 	 * @param $tags all tags which were created previously
 	 */
-	private function setTagParents($vid, $tags) {
+	public function setTagParents($vid, $tags) {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 		if (empty($tags)) return;
 		

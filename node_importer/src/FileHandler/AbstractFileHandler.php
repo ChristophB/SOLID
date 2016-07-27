@@ -19,9 +19,13 @@ abstract class AbstractFileHandler {
 	protected $filePath;
 	protected $fileContent;
 	protected $data;
+	protected $vocabularyImporter;
+	protected $nodeImporter;
 	
-	public function __construct($fid) {
-		if (!$fid) throw new Exception('Error: parameter $fid missing.');
+	public function __construct($fid, $vocabularyImporter, $nodeImporter) {
+		if (is_null($fid)) throw new Exception('Error: parameter $fid missing.');
+		if (is_null($vocabularyImporter)) throw new Exception('Error: parameter $vocabularyImporter missing.');
+		if (is_null($nodeImporter)) throw new Exception('Error: parameter $nodeImporter missing.');
 		
 		$this->data = [
 			'vocabularies' => [],
@@ -30,24 +34,18 @@ abstract class AbstractFileHandler {
 		
 	    $file = File::load($fid);
 	    
-	    $this->filePath = drupal_realpath($file->getFileUri());
+	    $this->filePath    = drupal_realpath($file->getFileUri());
 	    $this->fileContent = file_get_contents($this->filePath);
-	    $this->setData();
+	    
+	    $this->vocabularyImporter = $vocabularyImporter;
+	    $this->nodeImporter       = $nodeImporter;
 	}
 	
-	public function getData() {
-		return $this->data;
-	}
+	abstract public function setVocabularyData();
 	
-	public function getVocabularies() {
-	    return $this->data['vocabularies'];
-	}
+	abstract public function setNodeData();
 	
-	public function getNodes() {
-	    return $this->data['nodes'];
-	}
-	
-	abstract protected function setData();
+	abstract public function setData();
 }
  
 ?>

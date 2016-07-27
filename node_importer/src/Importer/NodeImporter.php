@@ -26,14 +26,15 @@ class NodeImporter extends AbstractImporter {
 	 */
     private $nodeReferences = [];
 
-    function __construct() {
+    function __construct($overwrite) {
         $this->entities['node'] = [];
         $this->entities['file'] = [];
         $this->entities['path'] = [];
+        
+        if ($overwrite) $this->overwrite = true;
     }
     
-    public function import($data, $overwrite = false) {
-        if ($overwrite) $this->overwrite = true;
+    public function import($data) {
         if (empty($data)) return;
         
         foreach ($data as $node) {
@@ -63,7 +64,7 @@ class NodeImporter extends AbstractImporter {
      * 
      * @return node
      */
-    private function createNode($params) {
+    public function createNode($params) {
 		if (!$params['title']) throw new Exception('Error: named parameter "title" missing.');
 		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
 
@@ -87,7 +88,7 @@ class NodeImporter extends AbstractImporter {
 				'alias' => $params['alias']
 			]);
 			
-		$this->entities['node'][] = $node;
+		$this->entities['node'][] = $node->id();
 		
 		return $node;
 	}
@@ -113,7 +114,7 @@ class NodeImporter extends AbstractImporter {
 		]);
 		$file->save();
 		
-		$this->entities['file'][] = $file;
+		$this->entities['file'][] = $file->id();
 			
 		return $file;
 	}
@@ -130,7 +131,7 @@ class NodeImporter extends AbstractImporter {
 		if (!empty($ids = $this->searchNodesByTitle($title))) {
 			if ($this->overwrite) {
 				foreach ($ids as $id) {
-					\Drupal::service('path.alias_storage')->delete(array('source' => '/node/'. $id));
+					\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
 					Node::load($id)->delete();
 				}
 			} else {
@@ -231,16 +232,16 @@ class NodeImporter extends AbstractImporter {
 		$path = \Drupal::service('path.alias_storage')->save(
 			'/node/'. $params['id'], 
 			'/'. $params['alias'], 
-			'de'
+			'en'
 		);
 		
-		$this->entities['path'][] = $path;
+		$this->entities['path'][] = $path['pid'];
 	}
 	
 	/**
 	 * Handles all in $nodeReferences saved references and inserts them.
 	 */
-	private function insertNodeReferences() {
+	public function insertNodeReferences() {
 		foreach ($this->nodeReferences as $pid => $field) {
 			foreach ($field as $fieldName => $reference) { // assumption: only one entitytype per field
 				foreach ($reference as $entityType => $entityNames) {
@@ -297,7 +298,8 @@ class NodeImporter extends AbstractImporter {
 	private function mapNodeTitleToNid($title) {
 		if (!$title) return null;
 		
-		foreach ($this->entities['node'] as $node) {
+		foreach ($this->entities['node'] as $nid) {
+			$node = Node::load($nid);
 			if ($node->label() == $title) 
 				return $node->id();
 		}
@@ -331,7 +333,8 @@ class NodeImporter extends AbstractImporter {
 	private function mapFileUriToFid($uri) {
 	    if (!$uri) return null;
 		
-		foreach ($this->entities['file'] as $file) {
+		foreach ($this->entities['file'] as $fid) {
+			$file = File::load($fid);
 			if ($file->uri() == $uri) 
 				return $uri->id();
 		}

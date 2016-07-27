@@ -26,16 +26,18 @@ class FileHandlerFactory {
      * @param $fid fid of the uploaded file
      * @return FileHandler
      */
-    public static function createFileHandler($fid) {
-    	if (!$fid) throw new Exception('Error: parameter $fid missing.');
+    public static function createFileHandler($fid, $vocabularyImporter, $nodeImporter) {
+    	if (is_null($fid)) throw new Exception('Error: parameter $fid missing.');
+    	if (is_null($vocabularyImporter)) throw new Exception('Error: parameter $vocabularyImporter missing.');
+    	if (is_null($nodeImporter)) throw new Exception('Error: parameter $nodeImporter missing.');
     	
         $uri = File::load($fid)->getFileUri();
 		
 		switch (pathinfo(drupal_realpath($uri), PATHINFO_EXTENSION)) {
 		    case 'json':
-		        return new JSONFileHandler($fid);
+		        return new JSONFileHandler($fid, $vocabularyImporter, $nodeImporter);
 		    case 'owl':
-		        return new OWLFileHandler($fid);
+		        return new OWLFileHandler($fid, $vocabularyImporter, $nodeImporter);
 		    default:
 		        throw new Exception('Error: input file format is not supported.');
 		}

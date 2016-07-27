@@ -67,17 +67,22 @@ class Form extends FormBase {
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
-        $vocabularyImporter = new VocabularyImporter();
-        $nodeImporter       = new NodeImporter();
-          
+        $overwrite = $form_state->getValue('overwrite');
+            
+        $vocabularyImporter = new VocabularyImporter($overwrite);
+        $nodeImporter       = new NodeImporter($overwrite);
+        
         try {
-            $fileHandler = FileHandlerFactory::createFileHandler($form_state->getValue('file')[0]);
-            $overwrite = $form_state->getValue('overwrite');
+            $fileHandler = FileHandlerFactory::createFileHandler(
+                $form_state->getValue('file')[0],
+                $vocabularyImporter,
+                $nodeImporter
+            );
             
             if ($form_state->getValue('import_vocabularies'))
-                $vocabularyImporter->import($fileHandler->getVocabularies(), $overwrite);
+                $fileHandler->setVocabularyData();
             if ($form_state->getValue('import_nodes'))
-                $nodeImporter->import($fileHandler->getNodes(), $overwrite);
+                $fileHandler->setNodeData();
         
             drupal_set_message(
 				sprintf(
