@@ -54,6 +54,11 @@ class Form extends FormBase {
             '#title' => t('Import classes under "Node" as nodes'),
         ];
         
+        $form['import_only_leaf_class_nodes'] = [
+            '#type'  => 'checkbox',
+            '#title' => t('Only import leaf classes unter "Node" as nodes'),
+        ];
+        
         $form['overwrite'] = [
             '#type'  => 'checkbox',
             '#title' => t('Overwrite'),
@@ -82,7 +87,8 @@ class Form extends FormBase {
                 'fid'                => $form_state->getValue('file')[0],
                 'vocabularyImporter' => $vocabularyImporter,
                 'nodeImporter'       => $nodeImporter,
-                'classesAsNodes'     => $form_state->getValue('import_class_nodes')
+                'classesAsNodes'     => $form_state->getValue('import_class_nodes'),
+                'onlyLeafClassesAsNodes' => $form_state->getValue('import_only_leaf_class_nodes'),
             ]);
             
             if ($form_state->getValue('import_vocabularies'))

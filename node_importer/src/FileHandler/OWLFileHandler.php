@@ -42,17 +42,17 @@ class OWLFileHandler extends AbstractFileHandler {
 	const ALT              = 'http://www.lha.org/drupal_ontology#alt';
 	const NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 	
-	private $classesAsNodes = false;
+	private $classesAsNodes         = false;
+	private $onlyLeafClassesAsNodes = false;
 	
 	public function __construct($params) {
-		if (empty($params)) throw new Exception('Error: no parameters provided.');
-		if (!isset($params['classesAsNodes'])) throw new Exception('Error: named parameter "classesAsNodes" missing.');
 		parent::__construct($params);
 		
 		$this->graph = new \EasyRdf_Graph();
 		$this->graph->parse($this->fileContent);
 		
-		if ($params['classesAsNodes']) $this->classesAsNodes = true;
+		if (isset($params['classesAsNodes'])) $this->classesAsNodes = true;
+		if (isset($params['onlyLeafClassesAsNodes'])) $this->onlyLeafClassesAsNodes = true;
 	}
 	
 	public function setData() {
@@ -81,9 +81,6 @@ class OWLFileHandler extends AbstractFileHandler {
 	
 	public function setNodeData() {
 		foreach ($this->getIndividuals() as $individual) {
-			if (!$this->isATransitive($individual, self::NODE))
-				continue;
-			
 			$node = [
 				'title'  => 
 					$this->getProperty($individual, self::TITLE) 
@@ -95,6 +92,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$this->nodeImporter->createNode($node);
 		}
+		
 		$this->nodeImporter->insertNodeReferences();
 	}
 	
@@ -123,10 +121,14 @@ class OWLFileHandler extends AbstractFileHandler {
 			'rdfs:subClassOf', $this->graph->resource(self::NODE)
 			) as $bundleResource
 		) {
-			if ($this->isATransitive($node, $bundleResource))
+			if (
+				$this->isATransitive($node, $bundleResource)
+				|| $this->hasTransitiveSubClass($bundleResource->getUri(), $node)
+			)
 				return strtolower(preg_replace(
 					'/[^A-Za-z0-9]/', '_', $bundleResource->localName()
 				));
+			
 		}
 		
 		return null;
@@ -209,7 +211,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns true if $subClass is a transitive subclass of $class.
 	 * 
-	 * @param $class class
+	 * @param $class class uri
 	 * @param $subClass subclass to search for
 	 * 
 	 * @return boolean
@@ -566,8 +568,76 @@ class OWLFileHandler extends AbstractFileHandler {
 		return $array;
 	}
 	
+	/**
+	 * Returns all individuals under class Node and classes under node,
+	 * depending on classesAsNodes and onlyLeafClasses.
+	 * 
+	 * @return array resources
+	 */
 	private function getIndividuals() {
-		return $this->graph->allOfType('owl:NamedIndividual');
+		$individuals = [];
+		
+		if ($this->classesAsNodes) {
+			if ($this->onlyLeafClassesAsNodes) {
+				foreach ($this->getDirectSubClassesOf(self::NODE) as $nodeTypeClass) {
+					$individuals = array_merge(
+						$individuals,
+						$this->findAllLeafClassesOf($nodeTypeClass->getUri())
+					);
+				}
+			} else {
+				foreach ($this->getDirectSubClassesOf(self::NODE) as $nodeTypeClass) {
+					$individuals = array_merge(
+						$individuals,
+						$this->findAllSubClassesOf($nodeTypeClass->getUri())
+					);
+				}
+			}
+		}
+		
+		foreach ($this->graph->allOfType('owl:NamedIndividual') as $individual) {
+			if (
+				!$this->isATransitive($individual, self::NODE)
+				|| $individual->isA(self::NODE) // individuals directly under Node are ignored
+			) continue;
+			$individuals[] = $individual;
+		}
+		
+		return $individuals;
+	}
+	
+	/**
+	 * Returns all subclasses of the given class, which dont have subclasses (=leafs).
+	 * Found leaf classes can be instantiated by individuals!
+	 * 
+	 * @param $class class uri
+	 * 
+	 * @return array of classes
+	 */
+	private function findAllLeafClassesOf($class) {
+		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
+		
+		$leafClasses = [];
+		foreach ($this->findAllSubClassesOf($class) as $subClass) {
+			if (empty($this->graph->resourcesMatching('rdfs:subClassOf', $subClass)))
+				$leafClasses[] = $subClass;
+		}
+		
+		return $leafClasses;
+	}
+	
+	/**
+	 * Returns the direct subclasses of a given class uri.
+	 * 
+	 * @param $class class uri
+	 * 
+	 * @return array subclasses as resources
+	 */
+	private function getDirectSubClassesOf($class) {
+		return $this->graph->resourcesMatching(
+			'rdfs:subClassOf', 
+			$this->graph->resource($class)
+		);
 	}
 	
 	private function getClasses() {
@@ -632,14 +702,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function findAllSubClassesOf($class) {
 		$result = [];
 		
-		foreach (
-			$this->graph->resourcesMatching(
-				'rdfs:subClassOf', 
-				$this->graph->resource($class)
-			) as $subClass
-		) {
-			if (!$this->hasDirectSuperClass($subClass, $class))
-				continue;
+		foreach ($this->getDirectSubClassesOf($class) as $subClass) {
 			$result[] = $subClass;
 			$result = array_merge($result, $this->findAllSubClassesOf($subClass->getUri()));
 		}
