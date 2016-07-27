@@ -14,8 +14,8 @@ namespace Drupal\node_importer\FileHandler;
  */
 class JSONFileHandler extends AbstractFileHandler {
 	
-	public function __construct($fid, $vocabularyImporter, $nodeImporter) {
-		parent::__construct($fid, $vocabularyImporter, $nodeImporter);
+	public function __construct($params) {
+		parent::__construct($params);
 		
 		$this->data = json_decode($this->fileContent, TRUE);
 		if (json_last_error() != 0) throw new Exception(

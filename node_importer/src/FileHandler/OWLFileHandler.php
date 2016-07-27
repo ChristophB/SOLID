@@ -42,11 +42,17 @@ class OWLFileHandler extends AbstractFileHandler {
 	const ALT              = 'http://www.lha.org/drupal_ontology#alt';
 	const NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 	
-	public function __construct($fid, $vocabularyImporter, $nodeImporter) {
-		parent::__construct($fid, $vocabularyImporter, $nodeImporter);
+	private $classesAsNodes = false;
+	
+	public function __construct($params) {
+		if (empty($params)) throw new Exception('Error: no parameters provided.');
+		if (!isset($params['classesAsNodes'])) throw new Exception('Error: named parameter "classesAsNodes" missing.');
+		parent::__construct($params);
 		
 		$this->graph = new \EasyRdf_Graph();
 		$this->graph->parse($this->fileContent);
+		
+		if ($params['classesAsNodes']) $this->classesAsNodes = true;
 	}
 	
 	public function setData() {

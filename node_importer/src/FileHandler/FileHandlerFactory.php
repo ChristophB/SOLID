@@ -26,18 +26,23 @@ class FileHandlerFactory {
      * @param $fid fid of the uploaded file
      * @return FileHandler
      */
-    public static function createFileHandler($fid, $vocabularyImporter, $nodeImporter) {
-    	if (is_null($fid)) throw new Exception('Error: parameter $fid missing.');
-    	if (is_null($vocabularyImporter)) throw new Exception('Error: parameter $vocabularyImporter missing.');
-    	if (is_null($nodeImporter)) throw new Exception('Error: parameter $nodeImporter missing.');
+    public static function createFileHandler($params) {
+    	if (empty($params)) throw new Exception('Error: no parameters provided.');
+    	if (is_null($params['fid'])) throw new Exception('Error: named parameter "fid" missing.');
+    	if (is_null($params['vocabularyImporter'])) throw new Exception('Error: named parameter "vocabularyImporter" missing.');
+    	if (is_null($params['nodeImporter'])) throw new Exception('Error: named parameter "nodeImporter" missing.');
     	
-        $uri = File::load($fid)->getFileUri();
+        $uri = File::load($params['fid'])->getFileUri();
 		
 		switch (pathinfo(drupal_realpath($uri), PATHINFO_EXTENSION)) {
 		    case 'json':
-		        return new JSONFileHandler($fid, $vocabularyImporter, $nodeImporter);
+		        return new JSONFileHandler([
+		        	'fid'                => $params['fid'],
+		        	'vocabularyImporter' => $params['vocabularyImporter'],
+		        	'nodeImporter'       => $params['nodeImporter']
+		        ]);
 		    case 'owl':
-		        return new OWLFileHandler($fid, $vocabularyImporter, $nodeImporter);
+		        return new OWLFileHandler($params);
 		    default:
 		        throw new Exception('Error: input file format is not supported.');
 		}

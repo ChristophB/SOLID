@@ -49,6 +49,11 @@ class Form extends FormBase {
             '#title' => t('Import Nodes'),
         ];
         
+        $form['import_class_nodes'] = [
+            '#type'  => 'checkbox',
+            '#title' => t('Import classes under "Node" as nodes'),
+        ];
+        
         $form['overwrite'] = [
             '#type'  => 'checkbox',
             '#title' => t('Overwrite'),
@@ -73,11 +78,12 @@ class Form extends FormBase {
         $nodeImporter       = new NodeImporter($overwrite);
         
         try {
-            $fileHandler = FileHandlerFactory::createFileHandler(
-                $form_state->getValue('file')[0],
-                $vocabularyImporter,
-                $nodeImporter
-            );
+            $fileHandler = FileHandlerFactory::createFileHandler([
+                'fid'                => $form_state->getValue('file')[0],
+                'vocabularyImporter' => $vocabularyImporter,
+                'nodeImporter'       => $nodeImporter,
+                'classesAsNodes'     => $form_state->getValue('import_class_nodes')
+            ]);
             
             if ($form_state->getValue('import_vocabularies'))
                 $fileHandler->setVocabularyData();

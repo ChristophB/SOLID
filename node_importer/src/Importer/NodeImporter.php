@@ -26,7 +26,7 @@ class NodeImporter extends AbstractImporter {
 	 */
     private $nodeReferences = [];
 
-    function __construct($overwrite) {
+    function __construct($overwrite = false) {
         $this->entities['node'] = [];
         $this->entities['file'] = [];
         $this->entities['path'] = [];

@@ -22,23 +22,24 @@ abstract class AbstractFileHandler {
 	protected $vocabularyImporter;
 	protected $nodeImporter;
 	
-	public function __construct($fid, $vocabularyImporter, $nodeImporter) {
-		if (is_null($fid)) throw new Exception('Error: parameter $fid missing.');
-		if (is_null($vocabularyImporter)) throw new Exception('Error: parameter $vocabularyImporter missing.');
-		if (is_null($nodeImporter)) throw new Exception('Error: parameter $nodeImporter missing.');
+	public function __construct($params) {
+		if (empty($params)) throw new Exception('Error: no parameters provided.');
+		if (is_null($params['fid'])) throw new Exception('Error: named parameter "fid" missing.');
+		if (is_null($params['vocabularyImporter'])) throw new Exception('Error: named parameter "vocabularyImporter" missing.');
+		if (is_null($params['nodeImporter'])) throw new Exception('Error: named parameter "nodeImporter" missing.');
 		
 		$this->data = [
 			'vocabularies' => [],
 			'nodes'        => [], 
 		];
 		
-	    $file = File::load($fid);
+	    $file = File::load($params['fid']);
 	    
 	    $this->filePath    = drupal_realpath($file->getFileUri());
 	    $this->fileContent = file_get_contents($this->filePath);
 	    
-	    $this->vocabularyImporter = $vocabularyImporter;
-	    $this->nodeImporter       = $nodeImporter;
+	    $this->vocabularyImporter = $params['vocabularyImporter'];
+	    $this->nodeImporter       = $params['nodeImporter'];
 	}
 	
 	abstract public function setVocabularyData();
