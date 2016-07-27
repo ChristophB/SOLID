@@ -92,7 +92,7 @@ class Form extends FormBase {
             $vocabularyImporter->rollback();
 			drupal_set_message(
 			    t($e->getMessage())
-			    // . $e->getTraceAsString()
+			    . ' In '. $e->getFile(). ' (line:'. $e->getLine(). ')'
 			    . ' '. t('Rolling back...'),
 			    'error'
 			);

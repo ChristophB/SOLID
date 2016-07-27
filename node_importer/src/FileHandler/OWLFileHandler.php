@@ -88,7 +88,9 @@ class OWLFileHandler extends AbstractFileHandler {
 				continue;
 			
 			$node = [
-				'title'  => $this->getProperty($individual, self::TITLE),
+				'title'  => 
+					$this->getProperty($individual, self::TITLE) 
+					?: $individual->localName(),
 				'type'   => $this->getBundle($individual),
 				'alias'  => $this->getProperty($individual, self::ALIAS),
 				'fields' => $this->createNodeFields($individual)
@@ -178,11 +180,9 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$individual) throw new Exception('Error: parameter $individual missing');
 		
 		$fieldTags = [];
-		
+		throw new Exception('test');
 		foreach ($individual->allResources('rdf:type') as $tag) {
-			if ($this->hasDirectSuperClass($tag, self::NODE)
-				|| $tag == self::NAMED_INDIVIDUAL
-			)
+			if (!$this->hasTransitiveSubClass(self::VOCABULARY, $tag))
 				continue;
 			
 			$vocabulary = $this->getVocabularyForTag($tag);
@@ -194,6 +194,25 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $fieldTags ?: [];
+	}
+	
+	/**
+	 * Returns true if $subClass is a transitive subclass of $class.
+	 * 
+	 * @param $class class
+	 * @param $subClass subclass to search for
+	 * 
+	 * @return boolean
+	 */
+	private function hasTransitiveSubClass($class, $subClass) {
+		if (!$class) throw new Exception('Error: parameter $class missing.');
+		if (!$subClass) throw new Exception('Error: parameter $subClass missing.');
+		
+		foreach ($this->findAllSubClassesOf($class) as $curSubClass) {
+			if ($curSubClass == $subClass)
+				return true;
+		}
+		return false;
 	}
 	
 	/**

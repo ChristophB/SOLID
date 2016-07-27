@@ -54,8 +54,8 @@ class VocabularyImporter extends AbstractImporter {
      * @param $name name of the vocabulary
      */
     private function createVocabulary($vid, $name) {
-		if (!$vid) throw new Exception('Error: parameter $vid missing.');
-		if (!$name) throw new Exception('Error: parameter $name missing.');
+		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
+		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
 		$exists = $this->clearVocabularyIfExists($vid);
     	
@@ -78,7 +78,7 @@ class VocabularyImporter extends AbstractImporter {
 	 * @param $tags array of tags
 	 */
 	private function createTags($vid, $tags) {
-	    if (!$vid) throw new Exception('Error: parameter $vid missing.');
+	    if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 	    if (empty($tags)) return;
 	    
 	    foreach ($tags as $tag) {
@@ -108,7 +108,8 @@ class VocabularyImporter extends AbstractImporter {
 	        		'vid'         => $vid
 	    		]);
 				foreach ($tids as $tid) {
-					Term::load($tid)->delete();
+					$term = Term::load($tid);
+					if (isset($term)) $term->delete();
 				}
 			} else {
 				throw new Exception(
@@ -129,7 +130,7 @@ class VocabularyImporter extends AbstractImporter {
 	 * @return boolean
 	 */
 	private function vocabularyExists($vid) {
-		if (!$vid) throw new Exception('Error: parameter $vid missing');
+		if (is_null($vid)) throw new Exception('Error: parameter $vid missing');
 		
 		$array = array_values($this->searchEntityIds([
 			'vid'         => $vid,
@@ -148,6 +149,9 @@ class VocabularyImporter extends AbstractImporter {
 	 * @param $tags all tags which were created previously
 	 */
 	private function setTagParents($vid, $tags) {
+		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
+		if (empty($tags)) return;
+		
 		foreach ($tags as $tag) {
 			if (empty($tag['parents'])) continue;
 			
