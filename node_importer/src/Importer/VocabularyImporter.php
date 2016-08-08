@@ -23,7 +23,7 @@ class VocabularyImporter extends AbstractImporter {
         $this->entities['taxonomy_vocabulary'] = [];
         $this->entities['taxonomy_term'] = [];
         
-        if (isset($overwrite)) $this->overwrite = true;
+        if ($overwrite) $this->overwrite = true;
     }
     
     public function import($data) {

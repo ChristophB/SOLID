@@ -31,7 +31,7 @@ class NodeImporter extends AbstractImporter {
         $this->entities['file'] = [];
         $this->entities['path'] = [];
         
-        if (isset($overwrite)) $this->overwrite = true;
+        if ($overwrite) $this->overwrite = true;
     }
     
     public function import($data) {
