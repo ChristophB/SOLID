@@ -17,7 +17,7 @@ use Exception;
  */
 class OWLFileHandler extends AbstractFileHandler {
 	
-	/** Declaration of DruCOn default classes/properties **/ 
+	/** Declaration of DUO default classes/properties **/ 
 	const VOCABULARY       = 'http://www.lha.org/drupal_ontology#Vocabulary';
 	const NODE             = 'http://www.lha.org/drupal_ontology#Node';
 	const IMG              = 'http://www.lha.org/drupal_ontology#Img';
@@ -46,10 +46,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	private $onlyLeafClassesAsNodes = false;
 	
 	public function __construct($params) {
+		\Drupal::logger('node_importer')->error('OWLFileHandler::__construct(): '. memory_get_usage());
 		parent::__construct($params);
 		
 		$this->graph = new \EasyRdf_Graph();
-		$this->graph->parse($this->fileContent);
+		$this->graph->parse(file_get_contents($this->filePath));
+		\Drupal::logger('node_importer')->error('graph parsed: '. memory_get_usage());
 		
 		if (isset($params['classesAsNodes'])) $this->classesAsNodes = true;
 		if (isset($params['onlyLeafClassesAsNodes'])) $this->onlyLeafClassesAsNodes = true;

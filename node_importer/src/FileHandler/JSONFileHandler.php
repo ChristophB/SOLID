@@ -17,7 +17,7 @@ class JSONFileHandler extends AbstractFileHandler {
 	public function __construct($params) {
 		parent::__construct($params);
 		
-		$this->data = json_decode($this->fileContent, TRUE);
+		$this->data = json_decode(file_get_contents($this->filePath), TRUE);
 		if (json_last_error() != 0) throw new Exception(
 			'Error: Could not decode the json file.'
 		);

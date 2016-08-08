@@ -64,6 +64,7 @@ class VocabularyImporter extends AbstractImporter {
 			]);
 			$vocabulary->save();
 			$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
+			$vocabulary = null;
 		}
 	}
 	
@@ -124,10 +125,14 @@ class VocabularyImporter extends AbstractImporter {
 	        		'entity_type' => 'taxonomy_term',
 	        		'vid'         => $vid
 	    		]);
-				foreach ($tids as $tid) {
-					$term = Term::load($tid);
-					if (isset($term)) $term->delete();
-				}
+				
+				$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+				$terms = $storage_handler->loadMultiple($tids);
+				$storage_handler->delete($terms); // @todo: memory leak!
+				
+				$storage_handler = null;
+				$terms = null;
+				$tids = null;
 			} else {
 				throw new Exception(
 					'Error: vocabulary with vid "'. $vid. '" already exists. '
@@ -148,15 +153,15 @@ class VocabularyImporter extends AbstractImporter {
 	 */
 	private function vocabularyExists($vid) {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing');
-		
+
 		$array = array_values($this->searchEntityIds([
 			'vid'         => $vid,
 			'entity_type' => 'taxonomy_vocabulary',
 		]));
+		$result = !empty($array) && $array[0] ? true : false;
+		$array = null;
 		
-		if (!empty($array) && $array[0]) return true;
-		
-		return false;
+		return $result;
 	}
 	
 	/**

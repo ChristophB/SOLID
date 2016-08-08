@@ -69,7 +69,6 @@ class NodeImporter extends AbstractImporter {
 		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
 
 		$this->deleteNodeIfExists($params['title']);
-		
 		$node = Node::create([
 			'type'     => $params['type'] ?: 'article',
 			'title'    => $params['title'],
@@ -81,7 +80,7 @@ class NodeImporter extends AbstractImporter {
 		
 		if (array_key_exists('fields', $params))
 			$this->insertFields($node, $params['fields']);
-			
+		
 		if (array_key_exists('alias', $params))
 			$this->addAlias([
 				'id'    => $node->id(),
@@ -89,8 +88,7 @@ class NodeImporter extends AbstractImporter {
 			]);
 			
 		$this->entities['node'][] = $node->id();
-		
-		return $node;
+		$node = null;
 	}
 	
 	/**
@@ -184,18 +182,22 @@ class NodeImporter extends AbstractImporter {
 					if (array_key_exists('uri', $field['value'])) {
 						$file = $this->createFile($field['value']['uri']);
 						$field['value']['target_id'] = $file->id();
+						unset($file);
 					} else {
 						foreach ($field['value'] as $value) {
 							$file = $this->createFile($value['uri']);
 							$value['target_id'] = $file->id();
+							unset($file, $value);
 						}
 					}
 				}
 				$node->get($field['field_name'])->setValue($field['value']);
 			}
+			unset($field);
 		}
 		
 		$node->save();
+		$node = null;
 	}
 	
 	/**

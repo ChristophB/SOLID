@@ -41,7 +41,7 @@ abstract class AbstractImporter {
 				} else {
 					$entity_manager = \Drupal::entityManager();
 					$entity = $entity_manager->getStorage($type)->load($id);
-					$entity->delete();
+					if ($entity) $entity->delete();
 				}
 			}
 		}
@@ -58,15 +58,17 @@ abstract class AbstractImporter {
      */
     protected function searchEntityIds($params) {
 		if (!$params['entity_type']) throw new Exception('Error: named parameter "entity_type" missing');
-		
 		$query = \Drupal::entityQuery($params['entity_type']);
 		
 		foreach ($params as $key => $value) {
 			if ($key == 'entity_type') continue;
 			$query->condition($key, $value);
+			unset($key, $value);
 		}
+		$result = $query->execute();
+		$query = null;
 		
-		return $query->execute();
+		return $result;
 	}
 	
 	/**

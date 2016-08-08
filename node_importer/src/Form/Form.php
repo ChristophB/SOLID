@@ -77,6 +77,7 @@ class Form extends FormBase {
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
+        \Drupal::logger('node_importer')->error('##### Start: '. memory_get_usage(false));
         $overwrite = $form_state->getValue('overwrite');
             
         $vocabularyImporter = new VocabularyImporter($overwrite);
@@ -95,7 +96,8 @@ class Form extends FormBase {
                 $fileHandler->setVocabularyData();
             if ($form_state->getValue('import_nodes'))
                 $fileHandler->setNodeData();
-        
+            \Drupal::logger('node_importer')->error('End: '. memory_get_usage(false));
+            \Drupal::logger('node_importer')->error('Peak: '. memory_get_peak_usage(false));
             drupal_set_message(
 				sprintf(
 					t('Success! %d vocabularies with %d terms and %d nodes imported.'),
@@ -107,6 +109,8 @@ class Form extends FormBase {
         } catch (Exception $e) {
             $nodeImporter->rollback();
             $vocabularyImporter->rollback();
+            \Drupal::logger('node_importer')->error('End: '. memory_get_usage(false));
+            \Drupal::logger('node_importer')->error('Peak: '. memory_get_peak_usage(false));
 			drupal_set_message(
 			    t($e->getMessage())
 			    . ' In '. $e->getFile(). ' (line:'. $e->getLine(). ')'
