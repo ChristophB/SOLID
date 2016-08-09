@@ -53,8 +53,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		$this->graph->parse(file_get_contents($this->filePath));
 		\Drupal::logger('node_importer')->error('graph parsed: '. memory_get_usage());
 		
-		if (isset($params['classesAsNodes'])) $this->classesAsNodes = true;
-		if (isset($params['onlyLeafClassesAsNodes'])) $this->onlyLeafClassesAsNodes = true;
+		if ($params['classesAsNodes']) $this->classesAsNodes = true;
+		if ($params['onlyLeafClassesAsNodes']) $this->onlyLeafClassesAsNodes = true;
 	}
 	
 	public function setData() {
@@ -165,13 +165,17 @@ class OWLFileHandler extends AbstractFileHandler {
 			]
 		];
 		
-		if ($this->isATransitive($individual, self::VOCABULARY))
+		if (
+			$this->isATransitive($individual, self::VOCABULARY)
+			|| $this->hasTransitiveSubClass(self::VOCABULARY, $individual)
+		) {
 			$fields[] = [
 				'field_name' => 'field_tags',
 				'value'      => $this->createFieldTags($individual),
 				'references' => 'taxonomy_term'
 			];
-
+		}
+		
 		foreach ($this->getProperties() as $property) {
 			if (!$individual->hasProperty($property))
 				continue;
@@ -195,7 +199,12 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$fieldTags = [];
 		
-		foreach ($individual->allResources('rdf:type') as $tag) {
+		$resources = array_merge(
+			$individual->allResources('rdf:type'),
+			$individual->allResources('rdfs:subClassOf')
+		);
+		
+		foreach ($resources as $tag) {
 			if (!$this->hasTransitiveSubClass(self::VOCABULARY, $tag))
 				continue;
 			
