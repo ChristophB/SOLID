@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.lha.org/duo#"
+     xml:base="http://www.lha.org/duo"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:duo="http://www.lha.org/duo#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.lha.org/duo"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/duo#alias -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#alias">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#alt -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#alt">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#content -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#content">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#entity_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#entity_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#ref_type"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#field -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#field"/>
+    
+
+
+    <!-- http://www.lha.org/duo#file_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#file_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#ref_type"/>
+        <rdfs:range rdf:resource="http://www.lha.org/duo#File"/>
+        <rdfs:domain rdf:resource="http://www.lha.org/duo#Node"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#image_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#image_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#ref_type"/>
+        <rdfs:range rdf:resource="http://www.lha.org/duo#Img"/>
+        <rdfs:domain rdf:resource="http://www.lha.org/duo#Node"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#link_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#link_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#ref_type"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#node_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#node_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#ref_type"/>
+        <rdfs:range rdf:resource="http://www.lha.org/duo#Node"/>
+        <rdfs:domain rdf:resource="http://www.lha.org/duo#Node"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#ref_num -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#ref_num"/>
+    
+
+
+    <!-- http://www.lha.org/duo#ref_type -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#ref_type"/>
+    
+
+
+    <!-- http://www.lha.org/duo#summary -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#summary">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#taxonomy_term_ref -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#taxonomy_term_ref">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#ref_type"/>
+        <rdfs:range rdf:resource="http://www.lha.org/duo#Vocabulary"/>
+        <rdfs:domain rdf:resource="http://www.lha.org/duo#Node"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#title -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#title">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/duo#uri -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/duo#uri">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/duo#reference_field -->
+
+    <owl:ObjectProperty rdf:about="http://www.lha.org/duo#reference_field"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/duo#literal_field -->
+
+    <owl:DatatypeProperty rdf:about="http://www.lha.org/duo#literal_field"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.lha.org/duo#Binary -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#Binary">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/duo#File"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/duo#Doc -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#Doc">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/duo#File"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/duo#Entity -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#Entity"/>
+    
+
+
+    <!-- http://www.lha.org/duo#File -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#File"/>
+    
+
+
+    <!-- http://www.lha.org/duo#Img -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#Img">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/duo#File"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/duo#Node -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#Node"/>
+    
+
+
+    <!-- http://www.lha.org/duo#Vocabulary -->
+
+    <owl:Class rdf:about="http://www.lha.org/duo#Vocabulary"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.3.20160319-0906) https://github.com/owlcs/owlapi -->
+
