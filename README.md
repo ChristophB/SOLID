@@ -28,10 +28,16 @@ Supported import formats:
 
 * You have to create a file with all information you want to import. Use the corresponding "template.*" file in the root folder of the release as reference.
 * Log in as administrator and navigate to Config->Content->Node Importer. (alternatively use the URL: "[your Drupal 8 root URL]/node_importer")
-* Place the previously created file into the form and click "Import".
+* Place the previously created file into the form.
+* Check "Import Vocabularies" or "Import Nodes" and click "Import".
 * There will be a message indicating the success/failure of the import process.
 * The module automatically undos all changes if an error occured.
 
+## Additional features
+
+The import form contains some important checkboxes, which only affect OWL imports.
+* "Import classes under 'Node' as nodes": Enables the user to handle classes as if they are individuals. The module will create a page for each class containing all properties.
+* "Only import leaf classes under 'Node' as nodes": This checkbox only works in combination with the above one. Only leaf classes will be handled as individuals.
 
 ## Troubleshooting/Importent notes
 

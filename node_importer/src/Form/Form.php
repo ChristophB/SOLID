@@ -56,7 +56,7 @@ class Form extends FormBase {
         
         $form['import_only_leaf_class_nodes'] = [
             '#type'  => 'checkbox',
-            '#title' => t('Only import leaf classes unter "Node" as nodes'),
+            '#title' => t('Only import leaf classes under "Node" as nodes'),
         ];
         
         $form['overwrite'] = [
