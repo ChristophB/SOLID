@@ -23,7 +23,7 @@ abstract class AbstractFileHandler {
 	
 	public function __construct($params) {
 		if (empty($params)) throw new Exception('Error: no parameters provided.');
-		if (is_null($params['fid'])) throw new Exception('Error: named parameter "fid" missing.');
+		if (is_null($params['path'])) throw new Exception('Error: named parameter "path" missing.');
 		if (is_null($params['vocabularyImporter'])) throw new Exception('Error: named parameter "vocabularyImporter" missing.');
 		if (is_null($params['nodeImporter'])) throw new Exception('Error: named parameter "nodeImporter" missing.');
 		
@@ -31,9 +31,8 @@ abstract class AbstractFileHandler {
 			'vocabularies' => [],
 			'nodes'        => [], 
 		];
-		
-	    $file = File::load($params['fid']);
-	    $this->filePath = drupal_realpath($file->getFileUri());
+	
+	    $this->filePath = $params['path'];
 	    
 	    $this->vocabularyImporter = $params['vocabularyImporter'];
 	    $this->nodeImporter       = $params['nodeImporter'];

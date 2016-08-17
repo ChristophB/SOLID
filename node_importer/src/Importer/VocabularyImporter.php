@@ -19,11 +19,11 @@ use Drupal\taxonomy\Entity\Term;
  */
 class VocabularyImporter extends AbstractImporter {
     
-    function __construct($overwrite = false) {
+    function __construct($overwrite = false, $userId) {
+    	parent::__construct($overwrite, $userId);
+    	
         $this->entities['taxonomy_vocabulary'] = [];
         $this->entities['taxonomy_term'] = [];
-        
-        if ($overwrite) $this->overwrite = true;
     }
     
     public function import($data) {
@@ -126,13 +126,15 @@ class VocabularyImporter extends AbstractImporter {
 	        		'vid'         => $vid
 	    		]);
 				
-				$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-				$terms = $storage_handler->loadMultiple($tids);
-				$storage_handler->delete($terms); // @todo: memory leak!
-				
-				$storage_handler = null;
-				$terms = null;
-				$tids = null;
+				if (!empty($tids)) {
+					$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+					$terms = $storage_handler->loadMultiple($tids);
+					$storage_handler->delete($terms); // @todo: memory leak!
+					
+					$storage_handler = null;
+					$terms = null;
+					$tids = null;
+				}
 			} else {
 				throw new Exception(
 					'Error: vocabulary with vid "'. $vid. '" already exists. '

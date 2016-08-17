@@ -8,9 +8,11 @@
 namespace Drupal\node_importer\FileHandler;
 
 use Drupal\file\Entity\File;
+use \Exception;
 
 use Drupal\node_importer\FileHandler\JSONFileHandler;
 use Drupal\node_importer\FileHandler\OWLFileHandler;
+use Drupal\node_importer\FileHandler\OWLLargeFileHandler;
 
 /**
  * Serves a FileHandler depending on the extension of the given file
@@ -18,6 +20,8 @@ use Drupal\node_importer\FileHandler\OWLFileHandler;
  * @author Christoph Beger
  */
 class FileHandlerFactory {
+    
+    const THRESHOLD = 10000000; // 10 MBytes
     
     /**
      * Loads the file by its fid and checks file extension
@@ -28,23 +32,27 @@ class FileHandlerFactory {
      */
     public static function createFileHandler($params) {
     	if (empty($params)) throw new Exception('Error: no parameters provided.');
-    	if (is_null($params['fid'])) throw new Exception('Error: named parameter "fid" missing.');
+    	if (is_null($params['path'])) throw new Exception('Error: named parameter "path" missing.');
     	if (is_null($params['vocabularyImporter'])) throw new Exception('Error: named parameter "vocabularyImporter" missing.');
     	if (is_null($params['nodeImporter'])) throw new Exception('Error: named parameter "nodeImporter" missing.');
-    	
-        $uri = File::load($params['fid'])->getFileUri();
 		
-		switch (pathinfo(drupal_realpath($uri), PATHINFO_EXTENSION)) {
+		$path = $params['path'];
+		
+		switch (pathinfo($path, PATHINFO_EXTENSION)) {
 		    case 'json':
 		        return new JSONFileHandler([
-		        	'fid'                => $params['fid'],
+		        	'path'               => $path,
 		        	'vocabularyImporter' => $params['vocabularyImporter'],
 		        	'nodeImporter'       => $params['nodeImporter']
 		        ]);
 		    case 'owl':
-		        return new OWLFileHandler($params);
+		    	if (filesize($path) > self::THRESHOLD) {
+		    		return new OWLLargeFileHandler($params);
+		    	} else {
+		        	return new OWLFileHandler($params);
+		    	}
 		    default:
-		        throw new Exception('Error: input file format is not supported.');
+		        throw new Exception('Error: input file format is not supported or file does not exist.');
 		}
     }
 }

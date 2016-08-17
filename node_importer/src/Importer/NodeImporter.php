@@ -26,12 +26,12 @@ class NodeImporter extends AbstractImporter {
 	 */
     private $nodeReferences = [];
 
-    function __construct($overwrite = false) {
+    function __construct($overwrite = false, $userId) {
+    	parent::__construct($overwrite, $userId);
+    	
         $this->entities['node'] = [];
         $this->entities['file'] = [];
         $this->entities['path'] = [];
-        
-        if ($overwrite) $this->overwrite = true;
     }
     
     public function import($data) {
@@ -74,7 +74,7 @@ class NodeImporter extends AbstractImporter {
 			'title'    => $params['title'],
 			'langcode' => 'en', // @todo get language from import file
 			'status'   => 1,
-			'uid'      => \Drupal::currentUser()->id()
+			'uid'      => $this->userId
 		]);
 		$node->save();
 		
@@ -102,11 +102,11 @@ class NodeImporter extends AbstractImporter {
 		if (!$uri) throw new Exception('Error: parameter $uri missing.');
 		$drupalUri = file_default_scheme(). '://'. $uri;
 		
-		if (!file_exists(drupal_realpath($drupalUri)))
-			throw new Exception('Error: file '. drupal_realpath($drupalUri). ' could not be found.');
+		if (!file_exists(\Drupal::service('file_system')->realpath($drupalUri)))
+			throw new Exception('Error: file '. \Drupal::service('file_system')->realpath($drupalUri). ' could not be found.');
 		
 		$file = File::create([
-			'uid'    => \Drupal::currentUser()->id(),
+			'uid'    => $this->userId,
 			'uri'    => $drupalUri,
 			'status' => 1,
 		]);

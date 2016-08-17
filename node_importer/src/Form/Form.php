@@ -77,53 +77,43 @@ class Form extends FormBase {
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
-        \Drupal::logger('node_importer')->error('##### Start: '. memory_get_usage(false));
-        $overwrite = $form_state->getValue('overwrite');
-            
-        $vocabularyImporter = new VocabularyImporter($overwrite);
-        $nodeImporter       = new NodeImporter($overwrite);
+        $fid                    = $form_state->getValue('file')[0];
+        $importVocabularies     = $form_state->getValue('import_vocabularies');
+        $importNodes            = $form_state->getValue('import_nodes');
+        $classesAsNodes         = $form_state->getValue('import_class_nodes');
+        $onlyLeafClassesAsNodes = $form_state->getValue('import_only_leaf_class_nodes');
+        $overwrite              = $form_state->getValue('overwrite');
+        $userId                 = \Drupal::currentUser()->id();
         
-        try {
-            $fileHandler = FileHandlerFactory::createFileHandler([
-                'fid'                    => $form_state->getValue('file')[0],
-                'vocabularyImporter'     => $vocabularyImporter,
-                'nodeImporter'           => $nodeImporter,
-                'classesAsNodes'         => $form_state->getValue('import_class_nodes'),
-                'onlyLeafClassesAsNodes' => $form_state->getValue('import_only_leaf_class_nodes'),
-            ]);
-            
-            if ($form_state->getValue('import_vocabularies'))
-                $fileHandler->setVocabularyData();
-            if ($form_state->getValue('import_nodes'))
-                $fileHandler->setNodeData();
-                
-            \Drupal::logger('node_importer')->error('End: '. memory_get_usage(false));
-            \Drupal::logger('node_importer')->error('Peak: '. memory_get_peak_usage(false));
-            
-            drupal_set_message(
-				sprintf(
-					t('Success! %d vocabularies with %d terms and %d nodes imported.'),
-					$vocabularyImporter->countCreatedVocabularies(),
-					$vocabularyImporter->countCreatedTags(),
-					$nodeImporter->countCreatedNodes()
-				)
-			);
-        } catch (Exception $e) {
-            $nodeImporter->rollback();
-            $vocabularyImporter->rollback();
-            
-            \Drupal::logger('node_importer')->error('End: '. memory_get_usage(false));
-            \Drupal::logger('node_importer')->error('Peak: '. memory_get_peak_usage(false));
-            
-			drupal_set_message(
-			    t($e->getMessage())
-			    . ' In '. $e->getFile(). ' (line:'. $e->getLine(). ')'
-			    . ' '. t('Rolling back...'),
-			    'error'
-			);
-        }
+        $file = File::load($fid);
+        $uri = $file->getFileUri();
+        $filePath = \Drupal::service('file_system')->realpath($uri);
+        $drupalPath = getcwd();
+        $newFile = $drupalPath. '/sites/default/files/'. $file->getFilename();
+        copy($filePath, $newFile);
+        
+        $cmd 
+            = "php -q modules/node_importer/src/Script/import.php $drupalPath "
+            . "$newFile $userId $importVocabularies $importNodes $classesAsNodes "
+            . "$onlyLeafClassesAsNodes $overwrite";
+        
+        $this->execInBackground($cmd);
+        
+        
+        drupal_set_message(
+			'Import started! Have a look at /admin/reports/dblog to see the progress.'
+		);
     }
 	
+	private function execInBackground($cmd) { 
+        if (substr(php_uname(), 0, 7) == "Windows"){ 
+            pclose(popen("start /B ". $cmd, "r"));  
+        } 
+        else { 
+            exec($cmd. " > /dev/null &");   
+        }
+    }
+    
 }
 
 ?>

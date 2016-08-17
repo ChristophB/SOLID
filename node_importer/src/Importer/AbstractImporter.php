@@ -21,6 +21,12 @@ abstract class AbstractImporter {
      */
     protected $entities  = [];
     protected $overwrite = false;
+    protected $userId;
+    
+    public function __construct($overwrite = false, $userId) {
+    	$this->userId = $userId;
+    	if ($overwrite) $this->overwrite = true;
+    }
     
     /**
      * Imports given data php object.
