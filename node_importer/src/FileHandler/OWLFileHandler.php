@@ -8,7 +8,7 @@
 namespace Drupal\node_importer\FileHandler;
 
 use Drupal\file\Entity\File;
-use Exception;
+use \Exception;
 
 /**
  * FileHandler which parses OWL files.
@@ -46,12 +46,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	private $onlyLeafClassesAsNodes = false;
 	
 	public function __construct($params) {
-		\Drupal::logger('node_importer')->error('OWLFileHandler::__construct(): '. memory_get_usage());
+		$this->doLog('OWLFileHandler::__construct(): '. memory_get_usage());
 		parent::__construct($params);
 		
 		$this->graph = new \EasyRdf_Graph();
 		$this->graph->parse(file_get_contents($this->filePath));
-		\Drupal::logger('node_importer')->error('graph parsed: '. memory_get_usage());
+		$this->doLog('graph parsed: '. memory_get_usage());
 		
 		if ($params['classesAsNodes']) $this->classesAsNodes = true;
 		if ($params['onlyLeafClassesAsNodes']) $this->onlyLeafClassesAsNodes = true;
@@ -65,13 +65,20 @@ class OWLFileHandler extends AbstractFileHandler {
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
 			$vid = $class->localName();
+			$this->doLog('Handling vocabulary: '. $vid);
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
-			foreach ($this->findAllSubClassesOf($class->getUri()) as $tag) {
+			$this->doLog('Collecting terms...');
+			$tags = $this->findAllSubClassesOf($class->getUri());
+			$this->doLog('Found '. sizeof($tags). ' terms.');
+			
+			$this->doLog('Inserting terms into Drupal DB...');
+			foreach ($tags as $tag) {
 				$this->vocabularyImporter->createTag($vid, $tag->localName());
 			}
 			
-			foreach ($this->findAllSubClassesOf($class->getUri()) as $subClass) {
+			$this->doLog('Adding child parent linkages to terms...');
+			foreach ($tags as $subClass) {
 				$tag = [
 					'name'    => $subClass->localName(),
 					'parents' => $this->getParentTags($subClass)
@@ -82,6 +89,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	public function setNodeData() {
+		$this->doLog('Inserting nodes into Drupal DB...');
 		foreach ($this->getIndividuals() as $individual) {
 			$node = [
 				'title'  => 
@@ -95,6 +103,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			$this->nodeImporter->createNode($node);
 		}
 		
+		$this->doLog('Adding node references...');
 		$this->nodeImporter->insertNodeReferences();
 	}
 	
@@ -660,9 +669,12 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$properties = [];
 		foreach ($annotationProperties as $annotationProperty) {
-			if ($this->getProperty($annotationProperty, 'rdfs:subPropertyOf') != self::ANNOTATION_FIELD)
-				continue;
-			$properties[] = $annotationProperty;
+			$superProperties = $this->getProperty($annotationProperty, 'rdfs:subPropertyOf');
+			
+			if (
+				(is_array($superProperties) && in_array(self::ANNOTATION_FIELD, $superProperties))
+				|| $superProperties == self::ANNOTATION_FIELD
+			) $properties[] = $annotationProperty;
 		}
 		
 		return $properties;
@@ -673,9 +685,12 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$properties = [];
 		foreach ($datatypeProperties as $datatypeProperty) {
-			if ($this->getProperty($datatypeProperty, 'rdfs:subPropertyOf') != self::DATATYPE_FIELD)
-				continue;
-			$properties[] = $datatypeProperty;
+			$superProperties = $this->getProperty($datatypeProperty, 'rdfs:subPropertyOf');
+			
+			if (
+				(is_array($superProperties) && in_array(self::DATATYPE_FIELD, $superProperties))
+				|| $superProperties == self::DATATYPE_FIELD
+			) $properties[] = $datatypeProperty;
 		}
 		
 		return $properties;
@@ -686,9 +701,12 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$properties = [];
 		foreach ($objectProperties as $objectProperty) {
-			if ($this->getProperty($objectProperty, 'rdfs:subPropertyOf') != self::OBJECT_FIELD)
-				continue;
-			$properties[] = $objectProperty;
+			$superProperties = $this->getProperty($objectProperty, 'rdfs:subPropertyOf');
+				
+			if (
+				(is_array($superProperties) && in_array(self::OBJECT_FIELD, $superProperties))
+				|| $superProperties == self::OBJECT_FIELD
+			) $properties[] = $objectProperty;
 		}
 		
 		return $properties;

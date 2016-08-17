@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\node_importer\Form\Form.
+ * Contains \Drupal\node_importer\Controller\Form.
  */
 
-namespace Drupal\node_importer\Form;
+namespace Drupal\node_importer\Controller;
 
 use Exception;
 
@@ -29,7 +29,6 @@ class Form extends FormBase {
     }
   
     public function buildForm(array $form, FormStateInterface $form_state) {
-
         $form['file'] = [
             '#type'   => 'managed_file',
             '#title'  => t('File:'),
@@ -84,6 +83,9 @@ class Form extends FormBase {
         $onlyLeafClassesAsNodes = $form_state->getValue('import_only_leaf_class_nodes');
         $overwrite              = $form_state->getValue('overwrite');
         $userId                 = \Drupal::currentUser()->id();
+        
+        // if log-file exists dont allow another import process
+        
         
         $file = File::load($fid);
         $uri = $file->getFileUri();

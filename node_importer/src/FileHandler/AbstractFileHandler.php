@@ -38,11 +38,17 @@ abstract class AbstractFileHandler {
 	    $this->nodeImporter       = $params['nodeImporter'];
 	}
 	
+	protected function doLog($msg) {
+		\Drupal::logger('node_importer')->notice($msg);
+		print($msg. "\n");
+	}
+	
 	abstract public function setVocabularyData();
 	
 	abstract public function setNodeData();
 	
 	abstract public function setData();
+	
 }
  
 ?>

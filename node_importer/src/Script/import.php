@@ -23,6 +23,11 @@ $overwrite              = $argv[8] ? true : false;
 if (!$drupalPath) die("Error: script parameter 'drupalPath' missing.\n");
 if (!$filePath) die("Error: script parameter 'filePath' missing.\n");
 
+$logFile = 'modules/node_importer/node_importer.log';
+if (file_exists($logFile)) unlink($logFile);
+fclose(STDOUT);
+$STDOUT = fopen($logFile, 'wb');
+
 $autoloader = require_once $drupalPath. '/autoload.php';
 
 $request = Request::createFromGlobals();
@@ -31,8 +36,8 @@ $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
 $kernel->boot();
 $kernel->prepareLegacyRequest($request);
 
-
-\Drupal::logger('node_importer')->notice('##### Start: '. memory_get_usage(false));
+$msg = '##### Start: '. memory_get_usage(false);
+doLog($msg);
 
 $vocabularyImporter = new VocabularyImporter($overwrite, $userId);
 $nodeImporter       = new NodeImporter($overwrite, $userId);
@@ -53,45 +58,41 @@ try {
     
     logMemoryUsage();
     
-    \Drupal::logger('node_importer')->notice(
-		sprintf(
-			t('Success! %d vocabularies with %d terms and %d nodes imported.'),
-			$vocabularyImporter->countCreatedVocabularies(),
-			$vocabularyImporter->countCreatedTags(),
-			$nodeImporter->countCreatedNodes()
-		)
+    $msg = sprintf(
+		t('Success! %d vocabularies with %d terms and %d nodes imported.'),
+		$vocabularyImporter->countCreatedVocabularies(),
+		$vocabularyImporter->countCreatedTags(),
+		$nodeImporter->countCreatedNodes()
 	);
-	print(
-	    sprintf(
-			t('Success! %d vocabularies with %d terms and %d nodes imported.'),
-			$vocabularyImporter->countCreatedVocabularies(),
-			$vocabularyImporter->countCreatedTags(),
-			$nodeImporter->countCreatedNodes()
-		). "\n"
-	);
+    doLog($msg);
 } catch (Exception $e) {
     $nodeImporter->rollback();
     $vocabularyImporter->rollback();
        
-    logMemoryUsage();     
-	\Drupal::logger('node_importer')->error(
-	    t($e->getMessage())
+    logMemoryUsage();
+    
+    $msg
+    	= t($e->getMessage())
 	    . ' In '. $e->getFile(). ' (line:'. $e->getLine(). ')'
-	    . ' '. t('Rolling back...')
-	);
-	print(
-	    t($e->getMessage())
-	    . ' In '. $e->getFile(). ' (line:'. $e->getLine(). ')'
-	    . ' '. t('Rolling back...')
-	    . "\n"
-	);
+	    . ' '. t('Rolling back...');
+	doLog($msg);
 }
 
-// unlink($filePath);
+unlink($filePath);
+fclose($STDOUT);
+unlink($logFile);
+
+
+function doLog($msg) {
+	\Drupal::logger('node_importer')->notice($msg);
+	print $msg. "\n";
+}
 
 function logMemoryUsage() {
-    \Drupal::logger('node_importer')->notice('End: '. memory_get_usage(false));
-    \Drupal::logger('node_importer')->notice('Peak: '. memory_get_peak_usage(false));
+	doLog(
+    	'End: '. memory_get_usage(false). "\n"
+    	. 'Peak: '. memory_get_peak_usage(false)
+    );
 }
 
 ?>

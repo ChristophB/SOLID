@@ -57,27 +57,22 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		if ($params['onlyLeafClassesAsNodes']) $this->onlyLeafClassesAsNodes = true;
 	}
 	
-	public function setData() {
-		$this->setVocabularyData();
-		$this->setNodeData();
-	}
-	
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
-			\Drupal::logger('node_importer')->notice('Handling vocabulary: '. $class);
+			$this->doLog('Handling vocabulary: '. $class);
 			$vid = $this->getLocalName($class);
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
-			\Drupal::logger('node_importer')->notice('Collecting terms...');
+			$this->doLog('Collecting terms...');
 			$tags = $this->findAllSubClassesOf($class);
-			\Drupal::logger('node_importer')->notice('Found '. sizeof($tags). ' terms.');
+			$this->doLog('Found '. sizeof($tags). ' terms.');
 			
-			\Drupal::logger('node_importer')->notice('Inserting terms into Drupal DB...');
+			$this->doLog('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
 				$this->vocabularyImporter->createTag($vid, $this->getLocalName($tag));
 			}
 			
-			\Drupal::logger('node_importer')->notice('Adding child parent linkages to terms...');
+			$this->doLog('Adding child parent linkages to terms...');
 			foreach ($tags as $subClass) {
 				$tag = [
 					'name'    => $this->getLocalName($subClass),
@@ -89,11 +84,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	public function setNodeData() {
-		\Drupal::logger('node_importer')->notice('Collecting nodes...');
+		$this->doLog('Collecting nodes...');
 		$individuals = $this->getIndividuals();
-		\Drupal::logger('node_importer')->notice('Found '. sizeof($individuals). ' nodes.');
+		$this->doLog('Found '. sizeof($individuals). ' nodes.');
 		
-		\Drupal::logger('node_importer')->notice('Inserting nodes into Drupal DB...');
+		$this->doLog('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
 			$properties = $this->getPropertiesAsArray($individual);
 			
@@ -109,7 +104,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			$this->nodeImporter->createNode($node);
 		}
 		
-		\Drupal::logger('node_importer')->notice('Adding node references...');
+		$this->doLog('Adding node references...');
 		$this->nodeImporter->insertNodeReferences();
 	}
 	
@@ -559,41 +554,6 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		if (!$string) return null;
 		
 		return preg_replace('/"?\^\^.*$/', '', $string);
-	}
-	
-	/**
-	 * Returns a string with <a> tag for individual and ref_num.
-	 * 
-	 * @param $individual individual resource
-	 * @param $num ref_num property
-	 * 
-	 * @return string
-	 */
-	private function createUrlForAxiom($individual, $num) {
-		throw new Exception('Deprecated!');
-		if (!$num) throw new Exception('Error: parameter $num missing');
-		
-		$axioms = $this->graph->resourcesMatching('owl:annotatedSource', $individual);
-		foreach ($axioms as $axiom) {
-			$properties = $this->getPropertiesAsArray($axiom);
-			
-			if (!$properties[self::REF_NUM] == $num. '"^^xsd:integer')
-				continue;
-				
-			$target = $this->graph->resource($properties['owl:annotatedTarget']);
-			$uri = $this->getProperty($target, self::URI);
-				
-			if (!$uri) {
-				$alias = $this->getProperty($target, self::ALIAS);
-				
-				if (!$alias) throw new Exception('Error: URLs can only reference entities with uri or alias. ('. $target->localName(). ')');
-				$uri = base_path(). $alias;
-			}
-				
-			return '<a href="'. base_path(). $alias. '">'. $target->localName(). '</a>';
-		}
-		
-		return null;
 	}
 	
 	/**
