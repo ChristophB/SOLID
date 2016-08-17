@@ -57,6 +57,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		if ($params['onlyLeafClassesAsNodes']) $this->onlyLeafClassesAsNodes = true;
 	}
 	
+	public function setData() {
+		$this->setVocabularyData();
+		$this->setNodeData();
+	}
+	
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
 			$this->doLog('Handling vocabulary: '. $class);
