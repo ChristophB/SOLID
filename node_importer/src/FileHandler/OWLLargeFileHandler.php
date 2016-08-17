@@ -120,11 +120,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 */
 	private function getBundle($node) {
 		if (!$node) throw new Exception('Error: parameter $node missing');
-	
+		
 		foreach ($this->getDirectSubClassesOf(self::NODE) as $bundle) {
 			if (
 				$this->isATransitive($node, $bundle)
-				|| $this->hasTransitiveSubClass($bundle, $node)
+				|| $this->hasTransitiveSuperClass($node, $bundle)
 			)
 				return strtolower(preg_replace(
 					'/[^A-Za-z0-9]/', '_', $this->getLocalName($bundle)
@@ -163,7 +163,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		if (
 			$this->isATransitive($individual, self::VOCABULARY)
-			|| $this->hasTransitiveSubClass(self::VOCABULARY, $individual)
+			|| $this->hasTransitiveSuperClass($individual, self::VOCABULARY)
 		) {
 			$fields[] = [
 				'field_name' => 'field_tags',
@@ -171,7 +171,6 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				'references' => 'taxonomy_term'
 			];
 		}
-		
 		
 		foreach ($this->getProperties() as $property) {
 			if (!array_key_exists($this->getLocalName($property), $properties))
@@ -202,7 +201,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		$fieldTags = [];
 		foreach ($tags as $tag) {
-			if (!$this->hasTransitiveSubClass(self::VOCABULARY, $tag))
+			if (!$this->hasTransitiveSuperClass($tag, self::VOCABULARY))
 				continue;
 			
 			$vocabulary = $this->getVocabularyForTag($tag);
@@ -224,12 +223,12 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * 
 	 * @return boolean
 	 */
-	private function hasTransitiveSubClass($class, $subClass) {
+	private function hasTransitiveSuperClass($class, $superClass) {
 		if (!$class) throw new Exception('Error: parameter $class missing.');
-		if (!$subClass) throw new Exception('Error: parameter $subClass missing.');
+		if (!$superClass) throw new Exception('Error: parameter $superClass missing.');
 		
-		foreach ($this->findAllSubClassesOf($class) as $curSubClass) {
-			if ($curSubClass == $subClass)
+		foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
+			if ($curSuperClass == $superClass)
 				return true;
 		}
 		return false;
@@ -506,7 +505,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns value of the resource property
 	 * 
-	 * @param $resource resource
+	 * @param $resource xml
 	 * @param $uri properties uri
 	 * 
 	 * @return
@@ -864,12 +863,32 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		if ($this->isA($individual, $superClass))
 			return true;
 		
-		foreach ($this->findAllSubClassesOf($superClass) as $curSubClass) {
-			if ($this->isA($individual, $curSubClass))
+		$xml = $this->getXMLElement($individual);
+		foreach ($this->getProperty($xml, 'type') as $directSuperClass) {die($directSuperClass);
+			if ($superClass == $directSuperClass)
 				return true;
+			
+			foreach ($this->findAllSuperClassesOf($directSuperClass) as $curClass) {
+				if ($superClass == $curClass)
+					return true;
+			}
 		}
 		
 		return false;
+	}
+	
+	private function findAllSuperClassesOf($class) {
+		if (!$class) throw new Exception('Error: parameter $class missing.');
+		
+		$xml = $this->getXMLElement($class);
+		if (is_null($xml)) return [];
+		$result = $this->getProperty($xml, 'subClassOf');
+		
+		foreach ($result as $superClass) {
+			$result = array_merge($result, $this->findAllSuperClassesOf($superClass));
+		}
+		
+		return array_unique($result);
 	}
 	
 	private function isA($individual, $superClass) {

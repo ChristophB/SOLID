@@ -90,8 +90,8 @@ function doLog($msg) {
 
 function logMemoryUsage() {
 	doLog(
-    	'End: '. memory_get_usage(false). "\n"
-    	. 'Peak: '. memory_get_peak_usage(false)
+    	'End: '. memory_get_usage(false)
+    	. ', Peak: '. memory_get_peak_usage(false)
     );
 }
 
