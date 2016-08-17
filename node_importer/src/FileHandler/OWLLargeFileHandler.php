@@ -17,10 +17,6 @@ use \Exception;
  * @author Christoph Beger
  */
 class OWLLargeFileHandler extends AbstractFileHandler {
-	
-	// $node->children($ns, true)
-	// (string) $node->attributes('rdf', true)->about
-	
 			
 	/** Declaration of DUO default classes/properties **/ 
 	const VOCABULARY       = 'http://www.lha.org/duo#Vocabulary';
@@ -29,22 +25,10 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	const ENTITY           = 'http://www.lha.org/duo#Entity';
 	const DOC              = 'http://www.lha.org/duo#Doc';
 	const FILE             = 'http://www.lha.org/duo#File';
-	const TITLE            = 'http://www.lha.org/duo#title';
-	const ALIAS            = 'http://www.lha.org/duo#alias';
-	const CONTENT          = 'http://www.lha.org/duo#content';
-	const SUMMARY          = 'http://www.lha.org/duo#summary';
-	const REF_NUM          = 'http://www.lha.org/duo#ref_num';
-	const REF_TYPE         = 'http://www.lha.org/duo#ref_type';
-	const NODE_REF         = 'http://www.lha.org/duo#node_ref';
-	const FILE_REF         = 'http://www.lha.org/duo#file_ref';
-	const IMAGE_REF        = 'http://www.lha.org/duo#image_ref';
-	const TERM_REF         = 'http://www.lha.org/duo#taxonomy_term_ref';
 	const DOC_REF          = 'http://www.lha.org/duo#doc_ref';
 	const ANNOTATION_FIELD = 'http://www.lha.org/duo#field';
 	const DATATYPE_FIELD   = 'http://www.lha.org/duo#literal_field';
 	const OBJECT_FIELD     = 'http://www.lha.org/duo#reference_field';
-	const URI              = 'http://www.lha.org/duo#uri';
-	const ALT              = 'http://www.lha.org/duo#alt';
 	const NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 	
 	private $classesAsNodes         = false;
@@ -95,6 +79,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		$this->doLog('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
+			$this->doLog('Inserting '. $this->getLocalName($individual). ' into Drupal DB...');
 			$properties = $this->getPropertiesAsArray($individual);
 			
 			$node = [
@@ -331,7 +316,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				];
 				$field['entity'] = 'file';
 			} elseif ($this->isATransitive($target, self::DOC)) {
-				$refType = self::DOC_REF;
+				$refType = self::DOC_REF; // @todo
 			} elseif (($vocabulary = $this->getVocabularyForTag($target)) != null) {
 				$value = [
 					'vid'  => $this->getLocalName($vocabulary),
@@ -340,8 +325,6 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
 				$axiom = $this->getAxiomWithTargetForIndividual($individual, $property, $target);
-				
-				
 					
 				foreach ($axiom->children('duo', true) as $child) {
 					if ($child->getName() == 'field') {
@@ -863,7 +846,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			}
 		}
 	
-		return $result;
+		return array_unique($result);
 	}
 	
 	/**

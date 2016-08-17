@@ -36,7 +36,7 @@ $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
 $kernel->boot();
 $kernel->prepareLegacyRequest($request);
 
-$msg = '##### Start: '. memory_get_usage(false);
+$msg = 'Start: '. memory_get_usage(false);
 doLog($msg);
 
 $vocabularyImporter = new VocabularyImporter($overwrite, $userId);
@@ -85,7 +85,7 @@ unlink($logFile);
 
 function doLog($msg) {
 	\Drupal::logger('node_importer')->notice($msg);
-	print $msg. "\n";
+	print date('H:m:s', time()). "> $msg\n";
 }
 
 function logMemoryUsage() {

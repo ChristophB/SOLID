@@ -331,7 +331,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				];
 				$field['entity'] = 'file';
 			} elseif ($this->isATransitive($target, self::DOC)) {
-				$refType = self::DOC_REF;
+				$refType = self::DOC_REF; // @todo
 			} elseif ($this->getVocabularyForTag($target) != null) {
 				$value = [
 					'vid'  => $this->getVocabularyForTag($target)->localName(),

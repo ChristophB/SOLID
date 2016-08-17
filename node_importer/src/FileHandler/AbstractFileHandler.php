@@ -40,7 +40,7 @@ abstract class AbstractFileHandler {
 	
 	protected function doLog($msg) {
 		\Drupal::logger('node_importer')->notice($msg);
-		print($msg. "\n");
+		print date('H:m:s', time()). "> $msg\n";
 	}
 	
 	abstract public function setVocabularyData();
