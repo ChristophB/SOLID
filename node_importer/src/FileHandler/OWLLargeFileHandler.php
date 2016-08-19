@@ -216,7 +216,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
-	 * Returns true if $subClass is a transitive subclass of $class.
+	 * Returns true if $superClass is a transitive superclass of $class.
 	 * 
 	 * @param $class class uri
 	 * @param $subClass subclass to search for
@@ -564,8 +564,9 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		while ($xml->read()) {
 			if (
-				$xml->name != 'owl:Axiom'
-				|| $xml->nodeType != ImprovedXMLReader::ELEMENT
+				$xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != 'owl:Axiom'
+				|| $xml->depth != 1
 			) continue;
 			$axiom = new \SimpleXMLElement($xml->readOuterXML());
 			
@@ -646,7 +647,10 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		$xml->open($this->filePath);
 		
 		while ($xml->read()) {
-			if (!preg_match('/owl:/', $xml->name) || $xml->nodeType != ImprovedXMLReader::ELEMENT) continue;
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| !preg_match('/owl:/', $xml->name)
+				|| $xml->depth != 1
+			) continue;
 			
 			$node = new \SimpleXMLElement($xml->readOuterXML());
 			
@@ -712,7 +716,10 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		$result = [];
 		
 		while ($xml->read()) {
-			if ($xml->name != $type || $xml->nodeType != ImprovedXMLReader::ELEMENT) continue;
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != $type
+				|| $xml->depth != 1
+			) continue;
 			
 			$node = new \SimpleXMLElement($xml->readOuterXML());
 			$result[] = (string)$node->attributes('rdf', true)->about;
@@ -755,7 +762,10 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		$result = [];
 		while ($xml->read()) {
-			if ($xml->name != 'owl:Class' || $xml->nodeType != ImprovedXMLReader::ELEMENT) continue;
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != 'owl:Class'
+				|| $xml->depth != 1	
+			) continue;
 			$node = new \SimpleXMLElement($xml->readOuterXML());
 			
 			foreach ($node->children('rdfs', true) as $child) {
