@@ -7,7 +7,7 @@
 
 namespace Drupal\node_importer\Importer;
 
-use Exception;
+use \Exception;
 
 use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;

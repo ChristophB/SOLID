@@ -7,7 +7,7 @@
 
 namespace Drupal\node_importer\Importer;
 
-use Exception;
+use \Exception;
 
 /**
  * This abstract class declares all functions which are required for an Importer.

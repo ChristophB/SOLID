@@ -69,6 +69,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				];
 				$this->vocabularyImporter->setTagParents($vid, [$tag]);
 			}
+			
+			unset($tags);
 		}
 	}
 	
@@ -93,6 +95,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			
 			$this->nodeImporter->createNode($node);
 		}
+		
+		unset($individuals);
 		
 		$this->doLog('Adding node references...');
 		$this->nodeImporter->insertNodeReferences();

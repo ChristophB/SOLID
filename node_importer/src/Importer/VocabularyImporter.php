@@ -7,7 +7,7 @@
 
 namespace Drupal\node_importer\Importer;
 
-use Exception;
+use \Exception;
 
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
