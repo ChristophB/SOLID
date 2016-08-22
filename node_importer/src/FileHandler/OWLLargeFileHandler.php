@@ -850,6 +850,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of class resources
 	 */
 	private function findAllSubClassesOf($class) {
+		print "found node: $class\n";
 		$result = [];
 		
 		foreach ($this->getDirectSubClassesOf($class) as $subClass) {
