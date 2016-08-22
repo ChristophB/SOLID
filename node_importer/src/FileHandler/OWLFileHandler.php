@@ -10,6 +10,7 @@ namespace Drupal\node_importer\FileHandler;
 use Drupal\file\Entity\File;
 use \Exception;
 
+
 /**
  * FileHandler which parses OWL files.
  * 
@@ -89,8 +90,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	public function setNodeData() {
+		$this->doLog('Collecting nodes...');
+		$individuals = $this->getIndividuals();
+		$this->doLog('Found '. sizeof($individuals). ' Nodes.');
+		
 		$this->doLog('Inserting nodes into Drupal DB...');
-		foreach ($this->getIndividuals() as $individual) {
+		foreach ($individuals as $individual) {
 			$node = [
 				'title'  => 
 					$this->getProperty($individual, self::TITLE) 
@@ -134,12 +139,11 @@ class OWLFileHandler extends AbstractFileHandler {
 		) {
 			if (
 				$this->isATransitive($node, $bundleResource)
-				|| $this->hasTransitiveSubClass($bundleResource->getUri(), $node)
+				|| $this->hasTransitiveSuperClass($node, $bundleResource->getUri())
 			)
 				return strtolower(preg_replace(
 					'/[^A-Za-z0-9]/', '_', $bundleResource->localName()
 				));
-			
 		}
 		
 		return null;
@@ -176,7 +180,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		if (
 			$this->isATransitive($individual, self::VOCABULARY)
-			|| $this->hasTransitiveSubClass(self::VOCABULARY, $individual)
+			|| $this->hasTransitiveSuperClass($individual, self::VOCABULARY)
 		) {
 			$fields[] = [
 				'field_name' => 'field_tags',
@@ -214,7 +218,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		);
 		
 		foreach ($resources as $tag) {
-			if (!$this->hasTransitiveSubClass(self::VOCABULARY, $tag))
+			if (!$this->hasTransitiveSuperClass($tag, self::VOCABULARY))
 				continue;
 			
 			$vocabulary = $this->getVocabularyForTag($tag);
@@ -231,17 +235,17 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns true if $subClass is a transitive subclass of $class.
 	 * 
-	 * @param $class class uri
-	 * @param $subClass subclass to search for
+	 * @param $class class resource
+	 * @param $subClass superclass uri to search for
 	 * 
 	 * @return boolean
 	 */
-	private function hasTransitiveSubClass($class, $subClass) {
+	private function hasTransitiveSuperClass($class, $superClass) {
 		if (!$class) throw new Exception('Error: parameter $class missing.');
-		if (!$subClass) throw new Exception('Error: parameter $subClass missing.');
+		if (!$superClass) throw new Exception('Error: parameter $superClass missing.');
 		
-		foreach ($this->findAllSubClassesOf($class) as $curSubClass) {
-			if ($curSubClass == $subClass)
+		foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
+			if ($curSuperClass->getUri() == $superClass)
 				return true;
 		}
 		return false;
@@ -671,10 +675,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($annotationProperties as $annotationProperty) {
 			$superProperties = $this->getProperty($annotationProperty, 'rdfs:subPropertyOf');
 			
-			if (
-				(is_array($superProperties) && in_array(self::ANNOTATION_FIELD, $superProperties))
-				|| $superProperties == self::ANNOTATION_FIELD
-			) $properties[] = $annotationProperty;
+			if (strpos($superProperties, self::ANNOTATION_FIELD) !== false)
+				$properties[] = $annotationProperty;
 		}
 		
 		return $properties;
@@ -687,10 +689,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($datatypeProperties as $datatypeProperty) {
 			$superProperties = $this->getProperty($datatypeProperty, 'rdfs:subPropertyOf');
 			
-			if (
-				(is_array($superProperties) && in_array(self::DATATYPE_FIELD, $superProperties))
-				|| $superProperties == self::DATATYPE_FIELD
-			) $properties[] = $datatypeProperty;
+			if (strpos($superProperties, self::DATATYPE_FIELD) !== false)
+				$properties[] = $datatypeProperty;
 		}
 		
 		return $properties;
@@ -703,10 +703,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($objectProperties as $objectProperty) {
 			$superProperties = $this->getProperty($objectProperty, 'rdfs:subPropertyOf');
 				
-			if (
-				(is_array($superProperties) && in_array(self::OBJECT_FIELD, $superProperties))
-				|| $superProperties == self::OBJECT_FIELD
-			) $properties[] = $objectProperty;
+			if (strpos($superProperties, self::OBJECT_FIELD) !== false)
+				$properties[] = $objectProperty;
 		}
 		
 		return $properties;
@@ -754,12 +752,29 @@ class OWLFileHandler extends AbstractFileHandler {
 		if ($individual->isA($this->graph->resource($superClass)->getUri()))
 			return true;
 		
-		foreach ($this->findAllSubClassesOf($superClass) as $curSubClass) {
-			if ($individual->isA($curSubClass->getUri()))
+		foreach ($individual->allResources('rdf:type') as $class) {
+			if ($class->getUri() == $superClass) {
 				return true;
+			} else {
+				foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
+					if ($class->getUri() == $superClass)
+						return true;
+				}
+			}
 		}
 		
 		return false;
+	}
+	
+	private function findAllSuperClassesOf($class) {
+		if (!$class) throw new Exception('Error: parameter $class missing.');
+		
+		$result = [];
+		foreach ($class->allResources('rdfs:subClassOf') as $superClass) {
+			$result[] = $superClass;
+			$result = array_merge($result, $this->findAllSuperClassesOf($superClass));
+		}
+		return array_unique($result);
 	}
 	
 	/**
