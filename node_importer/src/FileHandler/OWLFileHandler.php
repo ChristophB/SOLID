@@ -761,7 +761,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				return true;
 			} else {
 				foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
-					if ($class->getUri() == $superClass)
+					if ($curSuperClass->getUri() == $superClass)
 						return true;
 				}
 			}
