@@ -80,7 +80,7 @@ try {
 
 unlink($filePath);
 fclose($STDOUT);
-unlink($logFile);
+# unlink($logFile);
 
 
 function doLog($msg) {

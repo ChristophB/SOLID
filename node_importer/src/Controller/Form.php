@@ -84,9 +84,6 @@ class Form extends FormBase {
         $overwrite              = $form_state->getValue('overwrite');
         $userId                 = \Drupal::currentUser()->id();
         
-        // if log-file exists dont allow another import process
-        
-        
         $file = File::load($fid);
         $uri = $file->getFileUri();
         $filePath = \Drupal::service('file_system')->realpath($uri);
