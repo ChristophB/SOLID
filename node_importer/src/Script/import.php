@@ -36,6 +36,11 @@ $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
 $kernel->boot();
 $kernel->prepareLegacyRequest($request);
 
+if (!file_exists($logFile) || !is_writable($logFile)) {
+   doLog('Could not open log file. Please check permissions.');
+   die;
+}
+
 $msg = 'Start: '. memory_get_usage(false);
 doLog($msg);
 
