@@ -47,12 +47,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	private $onlyLeafClassesAsNodes = false;
 	
 	public function __construct($params) {
-		$this->doLog('OWLFileHandler::__construct(): '. memory_get_usage());
+		$this->logNotice('OWLFileHandler::__construct(): '. memory_get_usage());
 		parent::__construct($params);
 		
 		$this->graph = new \EasyRdf_Graph();
 		$this->graph->parse(file_get_contents($this->filePath));
-		$this->doLog('graph parsed: '. memory_get_usage());
+		$this->logNotice('graph parsed: '. memory_get_usage());
 		
 		if ($params['classesAsNodes']) $this->classesAsNodes = true;
 		if ($params['onlyLeafClassesAsNodes']) $this->onlyLeafClassesAsNodes = true;
@@ -66,19 +66,19 @@ class OWLFileHandler extends AbstractFileHandler {
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
 			$vid = $class->localName();
-			$this->doLog('Handling vocabulary: '. $vid);
+			$this->logNotice('Handling vocabulary: '. $vid);
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
-			$this->doLog('Collecting terms...');
+			$this->logNotice('Collecting terms...');
 			$tags = $this->findAllSubClassesOf($class->getUri());
-			$this->doLog('Found '. sizeof($tags). ' terms.');
+			$this->logNotice('Found '. sizeof($tags). ' terms.');
 			
-			$this->doLog('Inserting terms into Drupal DB...');
+			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
 				$this->vocabularyImporter->createTag($vid, $tag->localName());
 			}
 			
-			$this->doLog('Adding child parent linkages to terms...');
+			$this->logNotice('Adding child parent linkages to terms...');
 			foreach ($tags as $subClass) {
 				$tag = [
 					'name'    => $subClass->localName(),
@@ -92,17 +92,14 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	public function setNodeData() {
-		$this->doLog('Collecting nodes...');
+		$this->logNotice('Collecting nodes...');
 		$individuals = $this->getIndividuals();
-		$this->doLog('Found '. sizeof($individuals). ' Nodes.');
+		$this->logNotice('Found '. sizeof($individuals). ' Nodes.');
 		
-		$this->doLog('Inserting nodes into Drupal DB...');
+		$this->logNotice('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
-			$title = $this->getProperty($individual, self::TITLE);
 			$node = [
-				'title'  => $title ?
-					$title. ' ('. $individual->localName(). ')'
-					: $individual->localName(),
+				'title'  => $this->getNodeTitle($individual),
 				'type'   => $this->getBundle($individual),
 				'alias'  => $this->getProperty($individual, self::ALIAS),
 				'fields' => $this->createNodeFields($individual)
@@ -113,7 +110,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		unset($individuals);
 		
-		$this->doLog('Adding node references...');
+		$this->logNotice('Adding node references...');
 		$this->nodeImporter->insertNodeReferences();
 	}
 	
@@ -300,6 +297,21 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
+	 * Returns a string containing the title and the id of an entity.
+	 * 
+	 * @param $entity entity
+	 * 
+	 * @return string title
+	 */
+	private function getNodeTitle($entity) {
+		$title = $this->getProperty($entity, self::TITLE);
+		
+		return $title
+			? $title. ' ('. $entity->localName(). ')'
+			: $entity->localName();
+	}
+	
+	/**
 	 * Returns an array for a field with values for each referenced resource.
 	 * 
 	 * @param $individual individual resource
@@ -324,7 +336,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			$value;
 			
 			if ($this->isATransitive($target, self::NODE)) {
-				$value = $targetProperties[self::TITLE];
+				$value = $this->getNodeTitle($target);
 				$field['references'] = 'node';
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [
@@ -357,16 +369,20 @@ class OWLFileHandler extends AbstractFileHandler {
 				) {
 					$value = $this->removeRdfsType($targetProperties[$targetField]);
 				} else {
-					throw new Exception(
-						'Error: Entity '. $target->localName(). ' referenced but no field given. '
-						. '('. $property->localName(). ')'
+					$this->logWarning(
+						'Entity \''. $target->localName()
+						. '\' by \''. $individual->localName()
+						. '\' referenced but no field given. '
+						. '(\''. $property->localName(). '\')'
 					);
+					continue;
 				}
 			} else {
-				throw new Exception(
-					'Could not determine target fields for "'
-					. $individual->localName(). '" and property "'. $property. '".'
+				$this->logWarning(
+					"Nonexistent entity referenced by '"
+					. $individual->localName(). "' and property '$property'"
 				);
+				continue;
 			}
 			
 			$field['value'][] = $value;

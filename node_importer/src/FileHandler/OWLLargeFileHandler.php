@@ -48,20 +48,20 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
-			$this->doLog('Handling vocabulary: '. $class);
+			$this->logNotice('Handling vocabulary: '. $class);
 			$vid = $this->getLocalName($class);
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
-			$this->doLog('Collecting terms...');
+			$this->logNotice('Collecting terms...');
 			$tags = $this->findAllSubClassesOf($class);
-			$this->doLog('Found '. sizeof($tags). ' terms.');
+			$this->logNotice('Found '. sizeof($tags). ' terms.');
 			
-			$this->doLog('Inserting terms into Drupal DB...');
+			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
 				$this->vocabularyImporter->createTag($vid, $this->getLocalName($tag));
 			}
 			
-			$this->doLog('Adding child parent linkages to terms...');
+			$this->logNotice('Adding child parent linkages to terms...');
 			foreach ($tags as $subClass) {
 				$tag = [
 					'name'    => $this->getLocalName($subClass),
@@ -75,22 +75,16 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	public function setNodeData() {
-		$this->doLog('Collecting nodes...');
+		$this->logNotice('Collecting nodes...');
 		$individuals = $this->getIndividuals();
-		$this->doLog('Found '. sizeof($individuals). ' nodes.');
+		$this->logNotice('Found '. sizeof($individuals). ' nodes.');
 		
-		$this->doLog('Inserting nodes into Drupal DB...');
+		$this->logNotice('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
-			# $this->doLog('Inserting '. $this->getLocalName($individual). ' into Drupal DB...');
-			$properties = $this->getPropertiesAsArray($individual);
-			
-			$title = $properties['title'][0];
 			$node = [
-				'title'  => $title ?
-					$title. ' ('. $this->getLocalName($individual). ')'
-					: $this->getLocalName($individual),
+				'title'  => $this->getNodeTitle($individual),
 				'type'   => $this->getBundle($individual),
-				'alias'  => $properties['alias'][0],
+				'alias'  => $this->getProperty('alias')[0],
 				'fields' => $this->createNodeFields($individual)
 			];
 			
@@ -99,7 +93,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		unset($individuals);
 		
-		$this->doLog('Adding node references...');
+		$this->logNotice('Adding node references...');
 		$this->nodeImporter->insertNodeReferences();
 	}
 	
@@ -280,6 +274,21 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
+	 * Returns a string containing the title and the id of an entity.
+	 * 
+	 * @param $entity entity
+	 * 
+	 * @return string title
+	 */
+	private function getNodeTitle($entity) {
+		$title = $this->getProperty($entity, 'title')[0];
+		
+		return $title
+			? $title. ' ('. $this->getLocalName($entity). ')'
+			: $this->getLocalName($entity);
+	}
+	
+	/**
 	 * Returns an array for a field with values for each referenced resource.
 	 * 
 	 * @param $individual individual uri
@@ -304,7 +313,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			$value;
 			
 			if ($this->isATransitive($target, self::NODE)) {
-				$value = $targetProperties['title'][0];
+				$value = $this->getNodeTitle($target);
 				$field['references'] = 'node';
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [
@@ -340,16 +349,21 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				if ($fieldName) {
 					$value = $targetProperties[$fieldName][0];
 				} else {
-					throw new Exception(
-						'Error: Entity '. $this->getLocalName($target). ' by '. $this->getLocalName($individual). ' referenced but no field given. '
-						. '('. $this->getLocalName($property). ')'
+					$this->logWarning(
+						'Entity \''. $this->getLocalName($target)
+						. '\' by \''. $this->getLocalName($individual)
+						. '\' referenced but no field given. '
+						. '(\''. $this->getLocalName($property). '\')'
 					);
+					continue;
 				}
 			} else {
-				throw new Exception(
-					'Could not determine target fields for "'
-					. $this->getLocalName($individual). '" and property "'. $property. '".'
+				$this->logWarning(
+					"Nonexistent entity referenced by '"
+					. $this->getLocalName($individual)
+					. "' and property '$property'"
 				);
+				continue;
 			}
 			
 			$field['value'][] = $value;

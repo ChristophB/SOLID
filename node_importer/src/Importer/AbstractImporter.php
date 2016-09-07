@@ -21,6 +21,7 @@ abstract class AbstractImporter {
      */
     protected $entities  = [];
     protected $overwrite = false;
+    protected $warnings  = [];
     protected $userId;
     
     public function __construct($overwrite = false, $userId) {
@@ -115,6 +116,19 @@ abstract class AbstractImporter {
 			}, 
 			$tags
 		);
+	}
+	
+	protected function logWarning($msg) {
+		if (!in_array($msg, $this->warnings)) {
+			\Drupal::logger('node_importer')->warning($msg);
+			print date('H:m:s', time()). "> Warning: $msg\n";
+			array_push($this->warnings, $msg);
+		}
+	}
+	
+	protected function logNotice($msg) {
+		\Drupal::logger('node_importer')->notice($msg);
+		print date('H:m:s', time()). "> $msg\n";
 	}
 	
 }

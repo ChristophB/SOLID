@@ -69,8 +69,15 @@ class NodeImporter extends AbstractImporter {
 		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
 
 		$this->deleteNodeIfExists($params['title']);
+		
+		$type = $params['type'] ?: 'article';
+		if (!$this->contentTypeExists($type)) {
+			$this->logWarning("Content type '$type' does not exist in Drupal.");
+			return;
+		}
+		
 		$node = Node::create([
-			'type'     => $params['type'] ?: 'article',
+			'type'     => $type,
 			'title'    => $params['title'],
 			'langcode' => 'en', // @todo get language from import file
 			'status'   => 1,
@@ -89,6 +96,20 @@ class NodeImporter extends AbstractImporter {
 			
 		$this->entities['node'][] = $node->id();
 		$node = null;
+	}
+	
+	/**
+	 * Checks if a content type exists with given id.
+	 * 
+	 * @param $type content type
+	 * 
+	 * @return boolean
+	 */
+	private function contentTypeExists($type) {
+		return array_key_exists(
+			$type,
+			\Drupal::entityManager()->getBundleInfo('node')
+		);
 	}
 	
 	/**
@@ -168,11 +189,13 @@ class NodeImporter extends AbstractImporter {
 		if (empty($fields)) return;
 		
 		foreach ($fields as $field) {
-			if (!$this->nodeHasField($node, $field['field_name']))
-				throw new Exception(
-					'Error: field "'. $field['field_name']
+			if (!$this->nodeHasField($node, $field['field_name'])) {
+				$this->logWarning(
+					'field "'. $field['field_name']
 					. '" does not exists in "'. $node->bundle(). '".'
 				);
+				continue;
+			}
 			
 			if (array_key_exists('references', $field) && $field['references']) {
 				$this->nodeReferences[$node->id()][$field['field_name']][$field['references']]

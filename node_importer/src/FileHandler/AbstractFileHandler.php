@@ -20,6 +20,7 @@ abstract class AbstractFileHandler {
 	protected $data;
 	protected $vocabularyImporter;
 	protected $nodeImporter;
+	protected $warnings = [];
 	
 	public function __construct($params) {
 		if (empty($params)) throw new Exception('Error: no parameters provided.');
@@ -38,9 +39,17 @@ abstract class AbstractFileHandler {
 	    $this->nodeImporter       = $params['nodeImporter'];
 	}
 	
-	protected function doLog($msg) {
+	protected function logNotice($msg) {
 		\Drupal::logger('node_importer')->notice($msg);
 		print date('H:m:s', time()). "> $msg\n";
+	}
+	
+	protected function logWarning($msg) {
+		if (!in_array($msg, $this->warnings)) {
+			\Drupal::logger('node_importer')->warning($msg);
+			print date('H:m:s', time()). "> Warning: $msg\n";
+			array_push($this->warnings, $msg);
+		}
 	}
 	
 	abstract public function setVocabularyData();
