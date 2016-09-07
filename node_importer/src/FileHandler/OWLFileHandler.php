@@ -379,8 +379,9 @@ class OWLFileHandler extends AbstractFileHandler {
 				}
 			} else {
 				$this->logWarning(
-					"Nonexistent entity referenced by '"
-					. $individual->localName(). "' and property '$property'"
+					"Nonexistent entity '". $target->localName()
+					. "' referenced by '". $individual->localName()
+					. "' and property '$property'"
 				);
 				continue;
 			}

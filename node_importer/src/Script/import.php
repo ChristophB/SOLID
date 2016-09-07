@@ -13,7 +13,7 @@ if (sizeof($argv) < 2)
 
 $drupalPath             = $argv[1];
 $filePath               = $argv[2];
-$userId                 = $argv[3];
+$userId                 = intval($argv[3]);
 $importVocabularies     = $argv[4] ? true : false;
 $importNodes            = $argv[5] ? true : false;
 $classesAsNodes         = $argv[6] ? true : false;
@@ -29,20 +29,17 @@ fclose(STDOUT);
 $STDOUT = fopen($logFile, 'wb');
 
 $autoloader = require_once $drupalPath. '/autoload.php';
-
 $request = Request::createFromGlobals();
-
 $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
 $kernel->boot();
 $kernel->prepareLegacyRequest($request);
 
 if (!file_exists($logFile) || !is_writable($logFile)) {
-   doLog('Could not open log file. Please check permissions.');
-   die;
+  doLog('Could not open log file. Please check permissions.');
+  die;
 }
 
-$msg = 'Start: '. memory_get_usage(false);
-doLog($msg);
+doLog('Start: '. memory_get_usage(false));
 
 $vocabularyImporter = new VocabularyImporter($overwrite, $userId);
 $nodeImporter       = new NodeImporter($overwrite, $userId);
@@ -53,7 +50,7 @@ try {
         'vocabularyImporter'     => $vocabularyImporter,
         'nodeImporter'           => $nodeImporter,
         'classesAsNodes'         => $classesAsNodes,
-        'onlyLeafClassesAsNodes' => $onlyLeafClassesAsNodes,
+        'onlyLeafClassesAsNodes' => $onlyLeafClassesAsNodes
     ]);
     
     if ($importVocabularies)
