@@ -81,13 +81,14 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		$this->doLog('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
-			$this->doLog('Inserting '. $this->getLocalName($individual). ' into Drupal DB...');
+			# $this->doLog('Inserting '. $this->getLocalName($individual). ' into Drupal DB...');
 			$properties = $this->getPropertiesAsArray($individual);
 			
+			$title = $properties['title'][0];
 			$node = [
-				'title'  => 
-					$properties['title'][0] 
-					?: $this->getLocalName($individual),
+				'title'  => $title ?
+					$title. ' ('. $this->getLocalName($individual). ')'
+					: $this->getLocalName($individual),
 				'type'   => $this->getBundle($individual),
 				'alias'  => $properties['alias'][0],
 				'fields' => $this->createNodeFields($individual)

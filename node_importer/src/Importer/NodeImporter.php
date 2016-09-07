@@ -257,6 +257,8 @@ class NodeImporter extends AbstractImporter {
 							$entityIds = $this->mapNodeTitlesToNids($entityNames);
 							break;
 						case 'image':
+							throw new Exception('References to images are not implemented.');
+							break;
 						case 'file':
 							$entityIds = $this->mapFileUrisToFids($entityNames);
 							break;
