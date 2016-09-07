@@ -8,6 +8,8 @@
 namespace Drupal\node_importer\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * This class provides a view containing messages of a currently running import.
@@ -24,9 +26,17 @@ class Progress extends ControllerBase {
             $log = 'No import process running!';
         }
         
+        $formLink     = Link::createFromRoute('Form', 'node_importer');
+        $progressLink = Link::createFromRoute('Progress', 'node_importer.progress');
+        
         return [
             '#type' => 'markup',
-            '#markup' => "<pre>$log</pre>",
+            '#markup'
+                =>'<ul>'
+                . '  <li>'. $formLink->toString(). '</li>'
+                . '  <li>'. $progressLink->toString(). '</li>'
+                . '</ul>'
+                . "<pre>$log</pre>"
         ];
     }
   

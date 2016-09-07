@@ -1,5 +1,5 @@
-node_importer_form:
-    path: 'node_importer'
+node_importer:
+    path: '/node_importer'
     defaults:
         _title: 'NodeImporter - Form'
         _form: '\Drupal\node_importer\Controller\Form'
@@ -7,7 +7,7 @@ node_importer_form:
         _role: 'administrator'
 
 node_importer.progress:
-    path: 'node_importer/progress'
+    path: '/node_importer/progress'
     defaults:
         _title: 'NodeImporter - Progress'
         _controller: '\Drupal\node_importer\Controller\Progress::content'

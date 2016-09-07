@@ -12,10 +12,13 @@ use Exception;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 use Drupal\node_importer\Importer\VocabularyImporter;
 use Drupal\node_importer\Importer\NodeImporter;
 use Drupal\node_importer\FileHandler\FileHandlerFactory;
+
 
 /**
  * Main Class which is instantiated by callung "/node_importer"
@@ -29,6 +32,8 @@ class Form extends FormBase {
     }
   
     public function buildForm(array $form, FormStateInterface $form_state) {
+        $form['content'] = $this->content();
+        
         $form['file'] = [
             '#type'   => 'managed_file',
             '#title'  => t('File:'),
@@ -69,6 +74,20 @@ class Form extends FormBase {
         ];
 
         return $form;
+    }
+    
+    public function content() {
+        $formLink     = Link::createFromRoute('Form', 'node_importer');
+        $progressLink = Link::createFromRoute('Progress', 'node_importer.progress');
+        
+        return [
+            '#type' => 'markup',
+            '#markup'
+                =>'<ul>'
+                . '  <li>'. $formLink->toString(). '</li>'
+                . '  <li>'. $progressLink->toString(). '</li>'
+                . '</ul>'
+        ];
     }
     
     public function validateForm(array &$form, FormStateInterface $form_state) {

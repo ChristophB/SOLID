@@ -1,11 +1,13 @@
-node_importer.form:
-  title: Node Importer
+node_importer:
+  title: Import Form
   description: Import JSON/OWL files to automatically create nodes and vocabularies.
-  route_name: node_importer_form
+  route_name: node_importer
+  base_route: node_importer
   parent: system.admin_config_content
   
 node_importer.progress:
-  title: Node Importer (Progress)
+  title: Logging
   description: Shows messages of a currently running import process.
   route_name: node_importer.progress
-  parent: system.admin_config_content
+  base_route: node_importer
+  parent: system.admin_config_content.node_importer
