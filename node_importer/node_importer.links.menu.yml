@@ -1,5 +1,5 @@
 node_importer:
-  title: Import Form
+  title: Node Importer
   description: Import JSON/OWL files to automatically create nodes and vocabularies.
   route_name: node_importer
   base_route: node_importer
