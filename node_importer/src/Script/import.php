@@ -87,7 +87,7 @@ fclose($STDOUT);
 
 function doLog($msg) {
 	\Drupal::logger('node_importer')->notice($msg);
-	print date('H:m:s', time()). "> $msg\n";
+	print date('H:M:s', time()). "> $msg\n";
 }
 
 function logMemoryUsage() {
