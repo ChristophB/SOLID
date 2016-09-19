@@ -57,7 +57,7 @@ try {
         $fileHandler->setVocabularyData();
     if ($importNodes)
         $fileHandler->setNodeData();
-    throw new Exception("test");
+    
     logMemoryUsage();
     
     $msg = sprintf(

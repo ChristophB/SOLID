@@ -54,17 +54,30 @@ class VocabularyImporter extends AbstractImporter {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
-		$exists = $this->clearVocabularyIfExists($vid);
+		if ($this->overwrite) {
+			$exists = $this->clearVocabularyIfExists($vid);
     	
-    	if (!$exists) {
-			$vocabulary = Vocabulary::create([
-				'name'   => $name,
-				'weight' => 0,
-				'vid'    => $vid
-			]);
-			$vocabulary->save();
-			$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
-			$vocabulary = null;
+	    	if (!$exists) {
+				$vocabulary = Vocabulary::create([
+					'name'   => $name,
+					'weight' => 0,
+					'vid'    => $vid
+				]);
+				$vocabulary->save();
+				$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
+				$vocabulary = null;
+			}
+		} else {
+			if (!$this->vocabularyExists($vid)) {
+				$vocabulary = Vocabulary::create([
+					'name'   => $name,
+					'weight' => 0,
+					'vid'    => $vid
+				]);
+				$vocabulary->save();
+				$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
+				$vocabulary = null;
+			}
 		}
 	}
 	
@@ -80,14 +93,23 @@ class VocabularyImporter extends AbstractImporter {
 	    if (empty($tags)) return;
 	    
 	    foreach ($tags as $tag) {
-			$term = Term::create([
-				'name'   => $tag['name'],
-				'vid'    => $vid,
-			]);
-			$term->save();
-			
-			$this->entities['taxonomy_term'][] = $term;
+			$term = $this->createTag($vid, $tag['name']);
 		}
+	}
+	
+	/**
+	 * Checks if a tag with given name already exists in given vocabulary.
+	 * 
+	 * @param $vid vocabulary
+	 * @param $name name of the tag
+	 * 
+	 * @return {boolean}
+	 */
+	public function tagExists($vid, $name) {
+		if (!isset($vid)) throw new Exception('Error: parameter $vid missing.');
+		if (!isset($name)) throw new Exception('Error: parameter $name missing.');
+		
+		return null !== $this->searchTagIdByName($vid, $name);
 	}
 	
 	/**
@@ -100,6 +122,13 @@ class VocabularyImporter extends AbstractImporter {
 	public function createTag($vid, $name) {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 	    if (empty($name)) return;
+	    
+	    if ($this->tagExists($vid, $name)) {
+	    	throw new Exception(
+	    		"Error: tag '$name' already exists in vocabulary " 
+	    		. "'$vid', tick overwrite if you want to replace it."
+	    	);	
+	    }
 	    
 	    $term = Term::create([
 			'name' => $name,
@@ -129,7 +158,7 @@ class VocabularyImporter extends AbstractImporter {
 				if (!empty($tids)) {
 					$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
 					$terms = $storage_handler->loadMultiple($tids);
-					$storage_handler->delete($terms); // @todo: memory leak!
+					$storage_handler->delete($terms);
 					
 					$storage_handler = null;
 					$terms = null;
