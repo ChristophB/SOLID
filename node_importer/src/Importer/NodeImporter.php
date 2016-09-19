@@ -29,7 +29,7 @@ class NodeImporter extends AbstractImporter {
     function __construct($overwrite = false, $userId) {
     	parent::__construct($overwrite, $userId);
     	
-        $this->entities['node'] = [];
+        $this->entities['node'] = []; // [ nid => ..., title => ... ]
         $this->entities['file'] = [];
         $this->entities['path'] = [];
     }
@@ -94,7 +94,7 @@ class NodeImporter extends AbstractImporter {
 				'alias' => $params['alias']
 			]);
 			
-		$this->entities['node'][] = $node->id();
+		$this->entities['node'][] = [ 'nid' => $node->id(), 'title' => $params['title'] ];
 		$node = null;
 	}
 	
@@ -147,7 +147,7 @@ class NodeImporter extends AbstractImporter {
 	private function deleteNodeIfExists($title) {
 		if (!$title) throw new Exception('Error: parameter title missing.');
 		
-		if (!empty($ids = $this->searchNodesByTitle($title))) {
+		if (!empty($ids = $this->mapNodeTitleToNid($title))) {
 			if ($this->overwrite) {
 				foreach ($ids as $id) {
 					\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
@@ -160,22 +160,6 @@ class NodeImporter extends AbstractImporter {
 				);
 			}
 		}
-	}
-	
-	/**
-	 * Returns all Drupal node nids with given title.
-	 * 
-	 * @param $title title of the node
-	 * 
-	 * @return array of nids
-	 */
-	private function searchNodesByTitle($title) {
-		if (!$title) throw new Exception('Error: parameter $title missing.');
-		
-		return $this->searchEntityIds([
-			'title'       => $title,
-			'entity_type' => 'node',
-		]);
 	}
 	
 	/**
@@ -325,10 +309,9 @@ class NodeImporter extends AbstractImporter {
 	private function mapNodeTitleToNid($title) {
 		if (!$title) return null;
 		
-		foreach ($this->entities['node'] as $nid) {
-			$node = Node::load($nid);
-			if ($node->label() == $title) 
-				return $node->id();
+		foreach ($this->entities['node'] as $node) {
+			if ($node['title'] == $title) 
+				return $node['nid'];
 		}
 		
 		return null;

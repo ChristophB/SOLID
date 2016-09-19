@@ -41,14 +41,20 @@ abstract class AbstractImporter {
      * Deletes all created entities.
      */
     public function rollback() {
-         foreach ($this->entities as $type => $ids) {
-			foreach ($ids as $id) {
-				if ($type == 'path') {
-					\Drupal::service('path.alias_storage')->delete([ 'pid' => $id ]);
-				} else {
-					$entity_manager = \Drupal::entityManager();
-					$entity = $entity_manager->getStorage($type)->load($id);
-					if ($entity) $entity->delete();
+         foreach ($this->entities as $type => $entities) {
+         	$entity_manager = \Drupal::entityManager();
+			foreach ($entities as $entity) {
+				switch ($type) {
+					case 'path':
+						\Drupal::service('path.alias_storage')->delete([ 'pid' => $entity ]);
+						break;
+					case 'node': 
+						$drupal_entity = $entity_manager->getStorage($type)->load($entity['nid']);
+						if ($drupal_entity) $drupal_entity->delete();
+						break;
+					default:
+						$drupal_entity = $entity_manager->getStorage($type)->load($entity);
+						if ($drupal_entity) $drupal_entity->delete();
 				}
 			}
 		}
