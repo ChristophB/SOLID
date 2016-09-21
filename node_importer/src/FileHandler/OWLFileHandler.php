@@ -79,12 +79,14 @@ class OWLFileHandler extends AbstractFileHandler {
 			}
 			
 			$this->logNotice('Adding child parent linkages to terms...');
-			foreach ($tags as $subClass) {
-				$tag = [
-					'name'    => $subClass->localName(),
-					'parents' => $this->getParentTags($subClass)
-				];
-				$this->vocabularyImporter->setTagParents($vid, [$tag]);
+			foreach ($tags as $tag) {
+				$this->vocabularyImporter->setTagParents(
+					$vid,
+					[[
+						'name'    => $tag->label() ?: $tag->localName(),
+						'parents' => $this->getParentTags($tag)
+					]]
+				);
 			}
 			
 			unset($tags);
@@ -828,7 +830,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$tag) throw new Exception('Error: parameter $tag missing');
 		
 		return array_map(
-			function($x) { return $x->localName(); },
+			function($x) { return $x->label() ?: $x->localName(); },
 			array_filter(
 				$tag->allResources('rdfs:subClassOf'),
 				function($x) { return !$this->hasDirectSuperClass($x, self::VOCABULARY); }
