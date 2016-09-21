@@ -63,11 +63,13 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			
 			$this->logNotice('Adding child parent linkages to terms...');
 			foreach ($tags as $subClass) {
-				$tag = [
-					'name'    => $this->getLocalName($subClass),
-					'parents' => $this->getParentTags($subClass)
-				];
-				$this->vocabularyImporter->setTagParents($vid, [$tag]);
+				$this->vocabularyImporter->setTagParents(
+					$vid,
+					[[
+						'name'    => $this->getLocalName($subClass),
+						'parents' => $this->getParentTags($subClass)
+					]]
+				);
 			}
 			
 			unset($tags);
@@ -81,10 +83,13 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		$this->logNotice('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
+			$xml = $this->getXMLElement($individual);
+			$this->createNodeFields($individual);
+			
 			$node = [
-				'title'  => $this->getNodeTitle($individual),
+				'title'  => $this->getNodeTitle($xml),
 				'type'   => $this->getBundle($individual),
-				'alias'  => $this->getProperty('alias')[0],
+				'alias'  => $this->getProperty($xml, 'alias')[0],
 				'fields' => $this->createNodeFields($individual)
 			];
 			
@@ -97,8 +102,15 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		$this->nodeImporter->insertNodeReferences();
 	}
 	
-	private function getLocalName($individual) {
-		return preg_replace('/^.*#/', '', $individual);
+	/**
+	 * Returns the iri suffix.
+	 * 
+	 * @param $entity string
+	 * 
+	 * @return {string} local name
+	 */
+	private function getLocalName($entity) {
+		return preg_replace('/^.*#/', '', $entity);
 	}
 	
 	/**
@@ -236,7 +248,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array for a single field of a given node/individual.
 	 * 
-	 * @param $individual individual as resource
+	 * @param $individual individual as uri
 	 * @param $property IRI representation of the property
 	 * 
 	 * @return array with all properties of the field
@@ -282,10 +294,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 */
 	private function getNodeTitle($entity) {
 		$title = $this->getProperty($entity, 'title')[0];
+		$localName = $this->getLocalName($entity->attributes('rdf', true)->about);
 		
 		return $title
-			? $title. ' ('. $this->getLocalName($entity). ')'
-			: $this->getLocalName($entity);
+			? $title. ' ('. $localName. ')'
+			: $localName;
 	}
 	
 	/**
@@ -310,10 +323,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		foreach ($resources as $target) {
 			$targetProperties = $this->getPropertiesAsArray($target);
+			$xml = $this->getXMLElement($target);
 			$value;
 			
 			if ($this->isATransitive($target, self::NODE)) {
-				$value = $this->getNodeTitle($target);
+				$value = $this->getNodeTitle($xml);
 				$field['references'] = 'node';
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [
@@ -865,7 +879,6 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of class resources
 	 */
 	private function findAllSubClassesOf($class) {
-		print "found node: $class\n";
 		$result = [];
 		
 		foreach ($this->getDirectSubClassesOf($class) as $subClass) {
@@ -894,7 +907,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			return true;
 		
 		$xml = $this->getXMLElement($individual);
-		foreach ($this->getProperty($xml, 'type') as $directSuperClass) {die($directSuperClass);
+		foreach ($this->getProperty($xml, 'type') as $directSuperClass) {
 			if ($superClass == $directSuperClass)
 				return true;
 			
@@ -967,7 +980,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		if (!$tag) throw new Exception('Error: parameter $tag missing');
 		
 		return array_map(
-			function($x) { return $this->getLocalName($x); },
+			function($x) { 
+				$label = $this->getProperty($this->getXMLElement($x), 'label');
+				return $label ?: $this->getLocalName($x);
+				
+			},
 			array_filter(
 				$this->getPropertiesAsArray($tag)['subClassOf'] ?: [],
 				function($x) { return ($x != self::VOCABULARY); }
