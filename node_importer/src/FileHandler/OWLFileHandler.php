@@ -75,7 +75,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->createTag($vid, $tag->localName());
+				$this->vocabularyImporter->createTag($vid, $tag->label() ?: $tag->localName());
 			}
 			
 			$this->logNotice('Adding child parent linkages to terms...');
@@ -229,7 +229,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$fieldTags[] = [
 				'vid'  => $vocabulary->localName(),
-				'name' => $tag->localName()
+				'name' => $tag->label() ?: $tag->localName()
 			];
 		}
 		
@@ -358,7 +358,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			} elseif ($this->getVocabularyForTag($target) != null) {
 				$value = [
 					'vid'  => $this->getVocabularyForTag($target)->localName(),
-					'name' => $target->localName()
+					'name' => $target->label() ?: $target->localName()
 				];
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
