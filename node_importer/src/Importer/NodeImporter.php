@@ -147,7 +147,7 @@ class NodeImporter extends AbstractImporter {
 	private function deleteNodeIfExists($title) {
 		if (!$title) throw new Exception('Error: parameter title missing.');
 		
-		if (!empty($ids = $this->mapNodeTitleToNid($title))) {
+		if (!empty($ids = $this->searchNodeIdsByTitle($title))) {
 			if ($this->overwrite) {
 				foreach ($ids as $id) {
 					\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
@@ -160,6 +160,24 @@ class NodeImporter extends AbstractImporter {
 				);
 			}
 		}
+	}
+	
+	/**
+	 * Queries the drupal DB with node title and returns corresponding ids.
+	 * 
+	 * @param $title title
+	 * 
+	 * @return array of ids
+	 */
+	protected function searchNodeIdsByTitle($title) {
+	    if (!$title) throw new Exception('Error: parameter $name missing');
+	    
+	    $result = $this->searchEntityIds([
+	        'entity_type' => 'node',
+	        'title'       => $title,
+	    ]);
+	    
+	    return $result ? array_values($result)[0] : null;
 	}
 	
 	/**
