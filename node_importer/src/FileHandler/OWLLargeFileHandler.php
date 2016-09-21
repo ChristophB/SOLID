@@ -58,16 +58,22 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			
 			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->createTag($vid, $this->getLocalName($tag));
+				$label = $this->getProperty($this->getXMLElement($tag), 'label')[0];
+				$name = $label ?: $this->getLocalName($tag);
+				
+				$this->vocabularyImporter->createTag($vid, $name);
 			}
 			
 			$this->logNotice('Adding child parent linkages to terms...');
-			foreach ($tags as $subClass) {
+			foreach ($tags as $tag) {
+				$label = $this->getProperty($this->getXMLElement($tag), 'label')[0];
+				$name = $label ?: $this->getLocalName($tag);
+				
 				$this->vocabularyImporter->setTagParents(
 					$vid,
 					[[
-						'name'    => $this->getLocalName($subClass),
-						'parents' => $this->getParentTags($subClass)
+						'name'    => $name,
+						'parents' => $this->getParentTags($tag)
 					]]
 				);
 			}
@@ -217,9 +223,12 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			
 			$vocabulary = $this->getVocabularyForTag($tag);
 			
+			$label = $this->getProperty($this->getXMLElement($tag), 'label')[0];
+			$name = $label ?: $this->getLocalName($tag);
+			
 			$fieldTags[] = [
 				'vid'  => $this->getLocalName($vocabulary),
-				'name' => $this->getLocalName($tag)
+				'name' => $name
 			];
 		}
 		
@@ -345,9 +354,12 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			} elseif ($this->isATransitive($target, self::DOC)) {
 				$refType = self::DOC_REF; // @todo
 			} elseif (($vocabulary = $this->getVocabularyForTag($target)) != null) {
+				$label = $this->getProperty($this->getXMLElement($target), 'label')[0];
+				$name = $label ?: $this->getLocalName($target);
+				
 				$value = [
 					'vid'  => $this->getLocalName($vocabulary),
-					'name' => $this->getLocalName($target)
+					'name' => $name
 				];
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
@@ -981,7 +993,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		
 		return array_map(
 			function($x) { 
-				$label = $this->getProperty($this->getXMLElement($x), 'label');
+				$label = $this->getProperty($this->getXMLElement($x), 'label')[0];
 				return $label ?: $this->getLocalName($x);
 				
 			},
