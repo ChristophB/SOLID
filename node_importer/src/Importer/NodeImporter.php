@@ -177,7 +177,7 @@ class NodeImporter extends AbstractImporter {
 	        'title'       => $title,
 	    ]);
 	    
-	    return $result ? array_values($result)[0] : null;
+	    return $result;
 	}
 	
 	/**
