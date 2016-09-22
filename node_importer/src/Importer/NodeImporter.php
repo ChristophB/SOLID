@@ -29,7 +29,7 @@ class NodeImporter extends AbstractImporter {
     function __construct($overwrite = false, $userId) {
     	parent::__construct($overwrite, $userId);
     	
-        $this->entities['node'] = []; // [ nid => ..., title => ... ]
+        $this->entities['node'] = []; // [ nid => ..., uuid => ... ]
         $this->entities['file'] = [];
         $this->entities['path'] = [];
     }
@@ -61,14 +61,16 @@ class NodeImporter extends AbstractImporter {
      *   optional:
      *     "fields" contains the fields with names and values
      *     "alias"
+     *     "uuid"
      * 
      * @return node
      */
     public function createNode($params) {
 		if (!$params['title']) throw new Exception('Error: named parameter "title" missing.');
 		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
-
-		$this->deleteNodeIfExists($params['title']);
+		$uuid = $params['uuid'] ? $params['uuid'] : $params['title'];
+		
+		$this->deleteNodeIfExists($uuid);
 		
 		$type = $params['type'] ?: 'article';
 		if (!$this->contentTypeExists($type)) {
@@ -79,6 +81,7 @@ class NodeImporter extends AbstractImporter {
 		$node = Node::create([
 			'type'     => $type,
 			'title'    => $params['title'],
+			'uuid'     => $uuid,
 			'langcode' => 'en', // @todo get language from import file
 			'status'   => 1,
 			'uid'      => $this->userId
@@ -94,7 +97,7 @@ class NodeImporter extends AbstractImporter {
 				'alias' => $params['alias']
 			]);
 			
-		$this->entities['node'][] = [ 'nid' => $node->id(), 'title' => $params['title'] ];
+		$this->entities['node'][] = [ 'nid' => $node->id(), 'uuid' => $uuid ];
 		$node = null;
 	}
 	
@@ -139,15 +142,15 @@ class NodeImporter extends AbstractImporter {
 	}
 	
 	/**
-	 * Checks of a node with given title already exists
+	 * Checks of a node with given uuid already exists
 	 * and deletes it if overwrite is true.
 	 * 
-	 * @param $title title of the node
+	 * @param $uuid uuid of the node
 	 */
-	private function deleteNodeIfExists($title) {
-		if (!$title) throw new Exception('Error: parameter title missing.');
+	private function deleteNodeIfExists($uuid) {
+		if (!$uuid) throw new Exception('Error: parameter uuid missing.');
 		
-		if (!empty($ids = $this->searchNodeIdsByTitle($title))) {
+		if (!empty($ids = $this->searchNodeIdsByUuid($uuid))) {
 			if ($this->overwrite) {
 				foreach ($ids as $id) {
 					\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
@@ -155,7 +158,7 @@ class NodeImporter extends AbstractImporter {
 				}
 			} else {
 				throw new Exception(
-					"Node with title '$title' already exists. "
+					"Node with uuid '$uuid' already exists. "
 					. 'Tick "overwrite" if you want to replace it and try again.'
 				);
 			}
@@ -163,18 +166,18 @@ class NodeImporter extends AbstractImporter {
 	}
 	
 	/**
-	 * Queries the drupal DB with node title and returns corresponding ids.
+	 * Queries the drupal DB with node uuid and returns corresponding ids.
 	 * 
-	 * @param $title title
+	 * @param $uuid uuid
 	 * 
 	 * @return array of ids
 	 */
-	protected function searchNodeIdsByTitle($title) {
-	    if (!$title) throw new Exception('Error: parameter $name missing');
+	protected function searchNodeIdsByUuid($uuid) {
+	    if (!$uuid) throw new Exception('Error: parameter $uuid missing');
 	    
 	    $result = $this->searchEntityIds([
 	        'entity_type' => 'node',
-	        'title'       => $title,
+	        'uuid'       => $uuid,
 	    ]);
 	    
 	    return $result;
@@ -279,7 +282,7 @@ class NodeImporter extends AbstractImporter {
 							$entityIds = $this->searchTagIdsByNames($entityNames);
 							break;
 						case 'node':
-							$entityIds = $this->mapNodeTitlesToNids($entityNames);
+							$entityIds = $this->mapNodeUuidsToNids($entityNames);
 							break;
 						case 'image':
 							throw new Exception('References to images are not implemented.');
@@ -302,33 +305,33 @@ class NodeImporter extends AbstractImporter {
 	}
 	
 	/**
-	 * Returns an array of nids for a given array of recently created node titles.
+	 * Returns an array of nids for a given array of recently created node uuids.
 	 * 
-	 * @param $titles array of node titles
+	 * @param $uuids array of node uuids
 	 * 
 	 * @return array of nids
 	 */
-	private function mapNodeTitlesToNids($titles) {
-		if (empty($titles)) return [];
+	private function mapNodeUuidsToNids($uuids) {
+		if (empty($uuids)) return [];
 		
 		return array_map(
-			function($title) { return $this->mapNodeTitleToNid($title); }, 
-			$titles
+			function($uuid) { return $this->mapNodeUuidToNid($uuid); }, 
+			$uuids
 		);
 	}
 	
 	/**
-	 * Returns a nid for a recently created node title.
+	 * Returns a nid for a recently created node uuid.
 	 * 
-	 * @param $title node title
+	 * @param $uuid node uuid
 	 * 
-	 * @return integer nid
+	 * @return {integer} nid
 	 */
-	private function mapNodeTitleToNid($title) {
-		if (!$title) return null;
+	private function mapNodeUuidToNid($uuid) {
+		if (!$uuid) return null;
 		
 		foreach ($this->entities['node'] as $node) {
-			if ($node['title'] == $title) 
+			if ($node['uuid'] == $uuid) 
 				return $node['nid'];
 		}
 		

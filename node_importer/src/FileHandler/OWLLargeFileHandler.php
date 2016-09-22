@@ -96,7 +96,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				'title'  => $this->getNodeTitle($xml),
 				'type'   => $this->getBundle($individual),
 				'alias'  => $this->getProperty($xml, 'alias')[0],
-				'fields' => $this->createNodeFields($individual)
+				'fields' => $this->createNodeFields($individual),
+				'uuid'   => $individual
 			];
 			
 			$this->nodeImporter->createNode($node);
@@ -305,9 +306,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		$title = $this->getProperty($entity, 'title')[0];
 		$localName = $this->getLocalName($entity->attributes('rdf', true)->about);
 		
-		return $title
-			? $title. ' ('. $localName. ')'
-			: $localName;
+		return $title ?: $localName;
 	}
 	
 	/**
@@ -336,7 +335,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			$value;
 			
 			if ($this->isATransitive($target, self::NODE)) {
-				$value = $this->getNodeTitle($xml);
+				$value = $target;
 				$field['references'] = 'node';
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [

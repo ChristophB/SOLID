@@ -104,7 +104,8 @@ class OWLFileHandler extends AbstractFileHandler {
 				'title'  => $this->getNodeTitle($individual),
 				'type'   => $this->getBundle($individual),
 				'alias'  => $this->getProperty($individual, self::ALIAS),
-				'fields' => $this->createNodeFields($individual)
+				'fields' => $this->createNodeFields($individual),
+				'uuid'   => $individual->getUri()
 			];
 			
 			$this->nodeImporter->createNode($node);
@@ -308,9 +309,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function getNodeTitle($entity) {
 		$title = $this->getProperty($entity, self::TITLE);
 		
-		return $title
-			? $title. ' ('. $entity->localName(). ')'
-			: $entity->localName();
+		return $title ?: $entity->localName(); # . ' ('. $entity->localName(). ')'
 	}
 	
 	/**
@@ -338,7 +337,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			$value;
 			
 			if ($this->isATransitive($target, self::NODE)) {
-				$value = $this->getNodeTitle($target);
+				$value = $target->getUri();
 				$field['references'] = 'node';
 			} elseif ($this->isATransitive($target, self::IMG)) {
 				$value = [
