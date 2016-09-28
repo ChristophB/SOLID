@@ -25,6 +25,8 @@ class NodeImporter extends AbstractImporter {
 	 *   [ nid => [ field_name => [ refEntityType => [ EntityTitle, ... ] ], ... ], ... ]
 	 */
     private $nodeReferences = [];
+    
+    const MAX_FIELDNAME_LENGTH = 32;
 
     function __construct($overwrite = false, $userId) {
     	parent::__construct($overwrite, $userId);
@@ -194,16 +196,17 @@ class NodeImporter extends AbstractImporter {
 		if (empty($fields)) return;
 		
 		foreach ($fields as $field) {
-			if (!$this->nodeHasField($node, $field['field_name'])) {
+			$fieldName = substr($field['field_name'], 0, $this->MAX_FIELDNAME_LENGTH);
+			
+			if (!$this->nodeHasField($node, $fieldName)) {
 				$this->logWarning(
-					'field "'. $field['field_name']
-					. '" does not exists in "'. $node->bundle(). '".'
+					'field "'. $fieldName. '" does not exists in "'. $node->bundle(). '".'
 				);
 				continue;
 			}
 			
 			if (array_key_exists('references', $field) && $field['references']) {
-				$this->nodeReferences[$node->id()][$field['field_name']][$field['references']]
+				$this->nodeReferences[$node->id()][$fieldName][$field['references']]
 					= $field['value'];
 			} else {
 				if (array_key_exists('entity', $field) && $field['entity'] == 'file') {
@@ -219,7 +222,7 @@ class NodeImporter extends AbstractImporter {
 						}
 					}
 				}
-				$node->get($field['field_name'])->setValue($field['value']);
+				$node->get($fieldName)->setValue($field['value']);
 			}
 			unset($field);
 		}
