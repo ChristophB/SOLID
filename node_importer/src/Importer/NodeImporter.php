@@ -196,7 +196,7 @@ class NodeImporter extends AbstractImporter {
 		if (empty($fields)) return;
 		
 		foreach ($fields as $field) {
-			$fieldName = substr($field['field_name'], 0, $this->MAX_FIELDNAME_LENGTH);
+			$fieldName = substr($field['field_name'], 0, self::MAX_FIELDNAME_LENGTH);
 			
 			if (!$this->nodeHasField($node, $fieldName)) {
 				$this->logWarning(
