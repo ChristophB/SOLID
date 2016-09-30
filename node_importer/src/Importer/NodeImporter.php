@@ -152,12 +152,10 @@ class NodeImporter extends AbstractImporter {
 	private function deleteNodeIfExists($uuid) {
 		if (!$uuid) throw new Exception('Error: parameter uuid missing.');
 		
-		if (!empty($ids = $this->searchNodeIdsByUuid($uuid))) {
+		if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {
 			if ($this->overwrite) {
-				foreach ($ids as $id) {
-					\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
-					Node::load($id)->delete();
-				}
+				\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
+				Node::load($id)->delete();
 			} else {
 				throw new Exception(
 					"Node with uuid '$uuid' already exists. "
@@ -168,19 +166,19 @@ class NodeImporter extends AbstractImporter {
 	}
 	
 	/**
-	 * Queries the drupal DB with node uuid and returns corresponding ids.
+	 * Queries the drupal DB with node uuid and returns corresponding id.
 	 * 
 	 * @param $uuid uuid
 	 * 
-	 * @return array of ids
+	 * @return id
 	 */
-	protected function searchNodeIdsByUuid($uuid) {
+	protected function searchNodeIdByUuid($uuid) {
 	    if (!$uuid) throw new Exception('Error: parameter $uuid missing');
 	    
-	    $result = $this->searchEntityIds([
+	    $result = array_values($this->searchEntityIds([
 	        'entity_type' => 'node',
-	        'uuid'       => $uuid,
-	    ]);
+	        'uuid'        => $uuid,
+	    ]))[0];
 	    
 	    return $result;
 	}
