@@ -124,10 +124,11 @@ class VocabularyImporter extends AbstractImporter {
 	    if (empty($name)) return;
 	    
 	    if ($this->tagExists($vid, $name)) {
-	    	throw new Exception(
-	    		"Error: tag '$name' already exists in vocabulary " 
+	    	$this->logNotice(
+	    		"Tag '$name' already exists in vocabulary " 
 	    		. "'$vid', tick overwrite if you want to replace it."
-	    	);	
+	    	);
+	    	return;
 	    }
 	    
 	    $term = Term::create([
