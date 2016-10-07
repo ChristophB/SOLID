@@ -24,6 +24,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	const IMG              = 'http://www.lha.org/duo#Img';
 	const ENTITY           = 'http://www.lha.org/duo#Entity';
 	const DOC              = 'http://www.lha.org/duo#Doc';
+	const BINARY           = 'http://www.lha.org/duo#Binary';
 	const FILE             = 'http://www.lha.org/duo#File';
 	const DOC_REF          = 'http://www.lha.org/duo#doc_ref';
 	const ANNOTATION_FIELD = 'http://www.lha.org/duo#field';
@@ -337,21 +338,21 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			if ($this->isATransitive($target, self::NODE)) {
 				$value = $target;
 				$field['references'] = 'node';
-			} elseif ($this->isATransitive($target, self::IMG)) {
-				$value = [
-					'alt'   => $targetProperties['alt'][0],
-					'title' => $targetProperties['title'][0],
-					'uri'   => $targetProperties['uri'][0]
-				];
-				$field['entity'] = 'file';
-			} elseif ($this->isATransitive($target, self::FILE)) {
-				$value = [
-					'uri'   => $targetProperties['uri'][0],
-					'title' => $targetProperties['title'][0]
-				];
-				$field['entity'] = 'file';
-			} elseif ($this->isATransitive($target, self::DOC)) {
-				$refType = self::DOC_REF; // @todo
+			// } elseif ($this->isATransitive($target, self::IMG)) {
+			// 	$value = [
+			// 		'alt'   => $targetProperties['alt'][0],
+			// 		'title' => $targetProperties['title'][0],
+			// 		'uri'   => $targetProperties['uri'][0]
+			// 	];
+			// 	$field['entity'] = 'file';
+			} elseif (
+				$this->isATransitive($target, self::FILE)
+				|| $this->hasTransitiveSuperClass($target, self::FILE)
+			) {
+				$value = [ 'uri' => $this->getFilePath($target) ];
+				$field['references'] = 'file';
+			// } elseif ($this->isATransitive($target, self::DOC)) {
+			// 	$refType = self::DOC_REF;
 			} elseif (($vocabulary = $this->getVocabularyForTag($target)) != null) {
 				$label = $this->getProperty($this->getXMLElement($target), 'label')[0];
 				$name = $label ?: $this->getLocalName($target);
@@ -385,7 +386,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			} else {
 				$this->logWarning(
 					"Nonexistent entity '". $this->getLocalName($target)
-					. "'referenced by '". $this->getLocalName($individual)
+					. "' referenced by '". $this->getLocalName($individual)
 					. "' and property '$property'"
 				);
 				continue;
@@ -395,6 +396,44 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		}
 		
 		return $field;
+	}
+	
+	/**
+	 * Returns the path to a file.
+	 * Path is created from annotation duo:uri and all upper classes
+	 * which are subclasses of duo:File, concatenated with '/'.
+	 * 
+	 * @param $uri class or individual
+	 * 
+	 * @return {string} path
+	 */
+	private function getFilePath($uri) {
+		if (!$uri) throw new Exception('Error: parameter $uri missing.');
+		$properties = $this->getPropertiesAsArray($uri);
+		$xml = $this->getXMLElement($uri);
+		
+		$types = $this->getProperty($xml, 'type');
+		$classes = $this->getProperty($xml, 'subClassOf');
+		
+		foreach ((!empty($classes) ? $classes : $types) as $class) {
+			if (!$this->hasTransitiveSuperClass($class, self::FILE))
+				continue;
+			
+			$result = $this->getProperty($this->getXMLElement($class), 'label')[0] 
+				?: $this->getLocalName($class);
+			foreach ($this->findAllSuperClassesOf($class) as $superclass) {
+				if (!$this->hasTransitiveSuperClass($superclass, self::FILE))
+					continue;
+				$result = (
+					$this->getProperty($this->getXMLElement($superclass), 'label')[0]
+					?: $this->getLocalName($superclass)
+				). '/'. $result;
+			}
+			
+			return $result. '/'. $properties['uri'][0];
+		}
+		
+		return $properties['uri'][0];
 	}
 	
 	/**

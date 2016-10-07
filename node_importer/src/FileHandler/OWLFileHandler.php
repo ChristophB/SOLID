@@ -24,6 +24,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	const IMG              = 'http://www.lha.org/duo#Img';
 	const ENTITY           = 'http://www.lha.org/duo#Entity';
 	const DOC              = 'http://www.lha.org/duo#Doc';
+	const BINARY           = 'http://www.lha.org/duo#Binary';
 	const FILE             = 'http://www.lha.org/duo#File';
 	const TITLE            = 'http://www.lha.org/duo#title';
 	const ALIAS            = 'http://www.lha.org/duo#alias';
@@ -339,21 +340,21 @@ class OWLFileHandler extends AbstractFileHandler {
 			if ($this->isATransitive($target, self::NODE)) {
 				$value = $target->getUri();
 				$field['references'] = 'node';
-			} elseif ($this->isATransitive($target, self::IMG)) {
-				$value = [
-					'alt'   => $targetProperties[self::ALT],
-					'title' => $targetProperties[self::TITLE],
-					'uri'   => $targetProperties[self::URI]
-				];
-				$field['entity'] = 'file';
-			} elseif ($this->isATransitive($target, self::FILE)) {
-				$value = [
-					'uri'   => $targetProperties[self::URI],
-					'title' => $targetProperties[self::TITLE]
-				];
-				$field['entity'] = 'file';
-			} elseif ($this->isATransitive($target, self::DOC)) {
-				$refType = self::DOC_REF; // @todo
+			//} elseif ($this->isATransitive($target, self::IMG)) { // @todo
+			// 	$value = [
+			// 		'alt'   => $targetProperties[self::ALT],
+			// 		'title' => $targetProperties[self::TITLE],
+			// 		'uri'   => $targetProperties[self::URI]
+			// 	];
+			// 	$field['entity'] = 'file';
+			} elseif (
+				$this->isATransitive($target, self::FILE)
+				|| $this->hasTransitiveSuperClass($target, self::FILE)
+			) {
+				$value = [ 'uri' => $this->getFilePath($target) ];
+				$field['references'] = 'file';
+			// } elseif ($this->isATransitive($target, self::DOC)) { // @todo
+			// 	$refType = self::DOC_REF;
 			} elseif ($this->getVocabularyForTag($target) != null) {
 				$value = [
 					'vid'  => $this->getVocabularyForTag($target)->localName(),
@@ -391,6 +392,39 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $field;
+	}
+	
+	/**
+	 * Returns the path to a file.
+	 * Path is created from annotation duo:uri and all upper classes
+	 * which are subclasses of duo:File, concatenated with '/'.
+	 * 
+	 * @param $entity class or individual
+	 * 
+	 * @return {string} path
+	 */
+	private function getFilePath($entity) {
+		if (!$entity) throw new Exception('Error: parameter $entity missing.');
+		$properties = $this->getPropertiesAsArray($entity);
+		
+		$types = $entity->typesAsResources();
+		$classes = $entity->allResources('rdfs:subClassOf');
+		
+		foreach ((!empty($classes) ? $classes : $types) as $class) {
+			if (!$this->hasTransitiveSuperClass($class, self::FILE))
+				continue;
+			
+			$result = $class->label() ?: $class->localName();
+			foreach ($this->findAllSuperClassesOf($class) as $superclass) {
+				if (!$this->hasTransitiveSuperClass($superclass, self::FILE))
+					continue;
+				$result = ($superclass->label() ?: $superclass->localName()). '/'. $result;
+			}
+			
+			return $result. '/'. $properties[self::URI];
+		}
+		
+		return $properties[self::URI];
 	}
 	
 	/**

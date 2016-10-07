@@ -11,6 +11,7 @@ use \Exception;
 
 use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
+use Drupal\core\StreamWrapper\StreamWrapperManager;
 
 /**
  * Importer for nodes.
@@ -75,7 +76,7 @@ class NodeImporter extends AbstractImporter {
 		try {
 			$this->deleteNodeIfExists($uuid);
 		} catch (Exception $e) {
-			$this->logWarning($e);
+			$this->logWarning($e->getMessage());
 			return;
 		}
 		
@@ -133,8 +134,14 @@ class NodeImporter extends AbstractImporter {
 		if (!$uri) throw new Exception('Error: parameter $uri missing.');
 		$drupalUri = file_default_scheme(). '://'. $uri;
 		
-		if (!file_exists(\Drupal::service('file_system')->realpath($drupalUri)))
-			throw new Exception('Error: file '. \Drupal::service('file_system')->realpath($drupalUri). ' could not be found.');
+		// @todo: does not work in script
+		// if (!file_exists($drupalUri))
+		// 	throw new Exception("Error: file '$drupalUri' does not exist.");
+		
+		if ($fid = $this->searchFileByUri($drupalUri)) {
+			$this->logNotice("Found file $fid for uri '$drupalUri'.");
+			return File::load($fid);
+		}
 		
 		$file = File::create([
 			'uid'    => $this->userId,
@@ -142,7 +149,6 @@ class NodeImporter extends AbstractImporter {
 			'status' => 1,
 		]);
 		$file->save();
-		
 		$this->entities['file'][] = $file->id();
 			
 		return $file;
@@ -189,7 +195,7 @@ class NodeImporter extends AbstractImporter {
 	}
 	
 	/**
-	 * 
+	 * Inserts fields into a node
 	 * 
 	 * @param $node drupal node
 	 * @param $fields array of node fields
@@ -208,20 +214,22 @@ class NodeImporter extends AbstractImporter {
 				continue;
 			}
 			
-			if (array_key_exists('references', $field) && $field['references']) {
+			if (array_key_exists('references', $field)
+				&& ($field['references'] == 'taxonomy_term' || $field['references'] == 'node')
+			) {
 				$this->nodeReferences[$node->id()][$fieldName][$field['references']]
 					= $field['value'];
 			} else {
-				if (array_key_exists('entity', $field) && $field['entity'] == 'file') {
+				if (array_key_exists('references', $field) && $field['references'] == 'file') {
 					if (array_key_exists('uri', $field['value'])) {
 						$file = $this->createFile($field['value']['uri']);
 						$field['value']['target_id'] = $file->id();
 						unset($file);
 					} else {
-						foreach ($field['value'] as $value) {
-							$file = $this->createFile($value['uri']);
-							$value['target_id'] = $file->id();
-							unset($file, $value);
+						for ($i = 0; $i < sizeof($field['value']); $i++) {
+							$file = $this->createFile($field['value'][$i]['uri']);
+							$field['value'][$i]['target_id'] = $file->id();
+							unset($file);
 						}
 					}
 				}
@@ -290,12 +298,6 @@ class NodeImporter extends AbstractImporter {
 						case 'node':
 							$entityIds = $this->mapNodeUuidsToNids($entityNames);
 							break;
-						case 'image':
-							throw new Exception('References to images are not implemented.');
-							break;
-						case 'file':
-							$entityIds = $this->mapFileUrisToFids($entityNames);
-							break;
 						default:
 							throw new Exception(
 								'Error: not supported entity type "'
@@ -344,39 +346,10 @@ class NodeImporter extends AbstractImporter {
 		return null;
 	}
 	
-	/**
-	 * Returns array of fids for array of recently created file uris.
-	 * 
-	 * @param $uris array of file uris
-	 * 
-	 * @return array of fids
-	 */
-	private function mapFileUrisToFids($uris) {
-	    if (empty($uris)) return [];
+	private function searchFileByUri($uri) {
+		if (!$uri) throw new Exception('Error: parameter $uri missing.');
 		
-		return array_map(
-			function($uri) { return $this->mapFileUriToFid($uri); }, 
-			$uris
-		);
-	}
-	
-	/**
-	 * Returns fid for recently created file uri.
-	 * 
-	 * @param $uri uri of the file
-	 * 
-	 * @return integer fid
-	 */
-	private function mapFileUriToFid($uri) {
-	    if (!$uri) return null;
-		
-		foreach ($this->entities['file'] as $fid) {
-			$file = File::load($fid);
-			if ($file->uri() == $uri) 
-				return $uri->id();
-		}
-		
-		return null;
+		return array_values($this->searchEntityIds([ 'entity_type' => 'file', 'uri' => $uri]))[0];
 	}
 	
 }
