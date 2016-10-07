@@ -72,7 +72,12 @@ class NodeImporter extends AbstractImporter {
 		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
 		$uuid = $params['uuid'] ? $params['uuid'] : $params['title'];
 		
-		$this->deleteNodeIfExists($uuid);
+		try {
+			$this->deleteNodeIfExists($uuid);
+		} catch (Exception $e) {
+			$this->logWarning($e);
+			return;
+		}
 		
 		$type = $params['type'] ?: 'article';
 		if (!$this->contentTypeExists($type)) {
