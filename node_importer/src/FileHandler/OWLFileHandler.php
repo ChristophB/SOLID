@@ -405,7 +405,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 */
 	private function getFilePath($entity) {
 		if (!$entity) throw new Exception('Error: parameter $entity missing.');
-		$properties = $this->getPropertiesAsArray($entity);
+		$uri = $this->getProperty($entity, self::URI);
 		
 		$types = $entity->typesAsResources();
 		$classes = $entity->allResources('rdfs:subClassOf');
@@ -421,10 +421,10 @@ class OWLFileHandler extends AbstractFileHandler {
 				$result = ($superclass->label() ?: $superclass->localName()). '/'. $result;
 			}
 			
-			return $result. '/'. $properties[self::URI];
+			return $result. '/'. $uri;
 		}
 		
-		return $properties[self::URI];
+		return $uri;
 	}
 	
 	/**
