@@ -43,7 +43,7 @@ It is possible to define files, which will be attached to Nodes.
 * Create a "File" Drupal field and an annotation/object property in OWL.
 * Instantiate the class "http://lha.org/duo#File" to declare a file with property "http://lha.org/duo#uri".
 * Annotate an OWL individual or class with above property and file individual as target.
-* Make sure to place the file into the respective folder.
+* Make sure to place the file into the respective folder before importing the OWL file.
 
 ## Troubleshooting/Importent notes
 
