@@ -189,9 +189,9 @@ class NodeImporter extends AbstractImporter {
 	    $result = array_values($this->searchEntityIds([
 	        'entity_type' => 'node',
 	        'uuid'        => $uuid,
-	    ]))[0];
+	    ]));
 	    
-	    return $result;
+	    return empty($result) ? null : $result[0];
 	}
 	
 	/**
@@ -233,8 +233,25 @@ class NodeImporter extends AbstractImporter {
 						}
 					}
 				}
-				if (!is_null($field['value']))
+				if (!is_null($field['value'])
+					&& (!is_array($field['value']) || !is_null($field['value']['value']))
+				) {
 					$node->get($fieldName)->setValue($field['value']);
+				}
+				if (!is_null($field['value'])) {
+					if (is_array($field['value'])) {
+                        if (!empty($field['value'])
+                    	    && (!array_key_exists('value', $field['value'])
+                        	    || !is_null($field['value']['value'])
+                            )
+                        ) {
+                        	$node->get($fieldName)->setValue($field['value']);
+                        }
+                    } else {
+                        $node->get($fieldName)->setValue($field['value']);
+                    }
+                }
+
 			}
 			unset($field);
 		}
