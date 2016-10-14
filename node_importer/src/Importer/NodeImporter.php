@@ -233,7 +233,8 @@ class NodeImporter extends AbstractImporter {
 						}
 					}
 				}
-				$node->get($fieldName)->setValue($field['value']);
+				if (!is_null($field['value']))
+					$node->get($fieldName)->setValue($field['value']);
 			}
 			unset($field);
 		}
