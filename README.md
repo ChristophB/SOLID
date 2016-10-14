@@ -39,6 +39,12 @@ The import form contains some important checkboxes, which only affect OWL import
 * "Import classes under 'Node' as nodes": Enables the user to handle classes as if they are individuals. The module will create a page for each class containing all properties.
 * "Only import leaf classes under 'Node' as nodes": This checkbox only works in combination with the above one. Only leaf classes will be handled as individuals.
 
+It is possible to define files, which will be attached to Nodes.
+* Create a "File" Drupal field and an annotation/object property in OWL.
+* Instantiate the class "http://lha.org/duo#File" to declare a file with property "http://lha.org/duo#uri".
+* Annotate an OWL individual or class with above property and file individual as target.
+* Make sure to place the file into the respective folder.
+
 ## Troubleshooting/Importent notes
 
 * After the import of a vocabulary you have to assigne it to the fields, where you want to use the tags.
