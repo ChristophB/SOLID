@@ -36,7 +36,7 @@ class Form extends FormBase {
         
         $form['file'] = [
             '#type'   => 'managed_file',
-            '#title'  => t('File:'),
+            '#title'  => $this->t('File'),
             '#upload_validators' => [
 		        'file_validate_extensions' => [ 'json owl' ],
 	        ],
@@ -45,32 +45,32 @@ class Form extends FormBase {
         
         $form['import_vocabularies'] = [
             '#type'  => 'checkbox',
-            '#title' => t('Import Vocabularies'),
+            '#title' => $this->t('Import Vocabularies'),
         ];
         
         $form['import_nodes'] = [
             '#type'  => 'checkbox',
-            '#title' => t('Import Nodes'),
+            '#title' => $this->t('Import Nodes'),
         ];
         
         $form['import_class_nodes'] = [
             '#type'  => 'checkbox',
-            '#title' => t('Import classes under "Node" as nodes'),
+            '#title' => $this->t('Import classes under "Node" as nodes'),
         ];
         
         $form['import_only_leaf_class_nodes'] = [
             '#type'  => 'checkbox',
-            '#title' => t('Only import leaf classes under "Node" as nodes'),
+            '#title' => $this->t('Only import leaf classes under "Node" as nodes'),
         ];
         
         $form['overwrite'] = [
             '#type'  => 'checkbox',
-            '#title' => t('Overwrite'),
+            '#title' => $this->t('Overwrite'),
         ];
 
         $form['submit'] = [
             '#type'  => 'submit',
-            '#value' => t('Submit')
+            '#value' => $this->t('Submit')
         ];
 
         return $form;
@@ -91,7 +91,23 @@ class Form extends FormBase {
     }
     
     public function validateForm(array &$form, FormStateInterface $form_state) {
-        // @todo Implement validateForm() method.
+        if (!$form_state->getValue('import_nodes')
+            && !$form_state->getValue('import_vocabularies')
+        ) {
+            $form_state->setErrorByName(
+                'import_nodes',
+                $this->t('Nothing to import. Please select at least nodes or vocabularies for import.')
+            );
+        }
+        
+        if ($form_state->getValue('import_only_leaf_class_nodes')
+            && !$form_state->getValue('import_class_nodes')
+        ) {
+            $form_state->setErrorByName(
+                'import_only_leaf_class_nodes',
+                $this->t('Only leaf class node import is not allowed, when class node import is not selected.')
+            );
+        }
     }
 
     public function submitForm(array &$form, FormStateInterface $form_state) {
@@ -117,9 +133,8 @@ class Form extends FormBase {
         
         $this->execInBackground($cmd);
         
-        
         drupal_set_message(
-			'Import started! Have a look at /admin/reports/dblog to see the progress.'
+			$this->t('Import started! Have a look at /admin/reports/dblog to see the progress.')
 		);
     }
 	
