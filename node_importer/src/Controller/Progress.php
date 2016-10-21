@@ -21,7 +21,9 @@ class Progress extends ControllerBase {
     
     public function content() {
         if (file_exists($this->logFile)) {
-            $log = file_get_contents($this->logFile);
+            foreach(array_reverse(file($this->logFile)) as $line){
+                $log .= $line;
+            }
         } else {
             $log = 'No import process running!';
         }
@@ -32,11 +34,14 @@ class Progress extends ControllerBase {
         return [
             '#type' => 'markup',
             '#markup'
-                =>'<ul>'
-                . '  <li>'. $formLink->toString(). '</li>'
-                . '  <li>'. $progressLink->toString(). '</li>'
-                . '</ul>'
-                . "<pre>$log</pre>"
+                =>'<nav class="tabs" role="navigation" aria-label="Tabs">'
+                . '  <h2 class="visually-hidden">Primary tabs</h2>'
+                . '  <ul class="tabs primary tabs--primary nav nav-tabs">'
+                . '    <li>'. $formLink->toString(). '</li>'
+                . '    <li class="is-active active">'. $progressLink->toString(). '<span class="visually-hidden">(active tab)</span></li>'
+                . '  </ul>'
+                . '</nav>'
+                . '<pre>'. $log. '</pre>'
         ];
     }
   

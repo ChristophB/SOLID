@@ -83,10 +83,13 @@ class Form extends FormBase {
         return [
             '#type' => 'markup',
             '#markup'
-                =>'<ul>'
-                . '  <li>'. $formLink->toString(). '</li>'
-                . '  <li>'. $progressLink->toString(). '</li>'
-                . '</ul>'
+                =>'<nav class="tabs" role="navigation" aria-label="Tabs">'
+                . '  <h2 class="visually-hidden">Primary tabs</h2>'
+                . '  <ul class="tabs primary tabs--primary nav nav-tabs">'
+                . '    <li class="is-active active">'. $formLink->toString(). '<span class="visually-hidden">(active tab)</span></li>'
+                . '    <li>'. $progressLink->toString(). '</li>'
+                . '  </ul>'
+                . '</nav>'
         ];
     }
     
@@ -119,11 +122,11 @@ class Form extends FormBase {
         $overwrite              = $form_state->getValue('overwrite');
         $userId                 = \Drupal::currentUser()->id();
         
-        $file = File::load($fid);
-        $uri = $file->getFileUri();
-        $filePath = \Drupal::service('file_system')->realpath($uri);
+        $file       = File::load($fid);
+        $filePath   = \Drupal::service('file_system')->realpath($file->getFileUri());
         $drupalPath = getcwd();
-        $newFile = $drupalPath. '/sites/default/files/'. $file->getFilename();
+        $newFile    = $drupalPath. '/sites/default/files/'. $file->getFilename();
+        
         copy($filePath, $newFile);
         
         $cmd 
