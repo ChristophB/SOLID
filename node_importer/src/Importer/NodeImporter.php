@@ -135,8 +135,8 @@ class NodeImporter extends AbstractImporter {
 		$drupalUri = file_default_scheme(). '://'. $uri;
 		
 		// @todo: does not work in script
-		// if (!file_exists($drupalUri))
-		// 	throw new Exception("Error: file '$drupalUri' does not exist.");
+		if (!file_exists($drupalUri))
+			throw new Exception("Error: file '$drupalUri' does not exist.");
 		
 		if ($fid = $this->searchFileByUri($drupalUri)) {
 			$this->logNotice("Found file $fid for uri '$drupalUri'.");

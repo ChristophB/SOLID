@@ -127,14 +127,14 @@ abstract class AbstractImporter {
 	protected function logWarning($msg) {
 		if (!in_array($msg, $this->warnings)) {
 			\Drupal::logger('node_importer')->warning($msg);
-			print date('H:M:s', time()). "> Warning: $msg\n";
+			print date('H:i:s', time()). "> Warning: $msg\n";
 			array_push($this->warnings, $msg);
 		}
 	}
 	
 	protected function logNotice($msg) {
 		\Drupal::logger('node_importer')->notice($msg);
-		print date('H:M:s', time()). "> $msg\n";
+		print date('H:i:s', time()). "> $msg\n";
 	}
 	
 }
