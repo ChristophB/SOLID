@@ -180,6 +180,14 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			]
 		];
 		
+		if ($this->classesAsNodes && !$this->onlyLeafClassesAsNodes) {
+			$xml = $this->getXMLElement($individual);
+			$fields[] = $this->createFieldParent($xml);
+			
+			if ($xml->getName() == 'Class')
+				$fields[] = $this->createFieldChild($xml);
+		}
+		
 		if (
 			$this->isATransitive($individual, self::VOCABULARY)
 			|| $this->hasTransitiveSuperClass($individual, self::VOCABULARY)
@@ -200,6 +208,85 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		}
 		
 		return $fields;
+	}
+	
+	private function createFieldParent($resource) {
+		if (!$resource) throw new Exception('Error: parameter $resource missing.');
+		
+		if ($resource->getName() == 'Class') {
+			return [
+				'field_name' => 'field_parent',
+				'value'      => array_filter(
+					$this->getDirectSuperClassesOf($resource),
+					function($x) {
+						return $this->hasTransitiveSuperClass($x, self::NODE)
+							&& !$this->hasDirectSuperClass($x, self::NODE);
+					}
+				),
+				'references' => 'node'
+			];
+		} else {
+			return [
+				'field_name' => 'field_parent',
+				'value'      => array_filter(
+					$this->getTypesOf($resource),
+					function($x) {
+						return $this->hasTransitiveSuperClass($x, self::NODE)
+							&& !$this->hasDirectSuperClass($x, self::NODE);
+					}
+				),
+				'references' => 'node'
+			];
+		}
+	}
+	
+	private function getTypesOf($resource) {
+		if (!$resource) throw new Exception('Error: parameter $resource missing.');
+		
+		$properties = $this->getPropertiesAsArray($this->getUri($resource));
+		return $properties['type'];
+	}
+	
+	private function createFieldChild($class) {
+		if (!$class) throw new Exception('Error: parameter $class missing.');
+		
+		return [
+			'field_name' => 'field_child',
+			'value'      => 
+				array_merge(
+					$this->getDirectSubClassesOf($this->getUri($class)),
+					$this->getInstancesOf($class)
+				),
+			'references' => 'node'
+		];
+	}
+	
+	private function getInstancesOf($class) {
+		if (!$class) throw new Exception('Error: parameter $class missing');
+		
+		$xml = new ImprovedXMLReader();
+		$xml->open($this->filePath);
+		
+		$result = [];
+		while ($xml->read()) {
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != 'owl:NamedIndividual'
+				|| $xml->depth != 1
+			) continue;
+			
+			$node = new \SimpleXMLElement($xml->readOuterXML());
+			
+			foreach ($node->children('rdf', true) as $child) {
+				if ($child->getName() != 'type') continue;
+				$parent = $child->attributes('rdf', true)->resource;
+			
+				if ((string)$parent == $this->getUri($class))
+					$result[] = $this->getUri($node);
+			}
+		}
+		
+		$xml->close();
+		return $result;
 	}
 	
 	/**
@@ -305,7 +392,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 */
 	private function getNodeTitle($entity) {
 		$title = $this->getProperty($entity, 'title')[0];
-		$localName = $this->getLocalName($entity->attributes('rdf', true)->about);
+		$localName = $this->getLocalName($this->getUri($entity));
 		
 		return $title ?: $localName;
 	}
@@ -737,7 +824,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			
 			$node = new \SimpleXMLElement($xml->readOuterXML());
 			
-			if ((string)$node->attributes('rdf', true)->about == $uri) {
+			if ($this->getUri($node) == $uri) {
 				$xml->close();
 				return $node;
 			}
@@ -805,7 +892,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			) continue;
 			
 			$node = new \SimpleXMLElement($xml->readOuterXML());
-			$result[] = (string)$node->attributes('rdf', true)->about;
+			$result[] = $this->getUri($node);
 		}
 		
 		$xml->close();
@@ -855,7 +942,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				if ($child->getName() != 'subClassOf') continue;
 				$parent = $child->attributes('rdf', true)->resource;
 			
-				if ((string)$parent == $class) $result[] = (string)$node->attributes('rdf', true)->about;
+				if ((string)$parent == $class) $result[] = $this->getUri($node);
 			}
 		}
 		
@@ -863,8 +950,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		return $result;
 	}
 	
-	private function getClasses() {
-		return $this->graph->allOfType('owl:Class');
+	private function getDirectSuperClassesOf($class) {
+		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
+		
+		$properties = $this->getPropertiesAsArray($this->getUri($class));
+		return $properties['subClassOf'];
 	}
 	
 	private function getAnnotationProperties() {
@@ -880,6 +970,12 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		}
 		
 		return $properties;
+	}
+	
+	private function getUri($resource) {
+		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
+		
+		return (string)$resource->attributes('rdf', true)->about;
 	}
 	
 	private function getDatatypeProperties() {
@@ -1004,8 +1100,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	/**
 	 * Checks if given class has given superclass.
 	 * 
-	 * @param $class class resource
-	 * @param $superClass superclass resource
+	 * @param $class class uri
+	 * @param $superClass superclass uri
 	 * 
 	 * @return boolean
 	 */
@@ -1013,7 +1109,9 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		if (!$class) throw new Exception('Error: parameter $class missing');
 		if (!$superClass) throw new Exception('Error: parameter $superClass missing');
 		
-		if (in_array($superClass, $class->allResources('rdfs:subClassOf')))
+		$xml = $this->getXMLElement($class);
+		
+		if (in_array($superClass, $this->getProperty($xml, 'subClassOf')))
 			return true;
 		
 		return false;

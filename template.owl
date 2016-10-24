@@ -238,7 +238,7 @@
     <!-- http://www.lha.org/template_ontology#Node1 -->
 
     <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#Node1">
-        <rdf:type rdf:resource="http://www.lha.org/template_ontology#Nodetype1"/>
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#ClassNodeLeaf"/>
         <field_literal rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</field_literal>
         <duo:alias>alias</duo:alias>
         <duo:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</duo:content>

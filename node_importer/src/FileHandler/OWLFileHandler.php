@@ -184,6 +184,13 @@ class OWLFileHandler extends AbstractFileHandler {
 			]
 		];
 		
+		if ($this->classesAsNodes && !$this->onlyLeafClassesAsNodes) {
+			$fields[] = $this->createFieldParent($individual);
+			
+			if ($individual->type() == 'owl:Class')
+				$fields[] = $this->createFieldChild($individual);
+		}
+		
 		if (
 			$this->isATransitive($individual, self::VOCABULARY)
 			|| $this->hasTransitiveSuperClass($individual, self::VOCABULARY)
@@ -204,6 +211,61 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $fields;
+	}
+	
+	private function createFieldParent($resource) {
+		if (!$resource) throw new Exception('Error: parameter $resource missing.');
+		
+		if ($resource->type() == 'owl:Class') {
+			return [
+				'field_name' => 'field_parent',
+				'value'      => array_map(
+					function($x) { return $x->getUri(); },
+					array_filter(
+						$this->getDirectSuperClassesOf($resource),
+						function($x) {
+							return $this->hasTransitiveSuperClass($x, self::NODE)
+								&& !$this->hasDirectSuperClass($x, self::NODE);
+						}
+					)
+				),
+				'references' => 'node'
+			];
+		} else {
+			return [
+				'field_name' => 'field_parent',
+				'value'      => array_map(
+					function($x) { return $x->getUri(); },
+					array_filter(
+						$resource->allResources('rdf:type'),
+						function($x) {
+							return $this->hasTransitiveSuperClass($x, self::NODE)
+								&& !$this->hasDirectSuperClass($x, self::NODE);
+						}
+					)
+				),
+				'references' => 'node'
+			];
+		}
+	}
+	
+	private function createFieldChild($class) {
+		if (!$class) throw new Exception('Error: parameter $class missing.');
+		
+		return [
+			'field_name' => 'field_child',
+			'value'      => array_map(
+				function($x) { return $x->getUri(); },
+				array_merge($this->getDirectSubClassesOf($class), $this->getInstancesOf($class))
+			),
+			'references' => 'node'
+		];
+	}
+	
+	private function getInstancesOf($class) {
+		if (!$class) throw new Exception('Error: parameter $class missing');
+		
+		return $this->graph->allOfType($class->getUri());
 	}
 	
 	/**
@@ -719,6 +781,10 @@ class OWLFileHandler extends AbstractFileHandler {
 			'rdfs:subClassOf', 
 			$this->graph->resource($class)
 		);
+	}
+	
+	private function getDirectSuperClassesOf($class) {
+		return $class->allResources('rdfs:subClassOf');
 	}
 	
 	private function getClasses() {

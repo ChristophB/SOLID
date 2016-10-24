@@ -20,6 +20,7 @@ class Progress extends ControllerBase {
     private $logFile = 'modules/node_importer/node_importer.log';
     
     public function content() {
+        $log = '';
         if (file_exists($this->logFile)) {
             foreach(array_reverse(file($this->logFile)) as $line){
                 $log .= $line;
