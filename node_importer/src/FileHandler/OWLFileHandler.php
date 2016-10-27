@@ -124,9 +124,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return array of classes
 	 */
 	private function getVocabularyClasses() {
-		return $this->graph->resourcesMatching(
-			'rdfs:subClassOf', $this->graph->resource(self::VOCABULARY)
-		); 
+		return $this->getDirectSubClassesOf($this->graph->resource(self::VOCABULARY)); 
 	}
 
 	/** 
@@ -139,8 +137,9 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function getBundle($node) {
 		if (!$node) throw new Exception('Error: parameter $node missing');
 	
-		foreach ($this->graph->resourcesMatching(
-			'rdfs:subClassOf', $this->graph->resource(self::NODE)
+		foreach (
+			$this->getDirectSubClassesOf(
+				$this->graph->resource(self::NODE)
 			) as $bundleResource
 		) {
 			if (
@@ -282,7 +281,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$resources = array_merge(
 			$individual->allResources('rdf:type'),
-			$individual->allResources('rdfs:subClassOf')
+			$this->getDirectSuperClassesOf($individual)
 		);
 		
 		foreach ($resources as $tag) {
@@ -470,7 +469,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		$uri = $this->getProperty($entity, self::URI);
 		
 		$types = $entity->typesAsResources();
-		$classes = $entity->allResources('rdfs:subClassOf');
+		$classes = $this->getDirectSuperClassesOf($entity);
 		
 		foreach ((!empty($classes) ? $classes : $types) as $class) {
 			if (!$this->hasTransitiveSuperClass($class, self::FILE))
@@ -762,7 +761,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$leafClasses = [];
 		foreach ($this->findAllSubClassesOf($class) as $subClass) {
-			if (empty($this->graph->resourcesMatching('rdfs:subClassOf', $subClass)))
+			if (empty($this->getDirectSubClassesOf($subClass)))
 				$leafClasses[] = $subClass;
 		}
 		
@@ -893,7 +892,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$class) throw new Exception('Error: parameter $class missing.');
 		
 		$result = [];
-		foreach ($class->allResources('rdfs:subClassOf') as $superClass) {
+		foreach ($this->getDirectSuperClassesOf($class) as $superClass) {
 			$result[] = $superClass;
 			$result = array_merge($result, $this->findAllSuperClassesOf($superClass));
 		}
@@ -912,7 +911,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (!$class) throw new Exception('Error: parameter $class missing');
 		if (!$superClass) throw new Exception('Error: parameter $superClass missing');
 		
-		if (in_array($superClass, $class->allResources('rdfs:subClassOf')))
+		if (in_array($superClass, $this->getDirectSuperClassesOf($class)))
 			return true;
 		
 		return false;
@@ -931,7 +930,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		return array_map(
 			function($x) { return $x->label() ?: $x->localName(); },
 			array_filter(
-				$tag->allResources('rdfs:subClassOf'),
+				$this->getDirectSuperClassesOf($tag),
 				function($x) { return !$this->hasDirectSuperClass($x, self::VOCABULARY); }
 			)
 		);
