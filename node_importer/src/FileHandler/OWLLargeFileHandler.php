@@ -392,9 +392,10 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 */
 	private function getNodeTitle($entity) {
 		$title = $this->getProperty($entity, 'title')[0];
+		$label = $this->getProperty($entity, 'label')[0];
 		$localName = $this->getLocalName($this->getUri($entity));
 		
-		return $title ?: $localName;
+		return $title ?: $label ?: $localName;
 	}
 	
 	/**
