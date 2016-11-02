@@ -21,7 +21,7 @@ use Drupal\node_importer\FileHandler\OWLLargeFileHandler;
  */
 class FileHandlerFactory {
     
-    const THRESHOLD = 100000000; // 10 MBytes
+    const THRESHOLD = 100000000; // 100 MBytes
     
     /**
      * Loads the file by its fid and checks file extension
