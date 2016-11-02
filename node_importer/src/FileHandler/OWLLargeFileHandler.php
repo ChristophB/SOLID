@@ -422,7 +422,9 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			$xml = $this->getXMLElement($target);
 			$value;
 			
-			if ($this->isATransitive($target, self::NODE)) {
+			if ($this->isATransitive($target, self::NODE)
+				|| $this->hasTransitiveSuperClass($target, self::NODE)
+			) {
 				$value = $target;
 				$field['references'] = 'node';
 			// } elseif ($this->isATransitive($target, self::IMG)) {
