@@ -398,7 +398,10 @@ class OWLFileHandler extends AbstractFileHandler {
 			$targetProperties = $this->getPropertiesAsArray($target);
 			$value;
 			
-			if ($this->isATransitive($target, self::NODE)) {
+			if (
+				$this->isATransitive($target, self::NODE)
+				|| $this->hasTransitiveSuperClass($target, self::NODE)
+			) {
 				$value = $target->getUri();
 				$field['references'] = 'node';
 			//} elseif ($this->isATransitive($target, self::IMG)) { // @todo
