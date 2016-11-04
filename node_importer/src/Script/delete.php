@@ -2,6 +2,7 @@
 
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\node\Entity\Node;
 
 if (sizeof($argv) < 3)
     die("Usage: delete.php [drupal path] [content type] [userId?]\n");
@@ -27,6 +28,9 @@ $result = \Drupal::entityQuery('node')
     ->execute();
 
 print 'Found '. sizeof($result). " nodes.\n";
-entity_delete_multiple('node', $result);
+
+foreach ($result as $id) {
+    Node::load($id)->delete();
+}
 
 ?>
