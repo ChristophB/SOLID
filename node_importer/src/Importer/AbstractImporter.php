@@ -71,7 +71,9 @@ abstract class AbstractImporter {
      */
     protected function searchEntityIds($params) {
 		if (!$params['entity_type']) throw new Exception('Error: named parameter "entity_type" missing');
-		$query = \Drupal::entityQuery($params['entity_type']);
+		$query
+			= \Drupal::entityQuery($params['entity_type'])
+			->addMetadata('account', user_load($this->userId));
 		
 		foreach ($params as $key => $value) {
 			if ($key == 'entity_type') continue;
