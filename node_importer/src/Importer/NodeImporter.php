@@ -167,7 +167,7 @@ class NodeImporter extends AbstractImporter {
 			if ($this->overwrite) {
 				\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
 				Node::load($id)->delete();
-				$this->logNotice("Deleted node $id with uuid $uuid, because overwrite was selected.");
+				$this->logNotice("Deleted node $id with uuid $uuid.");
 			} else {
 				throw new Exception(
 					"Node with uuid '$uuid' already exists. "

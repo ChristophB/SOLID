@@ -2,7 +2,7 @@
 
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
-use \Exception;
+# use \Exception;
 
 use Drupal\node_importer\Importer\VocabularyImporter;
 use Drupal\node_importer\Importer\NodeImporter;
