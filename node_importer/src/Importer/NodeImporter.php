@@ -235,7 +235,10 @@ class NodeImporter extends AbstractImporter {
 					}
 				}
 				if (array_key_exists('value', $field) && !is_null($field['value'])
-					&& (!is_array($field['value']) || !is_null($field['value']['value']))
+					&& (
+						!is_array($field['value'])
+						|| (array_key_exists('value', $field['value']) && !is_null($field['value']['value']))
+					)
 				) {
 					$node->get($fieldName)->setValue($field['value']);
 				}
