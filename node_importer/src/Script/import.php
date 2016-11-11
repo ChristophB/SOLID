@@ -23,7 +23,7 @@ $overwrite              = $argv[8] ? true : false;
 if (!$drupalPath) die("Error: script parameter 'drupalPath' missing.\n");
 if (!$filePath) die("Error: script parameter 'filePath' missing.\n");
 
-$logFile = 'modules/node_importer/node_importer.log';
+$logFile = $drupalPath. '/modules/node_importer/node_importer.log';
 if (file_exists($logFile)) unlink($logFile);
 fclose(STDOUT);
 $STDOUT = fopen($logFile, 'wb');
