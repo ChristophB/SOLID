@@ -6,9 +6,9 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
-     xmlns:duo="http://www.lha.org/duo#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:duo="http://www.lha.org/duo#">
     <owl:Ontology rdf:about="http://www.lha.org/template_ontology">
         <owl:imports rdf:resource="http://www.lha.org/duo"/>
     </owl:Ontology>
@@ -66,6 +66,14 @@
     
 
 
+    <!-- http://www.lha.org/template_ontology#field_file -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_file">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
     <!-- http://www.lha.org/template_ontology#field_id -->
 
     <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_id">
@@ -77,6 +85,14 @@
     <!-- http://www.lha.org/template_ontology#field_name -->
 
     <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_name">
+        <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#field_node -->
+
+    <owl:AnnotationProperty rdf:about="http://www.lha.org/template_ontology#field_node">
         <rdfs:subPropertyOf rdf:resource="http://www.lha.org/duo#field"/>
     </owl:AnnotationProperty>
     
@@ -129,6 +145,7 @@
         <duo:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">This is an example for a non-leaf class which is importable as node.</duo:content>
         <duo:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ClassNode</duo:title>
         <field_disease rdf:resource="http://www.lha.org/template_ontology#Term1"/>
+        <field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</field_id>
     </owl:Class>
     
 
@@ -140,6 +157,7 @@
         <duo:content rdf:datatype="http://www.w3.org/2001/XMLSchema#string">This is an example for a class leaf which is importable as node.</duo:content>
         <duo:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ClassNodeLeaf</duo:title>
         <field_disease rdf:resource="http://www.lha.org/template_ontology#Term2"/>
+        <field_node rdf:resource="http://www.lha.org/template_ontology#ClassNode"/>
     </owl:Class>
     
 
@@ -190,20 +208,21 @@
         <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#Vocabulary2"/>
     </owl:Class>
     
-	
-	
-	<!-- http://www.lha.org/template_ontology#Term3 -->
 
-    <owl:Class rdf:about="http://www.lha.org/template_ontology#Term3">
-		<rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#Term1"/>
-    </owl:Class>
-	
-	
 
     <!-- http://www.lha.org/template_ontology#Term2 -->
 
     <owl:Class rdf:about="http://www.lha.org/template_ontology#Term2">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#Vocabulary2"/>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Term 2</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#Term3 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#Term3">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#Term1"/>
     </owl:Class>
     
 
@@ -220,6 +239,40 @@
 
     <owl:Class rdf:about="http://www.lha.org/template_ontology#Vocabulary2">
         <rdfs:subClassOf rdf:resource="http://www.lha.org/duo#Vocabulary"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#dir1 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#dir1">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/duo#File"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#dir2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#dir2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#dir1"/>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">dir2-label</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#dir3 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#dir3">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#dir2"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#test_file2 -->
+
+    <owl:Class rdf:about="http://www.lha.org/template_ontology#test_file2">
+        <rdfs:subClassOf rdf:resource="http://www.lha.org/template_ontology#dir1"/>
+        <duo:uri>test2.txt</duo:uri>
     </owl:Class>
     
 
@@ -246,7 +299,10 @@
         <field_authors rdf:resource="http://www.lha.org/template_ontology#Person1"/>
         <field_authors rdf:resource="http://www.lha.org/template_ontology#Person2"/>
         <field_disease rdf:resource="http://www.lha.org/template_ontology#Term1"/>
+        <field_file rdf:resource="http://www.lha.org/template_ontology#test_file1"/>
+        <field_file rdf:resource="http://www.lha.org/template_ontology#test_file2"/>
         <field_id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</field_id>
+        <field_node rdf:resource="http://www.lha.org/template_ontology#Node2"/>
         <field_publisher rdf:resource="http://www.lha.org/template_ontology#Organisation1"/>
     </owl:NamedIndividual>
     <owl:Axiom>
@@ -335,6 +391,15 @@
         <field_appreviation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pers2</field_appreviation>
         <field_email rdf:datatype="http://www.w3.org/2001/XMLSchema#string">person2@example.com</field_email>
         <field_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Person #2</field_name>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.lha.org/template_ontology#test_file1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.lha.org/template_ontology#test_file1">
+        <rdf:type rdf:resource="http://www.lha.org/template_ontology#dir3"/>
+        <duo:uri>test1.txt</duo:uri>
     </owl:NamedIndividual>
 </rdf:RDF>
 

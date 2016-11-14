@@ -49,6 +49,13 @@
 				{
 					"value": "Example Address",
 					"field_name": "field_publisher"
+				},
+				{
+					"value": [
+						{ "uri": "dir1/dir2-label/dir3/test1.txt" },
+						{ "uri": "dir1/test2.txt" }
+					],
+					"field_name": "field_file"
 				}
 			]
 		},
