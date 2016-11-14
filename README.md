@@ -31,7 +31,12 @@ Supported import formats:
 * Place the previously created file into the form.
 * Check "Import Vocabularies" or "Import Nodes" and click "Import".
 * There will be a message indicating the success/failure of the import process.
-* The module automatically undos all changes if an error occured.
+* The module automatically undos all changes if an error occured. (Be careful while using the "overwrite" option, because deleted nodes can not be restored.)
+* You can call call node_importer/src/Script/import.php to import data from command line.
+
+```sh
+php import.php [absolute path to drupal folder] [absolute path to import file] [userid] [import vocabulary?] [import nodes?] [import classes as nodes?] [import only leaf classes as nodes?] [overwrite?]
+```
 
 ## Additional features
 
