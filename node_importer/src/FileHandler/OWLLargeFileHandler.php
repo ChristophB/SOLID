@@ -35,7 +35,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	private $classesAsNodes         = false;
 	private $onlyLeafClassesAsNodes = false;
 	
-	public function __construct($params) {
+	public function __construct(array $params) {
 		parent::__construct($params);
 		
 		if ($params['classesAsNodes']) $this->classesAsNodes = true;
@@ -72,10 +72,12 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				
 				$this->vocabularyImporter->setTagParents(
 					$vid,
-					[[
-						'name'    => $name,
-						'parents' => $this->getParentTags($tag)
-					]]
+					[
+						[
+							'name'    => $name,
+							'parents' => $this->getParentTags($tag)
+						]
+					]
 				);
 			}
 			
@@ -138,7 +140,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return string bundle
 	 */
 	private function getBundle($node) {
-		if (!$node) throw new Exception('Error: parameter $node missing');
+		if (is_null($node)) throw new Exception('Error: parameter $node missing');
 		
 		foreach ($this->getDirectSubClassesOf(self::NODE) as $bundle) {
 			if (
@@ -161,7 +163,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of node fields
 	 */
 	private function createNodeFields($individual) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		
 		$properties = $this->getPropertiesAsArray($individual);
 		
@@ -184,7 +186,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 			$xml = $this->getXMLElement($individual);
 			$fields[] = $this->createFieldParent($xml);
 			
-			if ($xml->getName() == 'Class')
+			if ($xml->getName() === 'Class')
 				$fields[] = $this->createFieldChild($xml);
 		}
 		
@@ -211,9 +213,9 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	private function createFieldParent($resource) {
-		if (!$resource) throw new Exception('Error: parameter $resource missing.');
+		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
 		
-		if ($resource->getName() == 'Class') {
+		if ($resource->getName() === 'Class') {
 			return [
 				'field_name' => 'field_parent',
 				'value'      => array_filter(
@@ -241,14 +243,14 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	private function getTypesOf($resource) {
-		if (!$resource) throw new Exception('Error: parameter $resource missing.');
+		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
 		
 		$properties = $this->getPropertiesAsArray($this->getUri($resource));
 		return $properties['type'];
 	}
 	
 	private function createFieldChild($class) {
-		if (!$class) throw new Exception('Error: parameter $class missing.');
+		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
 		
 		return [
 			'field_name' => 'field_child',
@@ -262,7 +264,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	private function getInstancesOf($class) {
-		if (!$class) throw new Exception('Error: parameter $class missing');
+		if (is_null($class)) throw new Exception('Error: parameter $class missing');
 		
 		$xml = new ImprovedXMLReader();
 		$xml->open($this->filePath);
@@ -280,7 +282,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				if ($child->getName() != 'type') continue;
 				$parent = $child->attributes('rdf', true)->resource;
 			
-				if ((string)$parent == $this->getUri($class))
+				if ((string) $parent == $this->getUri($class))
 					$result[] = $this->getUri($node);
 			}
 		}
@@ -297,7 +299,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array containing all tag tuples
 	 */
 	private function createFieldTags($individual) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		
 		$properties = $this->getPropertiesAsArray($individual);
 		$tags = array_merge(
@@ -333,8 +335,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return boolean
 	 */
 	private function hasTransitiveSuperClass($class, $superClass) {
-		if (!$class) throw new Exception('Error: parameter $class missing.');
-		if (!$superClass) throw new Exception('Error: parameter $superClass missing.');
+		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
+		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing.');
 		
 		foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
 			if ($curSuperClass == $superClass)
@@ -352,8 +354,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array with all properties of the field
 	 */
 	private function createNodeField($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		if ($literals = $this->getSortedLiterals($individual, $property)) { // includes DataProperties
 			$field = [
@@ -375,7 +377,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return string
 	 */
 	private function literalValueToString($literal) {
-		if (!$literal) return null;
+		if (is_null($literal)) return null;
 		
 		if ($literal->getDatatype() == 'xsd:dateTime')
 			return $literal->format('Y-m-d');
@@ -407,8 +409,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array containing fields: 'value' (array of values), 'field_name'
 	 */
 	private function getResourceValuesForNodeField($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		$resources = $this->getSortedResources($individual, $property);
 		if (!$resources || empty($resources)) return null;
@@ -498,7 +500,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return {string} path
 	 */
 	private function getFilePath($uri) {
-		if (!$uri) throw new Exception('Error: parameter $uri missing.');
+		if (is_null($uri)) throw new Exception('Error: parameter $uri missing.');
 		$properties = $this->getPropertiesAsArray($uri);
 		$xml = $this->getXMLElement($uri);
 		
@@ -536,8 +538,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of targeted resources as uris
 	 */
 	private function getSortedResources($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		$resources = $this->getResources($individual, $property);
 		if (empty($resources)) return null;
@@ -566,8 +568,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of uris
 	 */
 	private function getResources($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 	
 		$xml = $this->getXMLElement($individual);
 		
@@ -579,7 +581,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 					|| $child->attributes('rdf', true)->resource == null
 				) continue;
 				
-				$result[] = (string)$child->attributes('rdf', true)->resource;
+				$result[] = (string) $child->attributes('rdf', true)->resource;
 			}
 		}
 		
@@ -595,8 +597,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of literals sorted by ref_num if it exists
 	 */
 	private function getSortedLiterals($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		$literals = $this->getLiterals($individual, $property);
 		if (empty($literals)) return null;
@@ -625,8 +627,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of values
 	 */
 	private function getLiterals($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		$xml = $this->getXMLElement($individual);
 		
@@ -656,9 +658,9 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of axiom properties
 	 */
 	private function getAxiomWithTargetForIndividual($individual, $property, $target) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
-		if (!$target) throw new Exception('Error: parameter $target missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
+		if (is_null($target)) throw new Exception('Error: parameter $target missing');
 		
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
@@ -711,7 +713,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return string
 	 */
 	private function removeRdfsType($string) {
-		if (!$string) return null;
+		if (is_null($string)) return null;
 		
 		return preg_replace('/"?\^\^.*$/', '', $string);
 	}
@@ -726,8 +728,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of SimpleXMLElements
 	 */
 	private function getAxiomsForIndividual($individual, $property) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$property) throw new Exception('Error: parameter $property missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		$xml = new ImprovedXMLReader();
 		$xml->open($this->filePath);
@@ -767,7 +769,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return string vid
 	 */
 	private function getVocabularyForTag($tag) {
-		if (!$tag) throw new Exception('Error: parameter $tag missing');
+		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
 		
 		foreach ($this->getVocabularyClasses() as $vocabulary) {
 			foreach ($this->findAllSubClassesOf($vocabulary) as $subClass) {
@@ -777,7 +779,6 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 		}
 		
 		return null;
-		// throw new Exception("Error: tag: '$tag->localName()' could not be found.");
 	}
 	
 	/**
@@ -788,10 +789,10 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of property value arrays
 	 */
 	private function getPropertiesAsArray($individual) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		
 		$xml = $this->getXMLElement($individual);
-		if ($xml == null) return [];
+		if (is_null($xml)) return [];
 		
 		$array = [];
 		
@@ -945,7 +946,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				if ($child->getName() != 'subClassOf') continue;
 				$parent = $child->attributes('rdf', true)->resource;
 			
-				if ((string)$parent == $class) $result[] = $this->getUri($node);
+				if ((string) $parent == $class) $result[] = $this->getUri($node);
 			}
 		}
 		
@@ -978,7 +979,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	private function getUri($resource) {
 		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
 		
-		return (string)$resource->attributes('rdf', true)->about;
+		return (string) $resource->attributes('rdf', true)->about;
 	}
 	
 	private function getDatatypeProperties() {
@@ -1049,8 +1050,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return boolean
 	 */
 	private function isATransitive($individual, $superClass) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$superClass) throw new Exception('Error: parameter $superClass missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing');
 		
 		if ($this->isA($individual, $superClass))
 			return true;
@@ -1070,10 +1071,11 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	private function findAllSuperClassesOf($class) {
-		if (!$class) throw new Exception('Error: parameter $class missing.');
+		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
 		
 		$xml = $this->getXMLElement($class);
 		if (is_null($xml)) return [];
+
 		$result = $this->getProperty($xml, 'subClassOf');
 		
 		foreach ($result as $superClass) {
@@ -1084,8 +1086,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	}
 	
 	private function isA($individual, $superClass) {
-		if (!$individual) throw new Exception('Error: parameter $individual missing');
-		if (!$superClass) throw new Exception('Error: parameter $superClass missing');
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing');
 		
 		$node = $this->getXMLElement($individual);
 		if ($node->getName() != 'NamedIndividual')
@@ -1109,8 +1111,8 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return boolean
 	 */
 	private function hasDirectSuperClass($class, $superClass) {
-		if (!$class) throw new Exception('Error: parameter $class missing');
-		if (!$superClass) throw new Exception('Error: parameter $superClass missing');
+		if (is_null($class)) throw new Exception('Error: parameter $class missing');
+		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing');
 		
 		$xml = $this->getXMLElement($class);
 		
@@ -1128,7 +1130,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	 * @return array of parental tag local names
 	 */
 	private function getParentTags($tag) {
-		if (!$tag) throw new Exception('Error: parameter $tag missing');
+		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
 		
 		return array_map(
 			function($x) { 

@@ -22,7 +22,7 @@ abstract class AbstractFileHandler {
 	protected $nodeImporter;
 	protected $warnings = [];
 	
-	public function __construct($params) {
+	public function __construct(array $params) {
 		if (empty($params)) throw new Exception('Error: no parameters provided.');
 		if (is_null($params['path'])) throw new Exception('Error: named parameter "path" missing.');
 		if (is_null($params['vocabularyImporter'])) throw new Exception('Error: named parameter "vocabularyImporter" missing.');

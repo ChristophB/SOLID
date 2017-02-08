@@ -15,11 +15,16 @@ Supported import formats:
 * JSON
 * OWL
 
+## Requirements:
+
+* Drupal 8
+* PHP >= 5.4
+
 ## How to install:
 
 * Download one of our releases and extract it to a random location.
 * Each release contains this readme file, a template and a folder "node_importer".
-* Copy the folder "node_importer" into your Drupal 8 installation folder - into "/[drupal-root-folder]/modules".
+* Copy the folder "node_importer" into your Drupal 8 installation folder - into "/[drupal-root-folder]/modules". Allow the web user (e.g. www-data) read and write access to this folder.
 * Log into your Drupal 8 Webpage as administrator and navigate to the menu "Extend".
 * On the "Extend" page you will see a list of available and installed modules. Search for the module "Node Importer" and select it.
 * Click "Install" on the bottom of the page.

@@ -21,7 +21,7 @@ use Drupal\node_importer\FileHandler\FileHandlerFactory;
 
 
 /**
- * Main Class which is instantiated by callung "/node_importer"
+ * Main Class which is instantiated by calling "/node_importer"
  * 
  * @author Christoph Beger
  */
@@ -122,12 +122,12 @@ class Form extends FormBase {
         $overwrite              = $form_state->getValue('overwrite');
         $userId                 = \Drupal::currentUser()->id();
         
-        $file       = File::load($fid);
-        $filePath   = \Drupal::service('file_system')->realpath($file->getFileUri());
-        $drupalPath = getcwd();
-        $newFile    = $drupalPath. '/sites/default/files/'. $file->getFilename();
+        $file        = File::load($fid);
+        $filePath    = \Drupal::service('file_system')->realpath($file->getFileUri());
+        $drupalPath  = getcwd();
+        $newFilePath = $drupalPath. '/sites/default/files/'. $file->getFilename();
         
-        copy($filePath, $newFile);
+        copy($filePath, $newFilePath);
         
         $cmd 
             = "php -q modules/node_importer/src/Script/import.php $drupalPath "
@@ -142,11 +142,10 @@ class Form extends FormBase {
     }
 	
 	private function execInBackground($cmd) { 
-        if (substr(php_uname(), 0, 7) == "Windows"){ 
-            pclose(popen("start /B ". $cmd, "r"));  
-        } 
-        else { 
-            exec($cmd. " > /dev/null &");   
+        if (substr(php_uname(), 0, 7) == 'Windows'){ 
+            pclose(popen('start /B '. $cmd, 'r'));  
+        } else { 
+            exec($cmd. ' > /dev/null &');   
         }
     }
     

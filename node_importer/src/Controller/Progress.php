@@ -22,9 +22,8 @@ class Progress extends ControllerBase {
     public function content() {
         $log = '';
         if (file_exists($this->logFile)) {
-            foreach(array_reverse(file($this->logFile)) as $line){
+            foreach (array_reverse(file($this->logFile)) as $line)
                 $log .= $line;
-            }
         } else {
             $log = 'No import process running!';
         }

@@ -14,7 +14,7 @@ namespace Drupal\node_importer\FileHandler;
  */
 class JSONFileHandler extends AbstractFileHandler {
 	
-	public function __construct($params) {
+	public function __construct(array $params) {
 		parent::__construct($params);
 		
 		$this->data = json_decode(file_get_contents($this->filePath), TRUE);
@@ -44,7 +44,7 @@ class JSONFileHandler extends AbstractFileHandler {
 			
 			$this->vocabularyImporter->setTagParents(
 				$vocabulary['vid'],
-				[$tag]
+				[ $tag ]
 			);
 		}
 	}
