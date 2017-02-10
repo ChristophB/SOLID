@@ -59,19 +59,18 @@ class NodeImporter extends AbstractImporter {
      * 
      * @param $params array of parameters
      *   required:
-     *     "title"
+     *     "title",
      *     "type" corresponds to bundle (e.g. "article" or "page")
      *   optional:
-     *     "fields" contains the fields with names and values
-     *     "alias"
-     *     "uuid"
+     *     "fields" contains the fields with names and values,
+     *     "alias", "uuid"
      * 
      * @return node
      */
     public function createNode($params) {
-		if (!$params['title']) throw new Exception('Error: named parameter "title" missing.');
-		if (!$params['type']) throw new Exception('Error: named parameter "type" missing.');
-		$uuid = $params['uuid'] ? $params['uuid'] : $params['title'];
+		if (is_null($params['title'])) throw new Exception('Error: named parameter "title" missing.');
+		if (is_null($params['type'])) throw new Exception('Error: named parameter "type" missing.');
+		$uuid = $params['uuid'] ?: $params['title'];
 		
 		try {
 			$this->deleteNodeIfExists($uuid);
@@ -131,8 +130,8 @@ class NodeImporter extends AbstractImporter {
 	 * @return file
 	 */
 	private function createFile($uri) {
-		if (!$uri) throw new Exception('Error: parameter $uri missing.');
-		$drupalUri = file_default_scheme(). '://'. $uri;
+		if (empty($uri)) throw new Exception('Error: parameter $uri missing.');
+		$drupalUri = file_default_scheme(). "://$uri";
 		
 		// @todo: does not work in script
 		if (!file_exists($drupalUri))
@@ -161,13 +160,13 @@ class NodeImporter extends AbstractImporter {
 	 * @param $uuid uuid of the node
 	 */
 	private function deleteNodeIfExists($uuid) {
-		if (!$uuid) throw new Exception('Error: parameter uuid missing.');
+		if (empty($uuid)) throw new Exception('Error: parameter uuid missing.');
 		
 		if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {
 			if ($this->overwrite) {
 				\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
 				Node::load($id)->delete();
-				$this->logNotice("Deleted node $id with uuid $uuid.");
+				$this->logNotice("Deleted node $id with uuid '$uuid'.");
 			} else {
 				throw new Exception(
 					"Node with uuid '$uuid' already exists. "
@@ -185,7 +184,7 @@ class NodeImporter extends AbstractImporter {
 	 * @return id
 	 */
 	protected function searchNodeIdByUuid($uuid) {
-	    if (!$uuid) throw new Exception('Error: parameter $uuid missing');
+	    if (empty($uuid)) throw new Exception('Error: parameter $uuid missing');
 	    
 	    $result = array_values($this->searchEntityIds([
 	        'entity_type' => 'node',
@@ -202,7 +201,7 @@ class NodeImporter extends AbstractImporter {
 	 * @param $fields array of node fields
 	 */
 	private function insertFields($node, $fields) {
-		if (!$node) throw new Exception('Error: parameter $node missing');
+		if (is_null($node)) throw new Exception('Error: parameter $node missing');
 		if (empty($fields)) return;
 		
 		foreach ($fields as $field) {
@@ -210,7 +209,7 @@ class NodeImporter extends AbstractImporter {
 			
 			if (!$this->nodeHasField($node, $fieldName)) {
 				$this->logWarning(
-					'field "'. $fieldName. '" does not exists in "'. $node->bundle(). '".'
+					"field '$fieldName' does not exists in '{$node->bundle()}'"
 				);
 				continue;
 			}
@@ -273,8 +272,8 @@ class NodeImporter extends AbstractImporter {
 	 * @return boolean
 	 */
 	private function nodeHasField($node, $fieldName) {
-		if (!$node) throw new Exception('Error: parameter $node missing.');
-		if (!$fieldName) throw new Exception('Error: parameter $fieldName missing.');
+		if (is_null($node)) throw new Exception('Error: parameter $node missing.');
+		if (is_null($fieldName)) throw new Exception('Error: parameter $fieldName missing.');
 		
 		try {
 			$node->get($fieldName);	
@@ -292,12 +291,12 @@ class NodeImporter extends AbstractImporter {
 	 *   "alias" alias to be inserted (optional)
 	 */
 	private function addAlias($params) {
-		if (!$params['id']) throw new Exception('Error: named parameter "id" missing.');
-		if (!$params['alias']) return;
+		if (empty($params['id'])) throw new Exception('Error: named parameter "id" missing.');
+		if (empty($params['alias'])) return;
 		
 		$path = \Drupal::service('path.alias_storage')->save(
-			'/node/'. $params['id'], 
-			'/'. $params['alias'], 
+			"/node/$params[id]",
+			"/$params[alias]",
 			'en'
 		);
 		
@@ -322,8 +321,7 @@ class NodeImporter extends AbstractImporter {
 							break;
 						default:
 							throw new Exception(
-								'Error: not supported entity type "'
-								. $entityType. '" in reference found.'
+								"Error: not supported entity type '$entityType' in reference found."
 							);
 					}
 					$node = Node::load($pid);
@@ -358,7 +356,7 @@ class NodeImporter extends AbstractImporter {
 	 * @return {integer} nid
 	 */
 	private function mapNodeUuidToNid($uuid) {
-		if (!$uuid) return null;
+		if (empty($uuid)) return null;
 		
 		foreach ($this->entities['node'] as $node) {
 			if ($node['uuid'] == $uuid) 
@@ -369,7 +367,7 @@ class NodeImporter extends AbstractImporter {
 	}
 	
 	private function searchFileByUri($uri) {
-		if (!$uri) throw new Exception('Error: parameter $uri missing.');
+		if (empty($uri)) throw new Exception('Error: parameter $uri missing.');
 		
 		return array_values($this->searchEntityIds([ 'entity_type' => 'file', 'uri' => $uri]))[0];
 	}

@@ -49,7 +49,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
-			$this->logNotice('Handling vocabulary: '. $class);
+			$this->logNotice("Handling vocabulary: $class");
 			$vid = $this->getLocalName($class);
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
@@ -468,18 +468,17 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 					$value = $targetProperties[$fieldName][0];
 				} else {
 					$this->logWarning(
-						'Entity \''. $this->getLocalName($target)
-						. '\' by \''. $this->getLocalName($individual)
-						. '\' referenced but no field given. '
-						. '(\''. $this->getLocalName($property). '\')'
+						"Entity '{$this->getLocalName($target)}' "
+						. "by '{$this->getLocalName($individual)}' "
+						. "referenced but no field given. ('{$this->getLocalName($property)}')"
 					);
 					continue;
 				}
 			} else {
 				$this->logWarning(
-					"Nonexistent entity '". $this->getLocalName($target)
-					. "' referenced by '". $this->getLocalName($individual)
-					. "' and property '$property'"
+					"Nonexistent entity '{$this->getLocalName($target)} "
+					. "referenced by '{$this->getLocalName($individual)} "
+					. "and property '{$this->getLocalName($property)}'."
 				);
 				continue;
 			}
@@ -522,7 +521,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 				). '/'. $result;
 			}
 			
-			return $result. '/'. $properties['uri'][0];
+			return "$result/{$properties['uri'][0]}";
 		}
 		
 		return $properties['uri'][0];
@@ -640,7 +639,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 					|| $child->attributes('rdf', true)->resource != null
 				) continue;
 				
-				$result[] = (string)$child;
+				$result[] = (string) $child;
 			}
 		}
 		

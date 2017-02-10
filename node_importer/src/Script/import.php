@@ -8,8 +8,12 @@ use Drupal\node_importer\Importer\VocabularyImporter;
 use Drupal\node_importer\Importer\NodeImporter;
 use Drupal\node_importer\FileHandler\FileHandlerFactory;
 
-if (sizeof($argv) < 2)
-    die("Usage: import.php [drupal path] [file path] [user id] [import vocabularies?] [import nodes?] [classes as nodes?] [only leaf classes as nodes?] [overwrite?]\n");
+if (sizeof($argv) < 2) {
+    doLog('Usage: import.php [drupal path] [file path] [user id] [import vocabularies?] '
+        . '[import nodes?] [classes as nodes?] [only leaf classes as nodes?] [overwrite?]'. PHP_EOL
+    );
+    die;
+}
 
 $drupalPath             = $argv[1];
 $filePath               = $argv[2];
@@ -20,15 +24,21 @@ $classesAsNodes         = $argv[6] ? true : false;
 $onlyLeafClassesAsNodes = $argv[7] ? true : false;
 $overwrite              = $argv[8] ? true : false;
 
-if (!$drupalPath) die("Error: script parameter 'drupalPath' missing.\n");
-if (!$filePath) die("Error: script parameter 'filePath' missing.\n");
+if (is_empty($drupalPath)) {
+    doLog('Error: script parameter "drupalPath" missing.'. PHP_EOL);
+    die;
+}
+if (is_empty($filePath)) {
+    doLog('Error: script parameter "filePath" missing.'. PHP_EOL);
+    die;
+}
 
-$logFile = $drupalPath. '/modules/node_importer/node_importer.log';
+$logFile = "$drupalPath/modules/node_importer/node_importer.log";
 if (file_exists($logFile)) unlink($logFile);
 fclose(STDOUT);
 $STDOUT = fopen($logFile, 'wb');
 
-$autoloader = require_once $drupalPath. '/autoload.php';
+$autoloader = require_once "$drupalPath/autoload.php";
 $request = Request::createFromGlobals();
 $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
 $kernel->boot();
@@ -75,8 +85,8 @@ try {
     
     $msg
     	= t($e->getMessage())
-	    . ' In '. $e->getFile(). ' (line:'. $e->getLine(). ')'
-	    . ' '. t('Rolling back...');
+	    . " In {$e->getFile()} (line:{$e->getLine()}) "
+	    . t('Rolling back...');
 	doLog($msg);
 }
 
@@ -87,7 +97,7 @@ fclose($STDOUT);
 
 function doLog($msg) {
 	\Drupal::logger('node_importer')->notice($msg);
-	print date('H:i:s', time()). "> $msg\n";
+	echo date('H:i:s', time()). "> $msg", PHP_EOL;
 }
 
 function logMemoryUsage() {

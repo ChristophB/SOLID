@@ -86,8 +86,8 @@ class Form extends FormBase {
                 =>'<nav class="tabs" role="navigation" aria-label="Tabs">'
                 . '  <h2 class="visually-hidden">Primary tabs</h2>'
                 . '  <ul class="tabs primary tabs--primary nav nav-tabs">'
-                . '    <li class="is-active active">'. $formLink->toString(). '<span class="visually-hidden">(active tab)</span></li>'
-                . '    <li>'. $progressLink->toString(). '</li>'
+                . "    <li class='is-active active'>{$formLink->toString()}<span class='visually-hidden'>(active tab)</span></li>"
+                . "    <li>{$progressLink->toString()}</li>"
                 . '  </ul>'
                 . '</nav>'
         ];

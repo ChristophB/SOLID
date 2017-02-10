@@ -17,12 +17,12 @@ class Timer {
     
     public function __construct() {
         $this->startTime = time();
-        $this->lastStop = $this->startTime;
+        $this->lastStop  = $this->startTime;
     }
     
-    public function printDiff($msg = null) {
+    public function echoDiff($msg = null) {
         $time = time();
-        print ($msg ? $msg. ': ' : ''). ($time - $this->lastStop). "\n";
+        echo ($msg ? $msg. ': ' : ''). ($time - $this->lastStop). PHP_EOL;
         $this->lastStop = $time;
     }
 }

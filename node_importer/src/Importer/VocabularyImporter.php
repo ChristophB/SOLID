@@ -106,8 +106,8 @@ class VocabularyImporter extends AbstractImporter {
 	 * @return {boolean}
 	 */
 	public function tagExists($vid, $name) {
-		if (!isset($vid)) throw new Exception('Error: parameter $vid missing.');
-		if (!isset($name)) throw new Exception('Error: parameter $name missing.');
+		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
+		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
 		return null !== $this->searchTagIdByName($vid, $name);
 	}
@@ -167,8 +167,8 @@ class VocabularyImporter extends AbstractImporter {
 				}
 			} else {
 				throw new Exception(
-					'Error: vocabulary with vid "'. $vid. '" already exists. '
-					. 'Tick "overwrite" if you want to replace it and try again.'
+					"Error: vocabulary with vid '$vid' already exists. "
+					. "Tick 'overwrite' if you want to replace it and try again."
 				);
 	    	}
 	    	return true;

@@ -67,7 +67,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
 			$vid = $class->localName();
-			$this->logNotice('Handling vocabulary: '. $vid);
+			$this->logNotice("Handling vocabulary: $vid");
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
 			$this->logNotice('Collecting terms...');
@@ -439,18 +439,17 @@ class OWLFileHandler extends AbstractFileHandler {
 					$value = $this->removeRdfsType($targetProperties[$targetField]);
 				} else {
 					$this->logWarning(
-						'Entity \''. $target->localName()
-						. '\' by \''. $individual->localName()
-						. '\' referenced but no field given. '
-						. '(\''. $property->localName(). '\')'
+						"Entity '{$target->localName()}' "
+						. "by '{$individual->localName()}' "
+						. "referenced but no field given. ('{$property->localName()}')"
 					);
 					continue;
 				}
 			} else {
 				$this->logWarning(
-					"Nonexistent entity '". $target->localName(). "' "
-					. "referenced by '". $individual->localName(). "' "
-					. "and property '$property'"
+					"Nonexistent entity '{$target->localName()}' "
+					. "referenced by '{$individual->localName()}' "
+					. "and property '{$property->localName()}'."
 				);
 				continue;
 			}
@@ -633,7 +632,9 @@ class OWLFileHandler extends AbstractFileHandler {
 			if (is_null($uri)) {
 				$alias = $this->getProperty($target, self::ALIAS);
 				
-				if (is_null($alias)) throw new Exception('Error: URLs can only reference entities with uri or alias. ('. $target->localName(). ')');
+				if (is_null($alias)) throw new Exception(
+					"Error: URLs can only reference entities with uri or alias. ({$target->localName()})"
+				);
 				$uri = base_path(). $alias;
 			}
 				

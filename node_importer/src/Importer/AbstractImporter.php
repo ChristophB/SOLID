@@ -50,11 +50,11 @@ abstract class AbstractImporter {
 						break;
 					case 'node': 
 						$drupal_entity = $entity_manager->getStorage($type)->load($entity['nid']);
-						if ($drupal_entity) $drupal_entity->delete();
+						if (!is_null($drupal_entity)) $drupal_entity->delete();
 						break;
 					default:
 						$drupal_entity = $entity_manager->getStorage($type)->load($entity);
-						if ($drupal_entity) $drupal_entity->delete();
+						if (!is_null($drupal_entity)) $drupal_entity->delete();
 				}
 			}
 		}
@@ -70,13 +70,13 @@ abstract class AbstractImporter {
      * @return array of IDs
      */
     protected function searchEntityIds($params) {
-		if (!$params['entity_type']) throw new Exception('Error: named parameter "entity_type" missing');
+		if (is_null($params['entity_type'])) throw new Exception('Error: named parameter "entity_type" missing');
 		$query
 			= \Drupal::entityQuery($params['entity_type'])
 			->addMetadata('account', user_load($this->userId));
 		
 		foreach ($params as $key => $value) {
-			if ($key == 'entity_type') continue;
+			if ($key === 'entity_type') continue;
 			$query->condition($key, $value);
 			unset($key, $value);
 		}
@@ -95,8 +95,8 @@ abstract class AbstractImporter {
 	 * @return integer tid
 	 */
 	protected function searchTagIdByName($vid, $name) {
-	    if (!$vid) throw new Exception('Error: parameter $vid missing');
-	    if (!$name) throw new Exception('Error: parameter $name missing');
+	    if (is_null($vid)) throw new Exception('Error: parameter $vid missing');
+	    if (is_null$name)) throw new Exception('Error: parameter $name missing');
 	    
 	    $result = $this->searchEntityIds([
 	        'entity_type' => 'taxonomy_term',
@@ -121,8 +121,7 @@ abstract class AbstractImporter {
 		return array_map(
 			function($tag) {
 				return $this->searchTagIdByName($tag['vid'], $tag['name']);
-			}, 
-			$tags
+			}, $tags
 		);
 	}
 	
