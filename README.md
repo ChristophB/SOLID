@@ -1,4 +1,4 @@
-# drupal8-node-importer
+# Simple Ontology Loader in Drupal (SOLID)
 
 ## General information:
 
