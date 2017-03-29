@@ -96,7 +96,7 @@ abstract class AbstractImporter {
 	 */
 	protected function searchTagIdByName($vid, $name) {
 	    if (is_null($vid)) throw new Exception('Error: parameter $vid missing');
-	    if (is_null$name)) throw new Exception('Error: parameter $name missing');
+	    if (is_null($name)) throw new Exception('Error: parameter $name missing');
 	    
 	    $result = $this->searchEntityIds([
 	        'entity_type' => 'taxonomy_term',
