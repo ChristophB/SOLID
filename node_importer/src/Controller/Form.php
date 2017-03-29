@@ -63,10 +63,10 @@ class Form extends FormBase {
             '#title' => $this->t('Only import leaf classes under "Node" as nodes'),
         ];
         
-        $form['overwrite'] = [
-            '#type'  => 'checkbox',
-            '#title' => $this->t('Overwrite'),
-        ];
+        // $form['overwrite'] = [
+        //     '#type'  => 'checkbox',
+        //     '#title' => $this->t('Overwrite'),
+        // ];
 
         $form['submit'] = [
             '#type'  => 'submit',
@@ -119,7 +119,7 @@ class Form extends FormBase {
         $importNodes            = $form_state->getValue('import_nodes');
         $classesAsNodes         = $form_state->getValue('import_class_nodes');
         $onlyLeafClassesAsNodes = $form_state->getValue('import_only_leaf_class_nodes');
-        $overwrite              = $form_state->getValue('overwrite');
+        $overwrite              = false; #$form_state->getValue('overwrite');
         $userId                 = \Drupal::currentUser()->id();
         
         $file        = File::load($fid);
@@ -131,7 +131,7 @@ class Form extends FormBase {
         
         $cmd 
             = "php -q modules/node_importer/src/Script/import.php $drupalPath "
-            . "$newFile $userId $importVocabularies $importNodes $classesAsNodes "
+            . "$newFilePath $userId $importVocabularies $importNodes $classesAsNodes "
             . "$onlyLeafClassesAsNodes $overwrite";
         
         $this->execInBackground($cmd);
