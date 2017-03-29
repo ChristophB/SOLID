@@ -35,8 +35,6 @@ Supported import formats:
 * Log in as administrator and navigate to Config->Content->Node Importer. (alternatively use the URL: "[your Drupal 8 root URL]/node_importer")
 * Place the previously created file into the form.
 * Check "Import Vocabularies" or "Import Nodes" and click "Import".
-* There will be a message indicating the success/failure of the import process.
-* The module automatically undos all changes if an error occured. (Be careful while using the "overwrite" option, because deleted nodes can not be restored.)
 * You can call call node_importer/src/Script/import.php to import data from command line.
 
 ```sh
@@ -44,6 +42,8 @@ php import.php [absolute path to drupal folder] [absolute path to import file] [
 ```
 
 ## Additional features
+
+Content imports are incrementally. If your ontology contains an entity which was imported with this module before, SOLID creates a new revision for this node and updates the fields according to owl annotation properties.
 
 The import form contains some important checkboxes, which only affect OWL imports.
 * "Import classes under 'Node' as nodes": Enables the user to handle classes as if they are individuals. The module will create a page for each class containing all properties.

@@ -72,28 +72,37 @@ class NodeImporter extends AbstractImporter {
 		if (is_null($params['type'])) throw new Exception('Error: named parameter "type" missing.');
 		$uuid = $params['uuid'] ?: $params['title'];
 		
-		try {
-			$this->deleteNodeIfExists($uuid);
-		} catch (Exception $e) {
-			$this->logWarning($e->getMessage());
-			return;
-		}
-		
 		$type = $params['type'] ?: 'article';
 		if (!$this->contentTypeExists($type)) {
 			$this->logWarning("Content type '$type' does not exist in Drupal.");
 			return;
 		}
+
+		// try {
+		// 	$this->deleteNodeIfExists($uuid);
+		// } catch (Exception $e) {
+		// 	$this->logWarning($e->getMessage());
+		// 	return;
+		// }
 		
-		$node = Node::create([
-			'type'     => $type,
-			'title'    => $params['title'],
-			'uuid'     => $uuid,
-			'langcode' => 'en', // @todo get language from import file
-			'status'   => 1,
-			'uid'      => $this->userId
-		]);
-		$node->save();
+		$node;
+		if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {
+			$node = Node::load($id);
+			$node->setNewRevision(true);
+			$node->setRevisionLogMessage('Incrementally updated at '. date('Y-m-d h:i', time()));
+			$node->setTitle($params['title']);
+			$node->save();
+		} else {
+			$node = Node::create([
+				'type'     => $type,
+				'title'    => $params['title'],
+				'uuid'     => $uuid,
+				'langcode' => 'en', // @todo get language from import file
+				'status'   => 1,
+				'uid'      => $this->userId
+			]);
+			$node->save();
+		}
 		
 		if (array_key_exists('fields', $params))
 			$this->insertFields($node, $params['fields']);
@@ -294,7 +303,7 @@ class NodeImporter extends AbstractImporter {
 		if (empty($params['id'])) throw new Exception('Error: named parameter "id" missing.');
 		if (empty($params['alias'])) return;
 		
-		$path = \Drupal::service('path.alias_storage')->save(
+		$path = \Drupal::service('path.alias_storage')->save( # @todo: dont allow duplicated paths 
 			"/node/$params[id]",
 			"/$params[alias]",
 			'en'
@@ -343,33 +352,20 @@ class NodeImporter extends AbstractImporter {
 		if (empty($uuids)) return [];
 		
 		return array_map(
-			function($uuid) { return $this->mapNodeUuidToNid($uuid); }, 
+			function($uuid) { return $this->searchNodeIdByUuid($uuid); }, 
 			$uuids
 		);
-	}
-	
-	/**
-	 * Returns a nid for a recently created node uuid.
-	 * 
-	 * @param $uuid node uuid
-	 * 
-	 * @return {integer} nid
-	 */
-	private function mapNodeUuidToNid($uuid) {
-		if (empty($uuid)) return null;
-		
-		foreach ($this->entities['node'] as $node) {
-			if ($node['uuid'] == $uuid) 
-				return $node['nid'];
-		}
-		
-		return null;
 	}
 	
 	private function searchFileByUri($uri) {
 		if (empty($uri)) throw new Exception('Error: parameter $uri missing.');
 		
-		return array_values($this->searchEntityIds([ 'entity_type' => 'file', 'uri' => $uri]))[0];
+		$result = $this->searchEntityIds([
+			'entity_type' => 'file',
+			'uri'         => $uri
+		]);
+
+		return $result ? array_values($result)[0] : null;
 	}
 	
 }
