@@ -24,25 +24,25 @@ $classesAsNodes         = $argv[6] ? true : false;
 $onlyLeafClassesAsNodes = $argv[7] ? true : false;
 $overwrite              = $argv[8] ? true : false;
 
-if (is_empty($drupalPath)) {
-    doLog('Error: script parameter "drupalPath" missing.'. PHP_EOL);
-    die;
+if (empty($drupalPath)) {
+    die('Error: script parameter "drupalPath" missing.'. PHP_EOL);
 }
-if (is_empty($filePath)) {
-    doLog('Error: script parameter "filePath" missing.'. PHP_EOL);
-    die;
-}
-
-$logFile = "$drupalPath/modules/node_importer/node_importer.log";
-if (file_exists($logFile)) unlink($logFile);
-fclose(STDOUT);
-$STDOUT = fopen($logFile, 'wb');
 
 $autoloader = require_once "$drupalPath/autoload.php";
 $request = Request::createFromGlobals();
 $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
 $kernel->boot();
 $kernel->prepareLegacyRequest($request);
+
+if (empty($filePath)) {
+    doLog('Error: script parameter "filePath" missing.'. PHP_EOL);
+    die;
+}
+
+$logFile = "$drupalPath/modules/SOLID/node_importer/node_importer.log"; # remove SOLID
+if (file_exists($logFile)) unlink($logFile);
+fclose(STDOUT);
+$STDOUT = fopen($logFile, 'wb');
 
 if (!file_exists($logFile) || !is_writable($logFile)) {
   doLog('Could not open log file. Please check permissions.');

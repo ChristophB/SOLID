@@ -11,8 +11,8 @@ $drupalPath  = $argv[1];
 $contentType = $argv[2];
 $userId      = $argv[3];
 
-if (is_empty($drupalPath)) die('Error: script parameter "drupalPath" missing.'. PHP_EOL);
-if (is_empty($contentType)) die('Error: script parameter "contentType" missing.'. PHP_EOL);
+if (empty($drupalPath)) die('Error: script parameter "drupalPath" missing.'. PHP_EOL);
+if (empty($contentType)) die('Error: script parameter "contentType" missing.'. PHP_EOL);
 
 
 $autoloader = require_once "$drupalPath/autoload.php";
