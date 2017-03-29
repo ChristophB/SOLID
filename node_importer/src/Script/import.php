@@ -39,7 +39,7 @@ if (empty($filePath)) {
     die;
 }
 
-$logFile = "$drupalPath/modules/SOLID/node_importer/node_importer.log"; # remove SOLID
+$logFile = "$drupalPath/modules/node_importer/node_importer.log";
 if (file_exists($logFile)) unlink($logFile);
 fclose(STDOUT);
 $STDOUT = fopen($logFile, 'wb');
