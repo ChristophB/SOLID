@@ -168,22 +168,22 @@ class NodeImporter extends AbstractImporter {
 	 * 
 	 * @param $uuid uuid of the node
 	 */
-	private function deleteNodeIfExists($uuid) {
-		if (empty($uuid)) throw new Exception('Error: parameter uuid missing.');
+	// private function deleteNodeIfExists($uuid) {
+	// 	if (empty($uuid)) throw new Exception('Error: parameter uuid missing.');
 		
-		if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {
-			if ($this->overwrite) {
-				\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
-				Node::load($id)->delete();
-				$this->logNotice("Deleted node $id with uuid '$uuid'.");
-			} else {
-				throw new Exception(
-					"Node with uuid '$uuid' already exists. "
-					. 'Tick "overwrite" if you want to replace it and try again.'
-				);
-			}
-		}
-	}
+	// 	if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {
+	// 		if ($this->overwrite) {
+	// 			\Drupal::service('path.alias_storage')->delete([ 'source' => '/node/'. $id ]);
+	// 			Node::load($id)->delete();
+	// 			$this->logNotice("Deleted node $id with uuid '$uuid'.");
+	// 		} else {
+	// 			throw new Exception(
+	// 				"Node with uuid '$uuid' already exists. "
+	// 				. 'Tick "overwrite" if you want to replace it and try again.'
+	// 			);
+	// 		}
+	// 	}
+	// }
 	
 	/**
 	 * Queries the drupal DB with node uuid and returns corresponding id.

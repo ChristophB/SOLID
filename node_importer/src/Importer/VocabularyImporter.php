@@ -54,30 +54,16 @@ class VocabularyImporter extends AbstractImporter {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
-		if ($this->overwrite) {
-			$exists = $this->clearVocabularyIfExists($vid);
-    	
-	    	if (!$exists) {
-				$vocabulary = Vocabulary::create([
-					'name'   => $name,
-					'weight' => 0,
-					'vid'    => $vid
-				]);
-				$vocabulary->save();
-				$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
-				$vocabulary = null;
-			}
-		} else {
-			if (!$this->vocabularyExists($vid)) {
-				$vocabulary = Vocabulary::create([
-					'name'   => $name,
-					'weight' => 0,
-					'vid'    => $vid
-				]);
-				$vocabulary->save();
-				$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
-				$vocabulary = null;
-			}
+		
+		if (!$this->clearVocabularyIfExists($vid)) {
+			$vocabulary = Vocabulary::create([
+				'name'   => $name,
+				'weight' => 0,
+				'vid'    => $vid
+			]);
+			$vocabulary->save();
+			$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
+			$vocabulary = null;
 		}
 	}
 	
@@ -124,10 +110,7 @@ class VocabularyImporter extends AbstractImporter {
 	    if (empty($name)) return;
 	    
 	    if ($this->tagExists($vid, $name)) {
-	    	$this->logNotice(
-	    		"Tag '$name' already exists in vocabulary " 
-	    		. "'$vid', tick overwrite if you want to replace it."
-	    	);
+	    	$this->logNotice("Tag '$name' already exists in vocabulary $vid.");
 	    	return;
 	    }
 	    
@@ -142,7 +125,7 @@ class VocabularyImporter extends AbstractImporter {
 	
 	/**
 	 * Checks of a vocabulary with given vid already exists
-	 * and deletes all its tags if overwrite is true.
+	 * and deletes all its tags.
 	 * 
 	 * @param $vid vid of the vocabulary
 	 * 
@@ -150,27 +133,20 @@ class VocabularyImporter extends AbstractImporter {
 	 */
 	private function clearVocabularyIfExists($vid) {
 		if ($this->vocabularyExists($vid)) {
-			if ($this->overwrite) {
-				$tids = $this->searchEntityIds([
-	        		'entity_type' => 'taxonomy_term',
-	        		'vid'         => $vid
-	    		]);
-				
-				if (!empty($tids)) {
-					$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-					$terms = $storage_handler->loadMultiple($tids);
-					$storage_handler->delete($terms);
+			$tids = $this->searchEntityIds([
+	        	'entity_type' => 'taxonomy_term',
+	        	'vid'         => $vid
+	    	]);
+			
+			if (!empty($tids)) {
+				$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+				$terms = $storage_handler->loadMultiple($tids);
+				$storage_handler->delete($terms);
 					
-					$storage_handler = null;
-					$terms = null;
-					$tids = null;
-				}
-			} else {
-				throw new Exception(
-					"Error: vocabulary with vid '$vid' already exists. "
-					. "Tick 'overwrite' if you want to replace it and try again."
-				);
-	    	}
+				$storage_handler = null;
+				$terms = null;
+				$tids = null;
+			}
 	    	return true;
 	    }
 	    return false;

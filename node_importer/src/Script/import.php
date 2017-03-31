@@ -78,15 +78,16 @@ try {
 	);
     doLog($msg);
 } catch (Exception $e) {
-    $nodeImporter->rollback();
-    $vocabularyImporter->rollback();
+    # $nodeImporter->rollback();
+    # $vocabularyImporter->rollback();
        
     logMemoryUsage();
     
     $msg
     	= t($e->getMessage())
 	    . " In {$e->getFile()} (line:{$e->getLine()}) "
-	    . t('Rolling back...');
+	    # . t('Rolling back...')
+        ;
 	doLog($msg);
 }
 
