@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\Importer\VocabularyImporter.
+ * Contains \Drupal\node_importer\Importer\VocabularyImporter.
  */
 
-namespace Drupal\SOLID\Importer;
+namespace Drupal\node_importer\Importer;
 
 use \Exception;
 

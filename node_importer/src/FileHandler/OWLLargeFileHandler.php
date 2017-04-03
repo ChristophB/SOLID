@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\FileHandler\OWLFileHandler.
+ * Contains \Drupal\node_importer\FileHandler\OWLLargeFileHandler.
  */
 
-namespace Drupal\SOLID\FileHandler;
+namespace Drupal\node_importer\FileHandler;
 
 use Drupal\file\Entity\File;
+use Drupal\node_importer\Reader\ImprovedXMLReader;
 use \Exception;
 
-
 /**
- * FileHandler which parses OWL files.
+ * FileHandler which parses large OWL files.
  * 
  * @author Christoph Beger
  */
-class OWLFileHandler extends AbstractFileHandler {
-	
+class OWLLargeFileHandler extends AbstractFileHandler {
+			
 	/** Declaration of DUO default classes/properties **/ 
 	const VOCABULARY       = 'http://www.lha.org/duo#Vocabulary';
 	const NODE             = 'http://www.lha.org/duo#Node';
@@ -26,34 +26,17 @@ class OWLFileHandler extends AbstractFileHandler {
 	const DOC              = 'http://www.lha.org/duo#Doc';
 	const BINARY           = 'http://www.lha.org/duo#Binary';
 	const FILE             = 'http://www.lha.org/duo#File';
-	const TITLE            = 'http://www.lha.org/duo#title';
-	const ALIAS            = 'http://www.lha.org/duo#alias';
-	const CONTENT          = 'http://www.lha.org/duo#content';
-	const SUMMARY          = 'http://www.lha.org/duo#summary';
-	const REF_NUM          = 'http://www.lha.org/duo#ref_num';
-	const REF_TYPE         = 'http://www.lha.org/duo#ref_type';
-	const NODE_REF         = 'http://www.lha.org/duo#node_ref';
-	const FILE_REF         = 'http://www.lha.org/duo#file_ref';
-	const IMAGE_REF        = 'http://www.lha.org/duo#image_ref';
-	const TERM_REF         = 'http://www.lha.org/duo#taxonomy_term_ref';
 	const DOC_REF          = 'http://www.lha.org/duo#doc_ref';
 	const ANNOTATION_FIELD = 'http://www.lha.org/duo#field';
 	const DATATYPE_FIELD   = 'http://www.lha.org/duo#literal_field';
 	const OBJECT_FIELD     = 'http://www.lha.org/duo#reference_field';
-	const URI              = 'http://www.lha.org/duo#uri';
-	const ALT              = 'http://www.lha.org/duo#alt';
 	const NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 	
 	private $classesAsNodes         = false;
 	private $onlyLeafClassesAsNodes = false;
 	
 	public function __construct(array $params) {
-		$this->logNotice('OWLFileHandler::__construct(): '. memory_get_usage());
 		parent::__construct($params);
-		
-		$this->graph = new \EasyRdf_Graph();
-		$this->graph->parse(file_get_contents($this->filePath));
-		$this->logNotice('graph parsed: '. memory_get_usage());
 		
 		if ($params['classesAsNodes']) $this->classesAsNodes = true;
 		if ($params['onlyLeafClassesAsNodes']) $this->onlyLeafClassesAsNodes = true;
@@ -66,26 +49,32 @@ class OWLFileHandler extends AbstractFileHandler {
 	
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
-			$vid = $class->localName();
-			$this->logNotice("Handling vocabulary: $vid");
+			$this->logNotice("Handling vocabulary: $class");
+			$vid = $this->getLocalName($class);
 			$this->vocabularyImporter->createVocabulary($vid, $vid);
 			
 			$this->logNotice('Collecting terms...');
-			$tags = $this->findAllSubClassesOf($class->getUri());
+			$tags = $this->findAllSubClassesOf($class);
 			$this->logNotice('Found '. sizeof($tags). ' terms.');
 			
 			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->createTag($vid, $tag->label() ?: $tag->localName());
+				$label = $this->getProperty($this->getXMLElement($tag), 'label')[0];
+				$name = $label ?: $this->getLocalName($tag);
+				
+				$this->vocabularyImporter->createTag($vid, $name);
 			}
 			
 			$this->logNotice('Adding child parent linkages to terms...');
 			foreach ($tags as $tag) {
+				$label = $this->getProperty($this->getXMLElement($tag), 'label')[0];
+				$name = $label ?: $this->getLocalName($tag);
+				
 				$this->vocabularyImporter->setTagParents(
 					$vid,
 					[
 						[
-							'name'    => $tag->label() ?: $tag->localName(),
+							'name'    => $name,
 							'parents' => $this->getParentTags($tag)
 						]
 					]
@@ -99,16 +88,19 @@ class OWLFileHandler extends AbstractFileHandler {
 	public function setNodeData() {
 		$this->logNotice('Collecting nodes...');
 		$individuals = $this->getIndividuals();
-		$this->logNotice('Found '. sizeof($individuals). ' Nodes.');
+		$this->logNotice('Found '. sizeof($individuals). ' nodes.');
 		
 		$this->logNotice('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
+			$xml = $this->getXMLElement($individual);
+			$this->createNodeFields($individual);
+			
 			$node = [
-				'title'  => $this->getNodeTitle($individual),
+				'title'  => $this->getNodeTitle($xml),
 				'type'   => $this->getBundle($individual),
-				'alias'  => $this->getProperty($individual, self::ALIAS),
+				'alias'  => $this->getProperty($xml, 'alias')[0],
 				'fields' => $this->createNodeFields($individual),
-				'uuid'   => $individual->getUri()
+				'uuid'   => $individual
 			];
 			
 			$this->nodeImporter->createNode($node);
@@ -121,12 +113,23 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
+	 * Returns the iri suffix.
+	 * 
+	 * @param $entity string
+	 * 
+	 * @return {string} local name
+	 */
+	private function getLocalName($entity) {
+		return preg_replace('/^.*#/', '', $entity);
+	}
+	
+	/**
 	 * Returns an array with all classes under "Vocabulary".
 	 * 
 	 * @return array of classes
 	 */
 	private function getVocabularyClasses() {
-		return $this->getDirectSubClassesOf($this->graph->resource(self::VOCABULARY)); 
+		return $this->getDirectSubClassesOf(self::VOCABULARY); 
 	}
 
 	/** 
@@ -138,18 +141,14 @@ class OWLFileHandler extends AbstractFileHandler {
 	 */
 	private function getBundle($node) {
 		if (is_null($node)) throw new Exception('Error: parameter $node missing');
-	
-		foreach (
-			$this->getDirectSubClassesOf(
-				$this->graph->resource(self::NODE)
-			) as $bundleResource
-		) {
+		
+		foreach ($this->getDirectSubClassesOf(self::NODE) as $bundle) {
 			if (
-				$this->isATransitive($node, $bundleResource)
-				|| $this->hasTransitiveSuperClass($node, $bundleResource->getUri())
+				$this->isATransitive($node, $bundle)
+				|| $this->hasTransitiveSuperClass($node, $bundle)
 			)
 				return strtolower(preg_replace(
-					'/[^A-Za-z0-9]/', '_', $bundleResource->localName()
+					'/[^A-Za-z0-9]/', '_', $this->getLocalName($bundle)
 				));
 		}
 		
@@ -159,7 +158,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array of all drupal-fields for a given individual.
 	 * 
-	 * @param $individual individual resource
+	 * @param $individual individual uri
 	 * 
 	 * @return array of node fields
 	 */
@@ -172,24 +171,23 @@ class OWLFileHandler extends AbstractFileHandler {
 			[
 				'field_name' => 'body', 
 				'value'      => [ 
-					'value'   => $this->removeRdfsType(
-						array_key_exists(self::CONTENT, $properties) 
-						? $properties[self::CONTENT] : null
-					),
-					'summary' => $this->removeRdfsType(
-						array_key_exists(self::SUMMARY, $properties) 
-						? $properties[self::SUMMARY] : null
-					),
+					'value'   =>
+						array_key_exists('content', $properties) 
+						? $properties['content'][0] : null,
+					'summary' =>
+						array_key_exists('summary', $properties) 
+						? $properties['summary'][0] : null,
 					'format'  => 'full_html'
 				]
 			]
 		];
 		
 		if ($this->classesAsNodes && !$this->onlyLeafClassesAsNodes) {
-			$fields[] = $this->createFieldParent($individual);
+			$xml = $this->getXMLElement($individual);
+			$fields[] = $this->createFieldParent($xml);
 			
-			if ($individual->type() == 'owl:Class')
-				$fields[] = $this->createFieldChild($individual);
+			if ($xml->getName() === 'Class')
+				$fields[] = $this->createFieldChild($xml);
 		}
 		
 		if (
@@ -204,7 +202,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		foreach ($this->getProperties() as $property) {
-			if (!$individual->hasProperty($property))
+			if (!array_key_exists($this->getLocalName($property), $properties))
 				continue;
 
 			if ($field = $this->createNodeField($individual, $property))
@@ -217,26 +215,38 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function createFieldParent($resource) {
 		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
 		
-		if ($resource->type() == 'owl:Class') {
-			$parents = $this->getDirectSuperClassesOf($resource);
-		} else {
-			$parents = $resource->allResources('rdf:type');
-		}
-		
-		return [
-			'field_name' => 'field_parent',
-			'value'      => array_map(
-				function($x) { return $x->getUri(); },
-				array_filter(
-					$parents,
+		if ($resource->getName() === 'Class') {
+			return [
+				'field_name' => 'field_parent',
+				'value'      => array_filter(
+					$this->getDirectSuperClassesOf($resource),
 					function($x) {
 						return $this->hasTransitiveSuperClass($x, self::NODE)
 							&& !$this->hasDirectSuperClass($x, self::NODE);
 					}
-				)
-			),
-			'references' => 'node'
-		];
+				),
+				'references' => 'node'
+			];
+		} else {
+			return [
+				'field_name' => 'field_parent',
+				'value'      => array_filter(
+					$this->getTypesOf($resource),
+					function($x) {
+						return $this->hasTransitiveSuperClass($x, self::NODE)
+							&& !$this->hasDirectSuperClass($x, self::NODE);
+					}
+				),
+				'references' => 'node'
+			];
+		}
+	}
+	
+	private function getTypesOf($resource) {
+		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
+		
+		$properties = $this->getPropertiesAsArray($this->getUri($resource));
+		return $properties['type'];
 	}
 	
 	private function createFieldChild($class) {
@@ -244,10 +254,11 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		return [
 			'field_name' => 'field_child',
-			'value'      => array_map(
-				function($x) { return $x->getUri(); },
-				array_merge($this->getDirectSubClassesOf($class), $this->getInstancesOf($class))
-			),
+			'value'      => 
+				array_merge(
+					$this->getDirectSubClassesOf($this->getUri($class)),
+					$this->getInstancesOf($class)
+				),
 			'references' => 'node'
 		];
 	}
@@ -255,35 +266,60 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function getInstancesOf($class) {
 		if (is_null($class)) throw new Exception('Error: parameter $class missing');
 		
-		return $this->graph->allOfType($class->getUri());
+		$xml = new ImprovedXMLReader();
+		$xml->open($this->filePath);
+		
+		$result = [];
+		while ($xml->read()) {
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != 'owl:NamedIndividual'
+				|| $xml->depth != 1
+			) continue;
+			
+			$node = new \SimpleXMLElement($xml->readOuterXML());
+			
+			foreach ($node->children('rdf', true) as $child) {
+				if ($child->getName() != 'type') continue;
+				$parent = $child->attributes('rdf', true)->resource;
+			
+				if ((string) $parent == $this->getUri($class))
+					$result[] = $this->getUri($node);
+			}
+		}
+		
+		$xml->close();
+		return $result;
 	}
 	
 	/**
 	 * Returns an array of tag tuple [vid, name].
 	 * 
-	 * @param $individual individual resource
+	 * @param $individual individual uri
 	 * 
 	 * @return array containing all tag tuples
 	 */
 	private function createFieldTags($individual) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		
-		$fieldTags = [];
-		
-		$resources = array_merge(
-			$individual->allResources('rdf:type'),
-			$this->getDirectSuperClassesOf($individual)
+		$properties = $this->getPropertiesAsArray($individual);
+		$tags = array_merge(
+			($properties['type'] ?: []),
+			($properties['subClassOf'] ?: [])
 		);
 		
-		foreach ($resources as $tag) {
+		$fieldTags = [];
+		foreach ($tags as $tag) {
 			if (!$this->hasTransitiveSuperClass($tag, self::VOCABULARY))
 				continue;
 			
 			$vocabulary = $this->getVocabularyForTag($tag);
 			
+			$label = $this->getProperty($this->getXMLElement($tag), 'label')[0];
+			$name = $label ?: $this->getLocalName($tag);
+			
 			$fieldTags[] = [
-				'vid'  => $vocabulary->localName(),
-				'name' => $tag->label() ?: $tag->localName()
+				'vid'  => $this->getLocalName($vocabulary),
+				'name' => $name
 			];
 		}
 		
@@ -291,10 +327,10 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
-	 * Returns true if $subClass is a transitive subclass of $class.
+	 * Returns true if $superClass is a transitive superclass of $class.
 	 * 
-	 * @param $class class resource
-	 * @param $subClass superclass uri to search for
+	 * @param $class class uri
+	 * @param $subClass subclass to search for
 	 * 
 	 * @return boolean
 	 */
@@ -303,7 +339,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing.');
 		
 		foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
-			if ($curSuperClass->getUri() === $superClass)
+			if ($curSuperClass == $superClass)
 				return true;
 		}
 		return false;
@@ -312,7 +348,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array for a single field of a given node/individual.
 	 * 
-	 * @param $individual individual as resource
+	 * @param $individual individual as uri
 	 * @param $property IRI representation of the property
 	 * 
 	 * @return array with all properties of the field
@@ -323,13 +359,10 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		if ($literals = $this->getSortedLiterals($individual, $property)) { // includes DataProperties
 			$field = [
-				'value' => array_map(
-					function ($x) { return $this->literalValueToString($x); },
-					$literals
-				),
-				'field_name' => $property->localName()
+				'value'      => $literals,
+				'field_name' => $this->getLocalName($property)
 			];
-		} elseif ($individual->allResources($property)) { // includes ObjectProperties
+		} elseif ($this->getSortedResources($individual, $property)) { // includes ObjectProperties
 			$field = $this->getResourceValuesForNodeField($individual, $property);
 		}
 		
@@ -360,16 +393,17 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return string title
 	 */
 	private function getNodeTitle($entity) {
-		return
-			$this->getProperty($entity, self::TITLE)
-			?: $entity->label()
-			?: $entity->localName();
+		$title = $this->getProperty($entity, 'title')[0];
+		$label = $this->getProperty($entity, 'label')[0];
+		$localName = $this->getLocalName($this->getUri($entity));
+		
+		return $title ?: $label ?: $localName;
 	}
 	
 	/**
 	 * Returns an array for a field with values for each referenced resource.
 	 * 
-	 * @param $individual individual resource
+	 * @param $individual individual uri
 	 * @param $property the property for which the field should get constructed.
 	 * 
 	 * @return array containing fields: 'value' (array of values), 'field_name'
@@ -379,29 +413,28 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		$resources = $this->getSortedResources($individual, $property);
-		if (is_null($resources) || empty($resources)) return null;
+		if (!$resources || empty($resources)) return null;
 		
 		$field = [
 			'value' => [],
-			'field_name' => $property->localName()
+			'field_name' => $this->getLocalName($property)
 		];
 		
 		foreach ($resources as $target) {
 			$targetProperties = $this->getPropertiesAsArray($target);
+			$xml = $this->getXMLElement($target);
 			$value;
-			$vocabulary = $this->getVocabularyForTag($target);
 			
-			if (
-				$this->isATransitive($target, self::NODE)
+			if ($this->isATransitive($target, self::NODE)
 				|| $this->hasTransitiveSuperClass($target, self::NODE)
 			) {
-				$value = $target->getUri();
+				$value = $target;
 				$field['references'] = 'node';
-			//} elseif ($this->isATransitive($target, self::IMG)) { // @TODO
+			// } elseif ($this->isATransitive($target, self::IMG)) {
 			// 	$value = [
-			// 		'alt'   => $targetProperties[self::ALT],
-			// 		'title' => $targetProperties[self::TITLE],
-			// 		'uri'   => $targetProperties[self::URI]
+			// 		'alt'   => $targetProperties['alt'][0],
+			// 		'title' => $targetProperties['title'][0],
+			// 		'uri'   => $targetProperties['uri'][0]
 			// 	];
 			// 	$field['entity'] = 'file';
 			} elseif (
@@ -410,36 +443,42 @@ class OWLFileHandler extends AbstractFileHandler {
 			) {
 				$value = [ 'uri' => $this->getFilePath($target) ];
 				$field['references'] = 'file';
-			// } elseif ($this->isATransitive($target, self::DOC)) { // @TODO
+			// } elseif ($this->isATransitive($target, self::DOC)) {
 			// 	$refType = self::DOC_REF;
-			} elseif ($vocabulary != null) {
+			} elseif (($vocabulary = $this->getVocabularyForTag($target)) != null) {
+				$label = $this->getProperty($this->getXMLElement($target), 'label')[0];
+				$name = $label ?: $this->getLocalName($target);
+				
 				$value = [
-					'vid'  => $vocabulary->localName(),
-					'name' => $target->label() ?: $target->localName()
+					'vid'  => $this->getLocalName($vocabulary),
+					'name' => $name
 				];
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
 				$axiom = $this->getAxiomWithTargetForIndividual($individual, $property, $target);
-				$axiomProperties = $this->getPropertiesAsArray($axiom);
+					
+				foreach ($axiom->children('duo', true) as $child) {
+					if ($child->getName() == 'field') {
+						$fieldName = $this->getLocalName($child->attributes('rdf', true)->resource);
+						break;
+					}
+				}
 				
-				if (
-					array_key_exists(self::ANNOTATION_FIELD, $axiomProperties)
-					&& $targetField = $axiomProperties[self::ANNOTATION_FIELD]
-				) {
-					$value = $this->removeRdfsType($targetProperties[$targetField]);
+				if ($fieldName) {
+					$value = $targetProperties[$fieldName][0];
 				} else {
 					$this->logWarning(
-						"Entity '{$target->localName()}' "
-						. "by '{$individual->localName()}' "
-						. "referenced but no field given. ('{$property->localName()}')"
+						"Entity '{$this->getLocalName($target)}' "
+						. "by '{$this->getLocalName($individual)}' "
+						. "referenced but no field given. ('{$this->getLocalName($property)}')"
 					);
 					continue;
 				}
 			} else {
 				$this->logWarning(
-					"Nonexistent entity '{$target->localName()}' "
-					. "referenced by '{$individual->localName()}' "
-					. "and property '{$property->localName()}'."
+					"Nonexistent entity '{$this->getLocalName($target)} "
+					. "referenced by '{$this->getLocalName($individual)} "
+					. "and property '{$this->getLocalName($property)}'."
 				);
 				continue;
 			}
@@ -455,54 +494,60 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * Path is created from annotation duo:uri and all upper classes
 	 * which are subclasses of duo:File, concatenated with '/'.
 	 * 
-	 * @param $entity class or individual
+	 * @param $uri class or individual
 	 * 
 	 * @return {string} path
 	 */
-	private function getFilePath($entity) {
-		if (is_null($entity)) throw new Exception('Error: parameter $entity missing.');
-		$uri = $this->getProperty($entity, self::URI);
+	private function getFilePath($uri) {
+		if (is_null($uri)) throw new Exception('Error: parameter $uri missing.');
+		$properties = $this->getPropertiesAsArray($uri);
+		$xml = $this->getXMLElement($uri);
 		
-		$types = $entity->typesAsResources();
-		$classes = $this->getDirectSuperClassesOf($entity);
+		$types = $this->getProperty($xml, 'type');
+		$classes = $this->getProperty($xml, 'subClassOf');
 		
 		foreach ((!empty($classes) ? $classes : $types) as $class) {
 			if (!$this->hasTransitiveSuperClass($class, self::FILE))
 				continue;
 			
-			$result = $class->label() ?: $class->localName();
+			$result = $this->getProperty($this->getXMLElement($class), 'label')[0] 
+				?: $this->getLocalName($class);
 			foreach ($this->findAllSuperClassesOf($class) as $superclass) {
 				if (!$this->hasTransitiveSuperClass($superclass, self::FILE))
 					continue;
-				$result = ($superclass->label() ?: $superclass->localName()). '/'. $result;
+				$result = (
+					$this->getProperty($this->getXMLElement($superclass), 'label')[0]
+					?: $this->getLocalName($superclass)
+				). '/'. $result;
 			}
 			
-			return $result. '/'. $uri;
+			return "$result/{$properties['uri'][0]}";
 		}
 		
-		return $uri;
+		return $properties['uri'][0];
 	}
 	
 	/**
 	 * Returns an array containing all annotated targets of the axioms and all
 	 * resources which have no assingned axiom. Axioms are prioriced.
 	 * 
-	 * @param $individual individual
-	 * @param $property property
+	 * @param $individual individual uri
+	 * @param $property property uri
 	 * 
-	 * @return array of targeted resources
+	 * @return array of targeted resources as uris
 	 */
 	private function getSortedResources($individual, $property) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
-		$resources = $individual->allResources($property);
+		$resources = $this->getResources($individual, $property);
 		if (empty($resources)) return null;
+		
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
 		$result = [];
 		foreach ($axioms as $axiom) {
-			$result[] = $axiom->get('owl:annotatedTarget');
+			$result[] = $this->getProperty($axiom, 'annotatedTarget')[0];
 		}
 		
 		foreach ($resources as $resource) {
@@ -514,10 +559,39 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
-	 * Returns an array of literals for a given individual and property.
+	 * Returns an array of uris for a given individual and property.
 	 * 
-	 * @param $individual individual
-	 * @param $property property
+	 * @param $individual uri
+	 * @param $property uri
+	 * 
+	 * @return array of uris
+	 */
+	private function getResources($individual, $property) {
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
+	
+		$xml = $this->getXMLElement($individual);
+		
+		$result = [];
+		foreach (['owl', 'duo', 'rdfs', 'rdf', ''] as $ns) {
+			foreach ($xml->children($ns, true) as $child) {
+				if (
+					$child->getName() != $this->getLocalName($property)
+					|| $child->attributes('rdf', true)->resource == null
+				) continue;
+				
+				$result[] = (string) $child->attributes('rdf', true)->resource;
+			}
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * Returns a sorted array of literals for a given individual and property.
+	 * 
+	 * @param $individual individual uri
+	 * @param $property property uri
 	 * 
 	 * @return array of literals sorted by ref_num if it exists
 	 */
@@ -525,19 +599,48 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
-		$literals = $individual->allLiterals($property);
-		
+		$literals = $this->getLiterals($individual, $property);
 		if (empty($literals)) return null;
+		
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		
 		$result = [];
 		foreach ($axioms as $axiom) {
-			$result[] = $axiom->getLiteral('owl:annotatedTarget');
+			$result[] = $this->getProperty($axiom, 'annotatedTarget')[0];
 		}
 		
 		foreach ($literals as $literal) {
 			if (!in_array($literal, $result))
 				$result[] = $literal;
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * Returns an array with all values for a literal property.
+	 * 
+	 * @param $individual uri
+	 * @param $property uri
+	 * 
+	 * @return array of values
+	 */
+	private function getLiterals($individual, $property) {
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($property)) throw new Exception('Error: parameter $property missing');
+		
+		$xml = $this->getXMLElement($individual);
+		
+		$result = [];
+		foreach (['owl', 'duo', 'rdfs', 'rdf', ''] as $ns) {
+			foreach ($xml->children($ns, true) as $child) {
+				if (
+					$child->getName() != $this->getLocalName($property)
+					|| $child->attributes('rdf', true)->resource != null
+				) continue;
+				
+				$result[] = (string) $child;
+			}
 		}
 		
 		return $result;
@@ -551,7 +654,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @param $property property of the axiom
 	 * @param $target target references by the axiom
 	 * 
-	 * @return resource axiom
+	 * @return array of axiom properties
 	 */
 	private function getAxiomWithTargetForIndividual($individual, $property, $target) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
@@ -559,16 +662,24 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($target)) throw new Exception('Error: parameter $target missing');
 		
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
-		foreach($axioms as $axiom) {
-			if ($axiom->get('owl:annotatedTarget')->getUri() === $target->getUri())
-				return $axiom;
+		
+		foreach ($axioms as $axiom) {
+			foreach ($axiom->children('owl', true) as $child) {
+				if ($child->getName() != 'annotatedTarget')
+					continue;
+					
+				if ((string)$child->attributes('rdf', true)->resource == $target)
+					return $axiom;
+			}
 		}
+		
+		return null;
 	}
 	
 	/**
 	 * Returns value of the resource property
 	 * 
-	 * @param $resource resource
+	 * @param $resource xml
 	 * @param $uri properties uri
 	 * 
 	 * @return
@@ -577,11 +688,20 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($resource)) throw new Exception('Error: parameter $resource missing');
 		if (is_null($uri)) throw new Exception('Error: parameter $uri missing');
 		
-		$properties = $this->getPropertiesAsArray($resource);
-		if (!array_key_exists($uri, $properties))
-			return null;
+		$result = [];
+		foreach (['owl', 'rdf', 'rdfs', 'duo', ''] as $ns) {
+			foreach ($resource->children($ns, true) as $child) {
+				if ($child->getName() != $this->getLocalName($uri)) continue;
+				
+				if ($refResource = $child->attributes('rdf', true)->resource) {
+					$result[] = $refResource;
+				} else {
+					$result[] = (string)$child;
+				}
+			}
+		}
 		
-		return $this->removeRdfsType($properties[$uri]);
+		return $result;
 	}
 	
 	/**
@@ -598,69 +718,44 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
-	 * Returns a string with <a> tag for individual and ref_num.
-	 * 
-	 * @param $individual individual resource
-	 * @param $num ref_num property
-	 * 
-	 * @return string
-	 */
-	private function createUrlForAxiom($individual, $num) {
-		throw new Exception('Deprecated!');
-		if (is_null($num)) throw new Exception('Error: parameter $num missing');
-		
-		$axioms = $this->graph->resourcesMatching('owl:annotatedSource', $individual);
-		foreach ($axioms as $axiom) {
-			$properties = $this->getPropertiesAsArray($axiom);
-			
-			if (!$properties[self::REF_NUM] === $num. '"^^xsd:integer')
-				continue;
-				
-			$target = $this->graph->resource($properties['owl:annotatedTarget']);
-			$uri = $this->getProperty($target, self::URI);
-				
-			if (is_null($uri)) {
-				$alias = $this->getProperty($target, self::ALIAS);
-				
-				if (is_null($alias)) throw new Exception(
-					"Error: URLs can only reference entities with uri or alias. ({$target->localName()})"
-				);
-				$uri = base_path(). $alias;
-			}
-				
-			return '<a href="'. base_path(). $alias. '">'. $target->localName(). '</a>';
-		}
-		
-		return null;
-	}
-	
-	/**
 	 * Returns array of axioms for a given individual and property,
 	 * sorted by ref_num if exists.
 	 * 
 	 * @param $individual individual uri
 	 * @param $property property uri
 	 * 
-	 * @return array
+	 * @return array of SimpleXMLElements
 	 */
 	private function getAxiomsForIndividual($individual, $property) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
+		$xml = new ImprovedXMLReader();
+		$xml->open($this->filePath);
+		
 		$result = [];
 		$prevIndex = 0;
 		
-		$axioms = $this->graph->resourcesMatching('owl:annotatedSource', $individual);
-		foreach ($axioms as $axiom) {
-			if (!$axiom->hasProperty('owl:annotatedProperty', $property))
-		 		continue;
-		 		
-			$curIndex = preg_replace('/"\^\^xsd:integer/', '', $this->getProperty($axiom, self::REF_NUM));
-			if (is_null($curIndex))
+		while ($xml->read()) {
+			if (
+				$xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != 'owl:Axiom'
+				|| $xml->depth != 1
+			) continue;
+			$axiom = new \SimpleXMLElement($xml->readOuterXML());
+			
+			if(
+				$this->getProperty($axiom, 'annotatedSource')[0] != $individual
+				|| $this->getProperty($axiom, 'annotatedProperty')[0] != $property
+			) continue;
+		 	
+			$curIndex = $this->getProperty($axiom, 'ref_num')[0];
+			if (!$curIndex)
 				$curIndex = $prevIndex + 1;
 			$result[$curIndex] = $axiom;
-			$prevIndex = $curIndex;	
+			$prevIndex = $curIndex;
 		}
+		
 		ksort($result);
 		return $result;
 	}
@@ -668,7 +763,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns the vid for a given tag.
 	 * 
-	 * @param $tag tag resource
+	 * @param $tag tag uri
 	 * 
 	 * @return string vid
 	 */
@@ -676,8 +771,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
 		
 		foreach ($this->getVocabularyClasses() as $vocabulary) {
-			foreach ($this->findAllSubClassesOf($vocabulary->getUri()) as $subClass) {
-				if ($subClass->getUri() === $tag->getUri())
+			foreach ($this->findAllSubClassesOf($vocabulary) as $subClass) {
+				if ($subClass == $tag)
 					return $vocabulary;
 			}
 		}
@@ -688,29 +783,65 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array with all properties of an individual.
 	 * 
-	 * @param $individual individual resource
+	 * @param $individual individual uri
 	 * 
-	 * @return array
+	 * @return array of property value arrays
 	 */
 	private function getPropertiesAsArray($individual) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		
-		$properties = explode(' -> ', $this->graph->dumpResource($individual, 'text'));
+		$xml = $this->getXMLElement($individual);
+		if (is_null($xml)) return [];
+		
 		$array = [];
-			
-		for ( $i = 1; $i < sizeof($properties); $i++) {
-			if ($i % 2 === 0) continue;
-			$array[$properties[$i]] = trim(preg_replace('/^\s*"|"\s*$/', '', $properties[$i + 1]));
+		
+		foreach (['rdfs', 'duo', 'owl', 'rdf', ''] as $ns) {
+			foreach ($xml->children($ns, true) as $child) {
+				if ($resource = $child->attributes('rdf', true)->resource) {
+					$array[$child->getName()][] = (string)$resource;
+				} else {
+					$array[$child->getName()][] = (string)$child;
+				}
+			}
 		}
 		
 		return $array;
 	}
 	
 	/**
+	 * Returns a class, property or individual by uri.
+	 * 
+	 * @param $uri uri to search for
+	 * 
+	 * @return SimpleXMLElement
+	 */
+	private function getXMLElement($uri) {
+		$xml = new ImprovedXMLReader();
+		$xml->open($this->filePath);
+		
+		while ($xml->read()) {
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| !preg_match('/owl:/', $xml->name)
+				|| $xml->depth != 1
+			) continue;
+			
+			$node = new \SimpleXMLElement($xml->readOuterXML());
+			
+			if ($this->getUri($node) == $uri) {
+				$xml->close();
+				return $node;
+			}
+		}
+		
+		$xml->close();
+		return null;
+	}
+	
+	/**
 	 * Returns all individuals under class Node and classes under node,
 	 * depending on classesAsNodes and onlyLeafClasses.
 	 * 
-	 * @return array resources
+	 * @return array of uris
 	 */
 	private function getIndividuals() {
 		$individuals = [];
@@ -720,28 +851,55 @@ class OWLFileHandler extends AbstractFileHandler {
 				foreach ($this->getDirectSubClassesOf(self::NODE) as $nodeTypeClass) {
 					$individuals = array_merge(
 						$individuals,
-						$this->findAllLeafClassesOf($nodeTypeClass->getUri())
+						$this->findAllLeafClassesOf($nodeTypeClass)
 					);
 				}
 			} else {
 				foreach ($this->getDirectSubClassesOf(self::NODE) as $nodeTypeClass) {
 					$individuals = array_merge(
 						$individuals,
-						$this->findAllSubClassesOf($nodeTypeClass->getUri())
+						$this->findAllSubClassesOf($nodeTypeClass)
 					);
 				}
 			}
 		}
 		
-		foreach ($this->graph->allOfType('owl:NamedIndividual') as $individual) {
+		foreach ($this->getAllOfType('owl:NamedIndividual') as $individual) {
 			if (
 				!$this->isATransitive($individual, self::NODE)
-				|| $individual->isA(self::NODE) // individuals directly under Node are ignored
+				|| $this->isA($individual, self::NODE) // individuals directly under Node are ignored
 			) continue;
 			$individuals[] = $individual;
 		}
 		
 		return $individuals;
+	}
+	
+	/**
+	 * Returns all individuals of a specified type.
+	 * 
+	 * @param $type type of the requested individuals
+	 * 
+	 * @return array of uris
+	 */
+	private function getAllOfType($type) {
+		$xml = new ImprovedXMLReader();
+		$xml->open($this->filePath);
+		
+		$result = [];
+		
+		while ($xml->read()) {
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != $type
+				|| $xml->depth != 1
+			) continue;
+			
+			$node = new \SimpleXMLElement($xml->readOuterXML());
+			$result[] = $this->getUri($node);
+		}
+		
+		$xml->close();
+		return $result;
 	}
 	
 	/**
@@ -769,60 +927,85 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * 
 	 * @param $class class uri
 	 * 
-	 * @return array subclasses as resources
+	 * @return array subclasses as uris
 	 */
 	private function getDirectSubClassesOf($class) {
-		return $this->graph->resourcesMatching(
-			'rdfs:subClassOf', 
-			$this->graph->resource($class)
-		);
+		$xml = new ImprovedXMLReader();
+		$xml->open($this->filePath);
+		
+		$result = [];
+		while ($xml->read()) {
+			if ($xml->nodeType != ImprovedXMLReader::ELEMENT
+				|| $xml->name != 'owl:Class'
+				|| $xml->depth != 1	
+			) continue;
+			$node = new \SimpleXMLElement($xml->readOuterXML());
+			
+			foreach ($node->children('rdfs', true) as $child) {
+				if ($child->getName() != 'subClassOf') continue;
+				$parent = $child->attributes('rdf', true)->resource;
+			
+				if ((string) $parent == $class) $result[] = $this->getUri($node);
+			}
+		}
+		
+		$xml->close();
+		return $result;
 	}
 	
 	private function getDirectSuperClassesOf($class) {
-		return $class->allResources('rdfs:subClassOf');
-	}
-	
-	private function getClasses() {
-		return $this->graph->allOfType('owl:Class');
+		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
+		
+		$properties = $this->getPropertiesAsArray($this->getUri($class));
+		return $properties['subClassOf'];
 	}
 	
 	private function getAnnotationProperties() {
-		$annotationProperties = $this->graph->allOfType('owl:AnnotationProperty');
+		$annotationProperties = $this->getAllOfType('owl:AnnotationProperty');
 		
 		$properties = [];
 		foreach ($annotationProperties as $annotationProperty) {
-			$superProperties = $this->getProperty($annotationProperty, 'rdfs:subPropertyOf');
-			
-			if (strpos($superProperties, self::ANNOTATION_FIELD) !== false)
+			foreach ($this->getPropertiesAsArray($annotationProperty)['subPropertyOf'] as $superProperty) {
+				if ($superProperty != self::ANNOTATION_FIELD)
+					continue;
 				$properties[] = $annotationProperty;
+			}
 		}
 		
 		return $properties;
 	}
 	
+	private function getUri($resource) {
+		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
+		
+		return (string) $resource->attributes('rdf', true)->about;
+	}
+	
 	private function getDatatypeProperties() {
-		$datatypeProperties = $this->graph->allOfType('owl:DatatypeProperty');
+		$datatypeProperties = $this->getAllOfType('owl:DatatypeProperty');
 		
 		$properties = [];
 		foreach ($datatypeProperties as $datatypeProperty) {
-			$superProperties = $this->getProperty($datatypeProperty, 'rdfs:subPropertyOf');
-			
-			if (strpos($superProperties, self::DATATYPE_FIELD) !== false)
+			foreach ($this->getPropertiesAsArray($datatypeProperty)['subPropertyOf'] as $superProperty) {
+				if ($superProperty != self::DATATYPE_FIELD)
+					continue;
 				$properties[] = $datatypeProperty;
+			}
 		}
 		
 		return $properties;
 	}
 	
 	private function getObjectProperties() {
-		$objectProperties = $this->graph->allOfType('owl:ObjectProperty');
+		$objectProperties = $this->getAllOfType('owl:ObjectProperty');
 		
 		$properties = [];
 		foreach ($objectProperties as $objectProperty) {
-			$superProperties = $this->getProperty($objectProperty, 'rdfs:subPropertyOf');
-				
-			if (strpos($superProperties, self::OBJECT_FIELD) !== false)
+			foreach ($this>getPropertiesAsArray($objectProperty)['subPropertyOf'] as $superProperty) {
+				if ($superProperty != self::OBJECT_FIELD)
+					continue;
 				$properties[] = $objectProperty;
+			}
 		}
 		
 		return $properties;
@@ -848,17 +1031,19 @@ class OWLFileHandler extends AbstractFileHandler {
 		$result = [];
 		
 		foreach ($this->getDirectSubClassesOf($class) as $subClass) {
-			$result[] = $subClass;
-			$result = array_merge($result, $this->findAllSubClassesOf($subClass->getUri()));
+			if (!in_array($subClass, $result)) {
+				$result[] = $subClass;
+				$result = array_merge($result, $this->findAllSubClassesOf($subClass));
+			}
 		}
-		
+	
 		return array_unique($result);
 	}
 	
 	/**
 	 * Checks if the given individual is a transitive instantiation of given class.
 	 * 
-	 * @param $individual individual resource
+	 * @param $individual individual uri
 	 * @param $superClass superClass uri
 	 * 
 	 * @return boolean
@@ -867,17 +1052,17 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing');
 		
-		if ($individual->isA($this->graph->resource($superClass)->getUri()))
+		if ($this->isA($individual, $superClass))
 			return true;
 		
-		foreach ($individual->allResources('rdf:type') as $class) {
-			if ($class->getUri() === $superClass) {
+		$xml = $this->getXMLElement($individual);
+		foreach ($this->getProperty($xml, 'type') as $directSuperClass) {
+			if ($superClass == $directSuperClass)
 				return true;
-			} else {
-				foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
-					if ($curSuperClass->getUri() === $superClass)
-						return true;
-				}
+			
+			foreach ($this->findAllSuperClassesOf($directSuperClass) as $curClass) {
+				if ($superClass == $curClass)
+					return true;
 			}
 		}
 		
@@ -887,19 +1072,40 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function findAllSuperClassesOf($class) {
 		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
 		
-		$result = [];
-		foreach ($this->getDirectSuperClassesOf($class) as $superClass) {
-			$result[] = $superClass;
+		$xml = $this->getXMLElement($class);
+		if (is_null($xml)) return [];
+
+		$result = $this->getProperty($xml, 'subClassOf');
+		
+		foreach ($result as $superClass) {
 			$result = array_merge($result, $this->findAllSuperClassesOf($superClass));
 		}
+		
 		return array_unique($result);
+	}
+	
+	private function isA($individual, $superClass) {
+		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
+		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing');
+		
+		$node = $this->getXMLElement($individual);
+		if ($node->getName() != 'NamedIndividual')
+			return false;
+		
+		foreach ($node->children('rdf', true) as $child) {
+			if ($child->getName() != 'type') continue;
+			if ($child->attributes('rdf', true)->resource == $superClass)
+				return true;
+		}
+		
+		return false;
 	}
 	
 	/**
 	 * Checks if given class has given superclass.
 	 * 
-	 * @param $class class resource
-	 * @param $superClass superclass resource
+	 * @param $class class uri
+	 * @param $superClass superclass uri
 	 * 
 	 * @return boolean
 	 */
@@ -907,7 +1113,9 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($class)) throw new Exception('Error: parameter $class missing');
 		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing');
 		
-		if (in_array($superClass, $this->getDirectSuperClassesOf($class)))
+		$xml = $this->getXMLElement($class);
+		
+		if (in_array($superClass, $this->getProperty($xml, 'subClassOf')))
 			return true;
 		
 		return false;
@@ -916,7 +1124,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array containing all parental tags of a given tag.
 	 * 
-	 * @param $tag tag resource
+	 * @param $tag tag uri
 	 * 
 	 * @return array of parental tag local names
 	 */
@@ -924,13 +1132,14 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
 		
 		return array_map(
-			function($x) { return $x->label() ?: $x->localName(); },
+			function($x) { 
+				$label = $this->getProperty($this->getXMLElement($x), 'label')[0];
+				return $label ?: $this->getLocalName($x);
+				
+			},
 			array_filter(
-				$this->getDirectSuperClassesOf($tag),
-				function($x) {
-					return !$this->hasDirectSuperClass($x, self::VOCABULARY)
-						&& $this->hasTransitiveSuperClass($x, self::VOCABULARY);
-				}
+				$this->getPropertiesAsArray($tag)['subClassOf'] ?: [],
+				function($x) { return ($x != self::VOCABULARY); }
 			)
 		);
 	}
