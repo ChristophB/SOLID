@@ -1,0 +1,15 @@
+SOLID:
+    path: '/SOLID'
+    defaults:
+        _title: 'SOLID - Form'
+        _form: '\Drupal\SOLID\Controller\Form'
+    requirements:
+        _role: 'administrator'
+
+SOLID.progress:
+    path: '/SOLID/progress'
+    defaults:
+        _title: 'SOLID - Progress'
+        _controller: '\Drupal\SOLID\Controller\Progress::content'
+    requirements:
+        _role: 'administrator'
