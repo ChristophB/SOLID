@@ -1,4 +1,4 @@
-name: Node Importer
+name: SOLID
 type: module
 description: Imports nodes from JSON and OWL file.
 version: 1.0

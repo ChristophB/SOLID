@@ -1,5 +1,5 @@
 SOLID:
-  title: Node Importer
+  title: SOLID
   description: Import JSON/OWL files to automatically create nodes and vocabularies.
   route_name: SOLID
   base_route: SOLID
