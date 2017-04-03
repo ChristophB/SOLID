@@ -218,36 +218,25 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($resource)) throw new Exception('Error: parameter $resource missing.');
 		
 		if ($resource->type() == 'owl:Class') {
-			return [
-				'field_name' => 'field_parent',
-				'value'      => array_map(
-					function($x) { return $x->getUri(); },
-					array_filter(
-						$this->getDirectSuperClassesOf($resource),
-						function($x) {
-							return $this->hasTransitiveSuperClass($x, self::NODE)
-								&& !$this->hasDirectSuperClass($x, self::NODE);
-						}
-					)
-				),
-				'references' => 'node'
-			];
+			$parents = $this->getDirectSuperClassesOf($resource);
 		} else {
-			return [
-				'field_name' => 'field_parent',
-				'value'      => array_map(
-					function($x) { return $x->getUri(); },
-					array_filter(
-						$resource->allResources('rdf:type'),
-						function($x) {
-							return $this->hasTransitiveSuperClass($x, self::NODE)
-								&& !$this->hasDirectSuperClass($x, self::NODE);
-						}
-					)
-				),
-				'references' => 'node'
-			];
+			$parents = $resource->allResources('rdf:type');
 		}
+		
+		return [
+			'field_name' => 'field_parent',
+			'value'      => array_map(
+				function($x) { return $x->getUri(); },
+				array_filter(
+					$parents,
+					function($x) {
+						return $this->hasTransitiveSuperClass($x, self::NODE)
+							&& !$this->hasDirectSuperClass($x, self::NODE);
+					}
+				)
+			),
+			'references' => 'node'
+		];
 	}
 	
 	private function createFieldChild($class) {
@@ -400,6 +389,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($resources as $target) {
 			$targetProperties = $this->getPropertiesAsArray($target);
 			$value;
+			$vocabulary = $this->getVocabularyForTag($target);
 			
 			if (
 				$this->isATransitive($target, self::NODE)
@@ -422,9 +412,9 @@ class OWLFileHandler extends AbstractFileHandler {
 				$field['references'] = 'file';
 			// } elseif ($this->isATransitive($target, self::DOC)) { // @TODO
 			// 	$refType = self::DOC_REF;
-			} elseif ($this->getVocabularyForTag($target) != null) {
+			} elseif ($vocabulary != null) {
 				$value = [
-					'vid'  => $this->getVocabularyForTag($target)->localName(),
+					'vid'  => $vocabulary->localName(),
 					'name' => $target->label() ?: $target->localName()
 				];
 				$field['references'] = 'taxonomy_term';
@@ -937,7 +927,10 @@ class OWLFileHandler extends AbstractFileHandler {
 			function($x) { return $x->label() ?: $x->localName(); },
 			array_filter(
 				$this->getDirectSuperClassesOf($tag),
-				function($x) { return !$this->hasDirectSuperClass($x, self::VOCABULARY); }
+				function($x) {
+					return !$this->hasDirectSuperClass($x, self::VOCABULARY)
+						&& $this->hasTransitiveSuperClass($x, self::VOCABULARY);
+				}
 			)
 		);
 	}
