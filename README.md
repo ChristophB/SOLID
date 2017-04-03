@@ -26,7 +26,7 @@ Supported import formats:
 * Each release contains this readme file, a template and a folder "SOLID".
 * Copy the folder "SOLID" into your Drupal 8 installation folder - into "/[drupal-root-folder]/modules". Allow the web user (e.g. www-data) read and write access to this folder.
 * Log into your Drupal 8 Webpage as administrator and navigate to the menu "Extend".
-* On the "Extend" page you will see a list of available and installed modules. Search for the module "Node Importer" and select it.
+* On the "Extend" page you will see a list of available and installed modules. Search for the module "SOLID" and select it.
 * Click "Install" on the bottom of the page.
 
 ## How to use:
