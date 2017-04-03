@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\node_importer\FileHandler\OWLLargeFileHandler.
+ * Contains \Drupal\SOLID\FileHandler\OWLLargeFileHandler.
  */
 
-namespace Drupal\node_importer\FileHandler;
+namespace Drupal\SOLID\FileHandler;
 
 use Drupal\file\Entity\File;
-use Drupal\node_importer\Reader\ImprovedXMLReader;
+use Drupal\SOLID\Reader\ImprovedXMLReader;
 use \Exception;
 
 /**

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\node_importer\FileHandler\OWLFileHandler.
+ * Contains \Drupal\SOLID\FileHandler\OWLFileHandler.
  */
 
-namespace Drupal\node_importer\FileHandler;
+namespace Drupal\SOLID\FileHandler;
 
 use Drupal\file\Entity\File;
 use \Exception;

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\node_importer\Timer\Timer.
+ * Contains \Drupal\SOLID\Timer\Timer.
  */
 
-namespace Drupal\node_importer\Timer;
+namespace Drupal\SOLID\Timer;
 
 /**
  * @author Christoph Beger
