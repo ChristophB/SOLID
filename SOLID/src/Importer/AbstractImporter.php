@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\node_importer\Importer\AbstractImporter.
+ * Contains \Drupal\SOLID\Importer\AbstractImporter.
  */
 
-namespace Drupal\node_importer\Importer;
+namespace Drupal\SOLID\Importer;
 
 use \Exception;
 
@@ -127,14 +127,14 @@ abstract class AbstractImporter {
 	
 	protected function logWarning($msg) {
 		if (!in_array($msg, $this->warnings)) {
-			\Drupal::logger('node_importer')->warning($msg);
+			\Drupal::logger('SOLID')->warning($msg);
 			print date('H:i:s', time()). "> Warning: $msg\n";
 			array_push($this->warnings, $msg);
 		}
 	}
 	
 	protected function logNotice($msg) {
-		\Drupal::logger('node_importer')->notice($msg);
+		\Drupal::logger('SOLID')->notice($msg);
 		print date('H:i:s', time()). "> $msg\n";
 	}
 	

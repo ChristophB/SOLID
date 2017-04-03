@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\node_importer\Parser\ImprovedXMLReader.
+ * Contains \Drupal\SOLID\Parser\ImprovedXMLReader.
  */
 
-namespace Drupal\node_importer\Reader;
+namespace Drupal\SOLID\Reader;
 
 use Exception;
 
