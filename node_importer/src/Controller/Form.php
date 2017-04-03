@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\Controller\Form.
+ * Contains \Drupal\node_importer\Controller\Form.
  */
 
-namespace Drupal\SOLID\Controller;
+namespace Drupal\node_importer\Controller;
 
 use Exception;
 
@@ -15,20 +15,20 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 
-use Drupal\SOLID\Importer\VocabularyImporter;
-use Drupal\SOLID\Importer\NodeImporter;
-use Drupal\SOLID\FileHandler\FileHandlerFactory;
+use Drupal\node_importer\Importer\VocabularyImporter;
+use Drupal\node_importer\Importer\NodeImporter;
+use Drupal\node_importer\FileHandler\FileHandlerFactory;
 
 
 /**
- * Main Class which is instantiated by calling "/SOLID"
+ * Main Class which is instantiated by calling "/node_importer"
  * 
  * @author Christoph Beger
  */
 class Form extends FormBase {
     
     public function getFormId() {
-        return 'SOLID_form';
+        return 'node_importer_form';
     }
   
     public function buildForm(array $form, FormStateInterface $form_state) {
@@ -77,8 +77,8 @@ class Form extends FormBase {
     }
     
     public function content() {
-        $formLink     = Link::createFromRoute('Form', 'SOLID');
-        $progressLink = Link::createFromRoute('Progress', 'SOLID.progress');
+        $formLink     = Link::createFromRoute('Form', 'node_importer');
+        $progressLink = Link::createFromRoute('Progress', 'node_importer.progress');
         
         return [
             '#type' => 'markup',
@@ -130,7 +130,7 @@ class Form extends FormBase {
         copy($filePath, $newFilePath);
         
         $cmd 
-            = "php -q modules/SOLID/src/Script/import.php $drupalPath "
+            = "php -q modules/node_importer/src/Script/import.php $drupalPath "
             . "$newFilePath $userId $importVocabularies $importNodes $classesAsNodes "
             . "$onlyLeafClassesAsNodes $overwrite";
         

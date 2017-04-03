@@ -23,8 +23,8 @@ Supported import formats:
 ## How to install:
 
 * Download one of our releases and extract it to a random location.
-* Each release contains this readme file, a template and a folder "SOLID".
-* Copy the folder "SOLID" into your Drupal 8 installation folder - into "/[drupal-root-folder]/modules". Allow the web user (e.g. www-data) read and write access to this folder.
+* Each release contains this readme file, a template and a folder "node_importer".
+* Copy the folder "node_importer" into your Drupal 8 installation folder - into "/[drupal-root-folder]/modules". Allow the web user (e.g. www-data) read and write access to this folder.
 * Log into your Drupal 8 Webpage as administrator and navigate to the menu "Extend".
 * On the "Extend" page you will see a list of available and installed modules. Search for the module "Node Importer" and select it.
 * Click "Install" on the bottom of the page.
@@ -32,10 +32,10 @@ Supported import formats:
 ## How to use:
 
 * You have to create a file with all information you want to import. Use the corresponding "template.*" file in the root folder of the release as reference.
-* Log in as administrator and navigate to Config->Content->Node Importer. (alternatively use the URL: "[your Drupal 8 root URL]/SOLID")
+* Log in as administrator and navigate to Config->Content->Node Importer. (alternatively use the URL: "[your Drupal 8 root URL]/node_importer")
 * Place the previously created file into the form.
 * Check "Import Vocabularies" or "Import Nodes" and click "Import".
-* You can call call SOLID/src/Script/import.php to import data from command line.
+* You can call call node_importer/src/Script/import.php to import data from command line.
 
 ```sh
 php import.php [absolute path to drupal folder] [absolute path to import file] [userid] [import vocabulary?] [import nodes?] [import classes as nodes?] [import only leaf classes as nodes?] [overwrite?]

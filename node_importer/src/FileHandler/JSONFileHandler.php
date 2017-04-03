@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\FileHandler\JSONFileHandler.
+ * Contains \Drupal\node_importer\FileHandler\JSONFileHandler.
  */
 
-namespace Drupal\SOLID\FileHandler;
+namespace Drupal\node_importer\FileHandler;
 
 /**
  * FileHandler which parses JSON files.

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\Controller\Progress.
+ * Contains \Drupal\node_importer\Controller\Progress.
  */
 
-namespace Drupal\SOLID\Controller;
+namespace Drupal\node_importer\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
@@ -17,7 +17,7 @@ use Drupal\Core\Link;
  * @author Christoph Beger
  */
 class Progress extends ControllerBase {
-    private $logFile = 'modules/SOLID/SOLID.log';
+    private $logFile = 'modules/node_importer/node_importer.log';
     
     public function content() {
         $log = '';
@@ -28,8 +28,8 @@ class Progress extends ControllerBase {
             $log = 'No import process running!';
         }
         
-        $formLink     = Link::createFromRoute('Form', 'SOLID');
-        $progressLink = Link::createFromRoute('Progress', 'SOLID.progress');
+        $formLink     = Link::createFromRoute('Form', 'node_importer');
+        $progressLink = Link::createFromRoute('Progress', 'node_importer.progress');
         
         return [
             '#type' => 'markup',

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\FileHandler\AbstractFileHandler.
+ * Contains \Drupal\node_importer\FileHandler\AbstractFileHandler.
  */
 
-namespace Drupal\SOLID\FileHandler;
+namespace Drupal\node_importer\FileHandler;
 
 use Drupal\file\Entity\File;
 
@@ -40,13 +40,13 @@ abstract class AbstractFileHandler {
 	}
 	
 	protected function logNotice($msg) {
-		\Drupal::logger('SOLID')->notice($msg);
+		\Drupal::logger('node_importer')->notice($msg);
 		print date('H:i:s', time()). "> $msg\n";
 	}
 	
 	protected function logWarning($msg) {
 		if (!in_array($msg, $this->warnings)) {
-			\Drupal::logger('SOLID')->warning($msg);
+			\Drupal::logger('node_importer')->warning($msg);
 			print date('H:i:s', time()). "> Warning: $msg\n";
 			array_push($this->warnings, $msg);
 		}

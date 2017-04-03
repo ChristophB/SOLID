@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\Importer\NodeImporter.
+ * Contains \Drupal\node_importer\Importer\NodeImporter.
  */
 
-namespace Drupal\SOLID\Importer;
+namespace Drupal\node_importer\Importer;
 
 use \Exception;
 

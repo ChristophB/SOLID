@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\SOLID\FileHandler\FileHandlerFactory.
+ * Contains \Drupal\node_importer\FileHandler\FileHandlerFactory.
  */
 
-namespace Drupal\SOLID\FileHandler;
+namespace Drupal\node_importer\FileHandler;
 
 use Drupal\file\Entity\File;
 use \Exception;
 
-use Drupal\SOLID\FileHandler\JSONFileHandler;
-use Drupal\SOLID\FileHandler\OWLFileHandler;
-use Drupal\SOLID\FileHandler\OWLLargeFileHandler;
+use Drupal\node_importer\FileHandler\JSONFileHandler;
+use Drupal\node_importer\FileHandler\OWLFileHandler;
+use Drupal\node_importer\FileHandler\OWLLargeFileHandler;
 
 /**
  * Serves a FileHandler depending on the extension of the given file.

@@ -4,9 +4,9 @@ use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
 # use \Exception;
 
-use Drupal\SOLID\Importer\VocabularyImporter;
-use Drupal\SOLID\Importer\NodeImporter;
-use Drupal\SOLID\FileHandler\FileHandlerFactory;
+use Drupal\node_importer\Importer\VocabularyImporter;
+use Drupal\node_importer\Importer\NodeImporter;
+use Drupal\node_importer\FileHandler\FileHandlerFactory;
 
 if (sizeof($argv) < 2) {
     doLog('Usage: import.php [drupal path] [file path] [user id] [import vocabularies?] '
@@ -39,7 +39,7 @@ if (empty($filePath)) {
     die;
 }
 
-$logFile = "$drupalPath/modules/SOLID/SOLID.log";
+$logFile = "$drupalPath/modules/node_importer/node_importer.log";
 if (file_exists($logFile)) unlink($logFile);
 fclose(STDOUT);
 $STDOUT = fopen($logFile, 'wb');
@@ -97,7 +97,7 @@ fclose($STDOUT);
 
 
 function doLog($msg) {
-	\Drupal::logger('SOLID')->notice($msg);
+	\Drupal::logger('node_importer')->notice($msg);
 	echo date('H:i:s', time()). "> $msg", PHP_EOL;
 }
 
