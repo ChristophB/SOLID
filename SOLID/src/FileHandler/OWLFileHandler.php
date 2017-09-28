@@ -322,11 +322,12 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
 		if ($literals = $this->getSortedLiterals($individual, $property)) { // includes DataProperties
+			$values = [];
+			foreach ($literals as $literal) {
+				array_push($values, $this->literalValueToString($individual, $property, $literal));
+			}
 			$field = [
-				'value' => array_map(
-					function ($x) { return $this->literalValueToString($x); },
-					$literals
-				),
+				'value'      => $values,
 				'field_name' => $property->localName()
 			];
 		} elseif ($individual->allResources($property)) { // includes ObjectProperties
@@ -339,16 +340,26 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns the value of the literal as string. Dates are converted to strings, using format().
 	 * 
+	 * @param $individual is required to extract annotations
+	 * @param $property is required to extract annotations
 	 * @param $literal literal
 	 * 
 	 * @return string
 	 */
-	private function literalValueToString($literal) {
+	private function literalValueToString($individual, $property, $literal) {
 		if (is_null($literal)) return null;
-		
+
 		if ($literal->getDatatype() == 'xsd:dateTime')
 			return $literal->format('Y-m-d');
 		
+		$axiom = $this->getAxiomWithTargetForIndividual($individual, $property, $literal);
+		if (!is_null($axiom) && $title = $this->getProperty($axiom, self::TITLE)) {
+			return [
+				'uri'   => $this->removeRdfsType($literal->getValue()),
+				'title' => $title
+			];
+		}
+
 		return $this->removeRdfsType($literal->getValue());
 	}
 	
@@ -544,12 +555,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	/**
-	 * Returns a single axiom form a given set of axiom,
-	 * which targets a given resource.
+	 * Returns a single axiom from a given set of axiom,
+	 * which targets a given target.
 	 * 
 	 * @param $individual individual references by the axiom
 	 * @param $property property of the axiom
-	 * @param $target target references by the axiom
+	 * @param $target target references by the axiom, can be resource or literal
 	 * 
 	 * @return resource axiom
 	 */
@@ -560,8 +571,13 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		$axioms = $this->getAxiomsForIndividual($individual, $property);
 		foreach($axioms as $axiom) {
-			if ($axiom->get('owl:annotatedTarget')->getUri() === $target->getUri())
+			$axiomTarget = $axiom->get('owl:annotatedTarget');
+
+			if ($axiomTarget == $target->getValue()
+				|| (method_exists($axiomTarget, 'getUri') && $axiomTarget->getUri() === $target->getUri())
+			) {
 				return $axiom;
+			}
 		}
 	}
 	
