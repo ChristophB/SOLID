@@ -144,7 +144,7 @@ class NodeImporter extends AbstractImporter {
 		
 		// @todo: does not work in script
 		if (!file_exists($drupalUri))
-			throw new Exception("Error: file '$drupalUri' does not exist.");
+			$this->logWarning("File '$drupalUri' does not exist, but URI entry inserted into DB. Upload the file manually to the server!");
 		
 		if ($fid = $this->searchFileByUri($drupalUri)) {
 			$this->logNotice("Found file $fid for uri '$drupalUri'.");
