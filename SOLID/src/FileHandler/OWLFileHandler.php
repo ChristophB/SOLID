@@ -424,9 +424,21 @@ class OWLFileHandler extends AbstractFileHandler {
 			// } elseif ($this->isATransitive($target, self::DOC)) { // @TODO
 			// 	$refType = self::DOC_REF;
 			} elseif ($vocabulary != null) {
+				$vid = $vocabulary->localName();
+				$tag = $target->label() ?: $target->localName()
+				
+				if (!$this->vocabularyImporter->tagExists($vid, $tag)) {
+					$this->logWarning(
+						"Non-existing tag '$tag' in vocabulary '$vid' "
+						. "referenced by '$individual->localname()' "
+						. "and property '{$property->localname()}'."
+					)
+					return [];
+				}
+
 				$value = [
-					'vid'  => $vocabulary->localName(),
-					'name' => $target->label() ?: $target->localName()
+					'vid'  => $vid,
+					'name' => $tag
 				];
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
@@ -448,7 +460,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				}
 			} else {
 				$this->logWarning(
-					"Nonexistent entity '{$target->localName()}' "
+					"Non-existing entity '{$target->localName()}' "
 					. "referenced by '{$individual->localName()}' "
 					. "and property '{$property->localName()}'."
 				);
