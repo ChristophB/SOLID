@@ -425,7 +425,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			// 	$refType = self::DOC_REF;
 			} elseif ($vocabulary != null) {
 				$vid = $vocabulary->localName();
-				$tag = $target->label() ?: $target->localName()
+				$tag = $target->label() ?: $target->localName();
 				
 				if (!$this->vocabularyImporter->tagExists($vid, $tag)) {
 					$this->logWarning(
