@@ -138,7 +138,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 */
 	private function getBundle($node) {
 		if (is_null($node)) throw new Exception('Error: parameter $node missing');
-	
+		
 		foreach (
 			$this->getDirectSubClassesOf(
 				$this->graph->resource(self::NODE)
@@ -303,7 +303,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($superClass)) throw new Exception('Error: parameter $superClass missing.');
 		
 		foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
-			if ($curSuperClass->getUri() === $superClass)
+			if ($curSuperClass->getUri() == $superClass)
 				return true;
 		}
 		return false;
@@ -585,8 +585,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach($axioms as $axiom) {
 			$axiomTarget = $axiom->get('owl:annotatedTarget');
 
-			if ((method_exists($target, 'getValue') && $axiomTarget == $target->getValue())
-				|| (method_exists($axiomTarget, 'getUri') && $axiomTarget->getUri() === $target->getUri())
+			if ((method_exists($target, 'getValue') && method_exists($axiomTarget, 'getValue') && $axiomTarget->getValue() == $target->getValue())
+				|| (method_exists($axiomTarget, 'getUri') && $axiomTarget->getUri() == $target->getUri())
 			) {
 				return $axiom;
 			}
@@ -641,7 +641,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($axioms as $axiom) {
 			$properties = $this->getPropertiesAsArray($axiom);
 			
-			if (!$properties[self::REF_NUM] === $num. '"^^xsd:integer')
+			if (!$properties[self::REF_NUM] == $num. '"^^xsd:integer')
 				continue;
 				
 			$target = $this->graph->resource($properties['owl:annotatedTarget']);
@@ -705,7 +705,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		foreach ($this->getVocabularyClasses() as $vocabulary) {
 			foreach ($this->findAllSubClassesOf($vocabulary->getUri()) as $subClass) {
-				if ($subClass->getUri() === $tag->getUri())
+				if ($subClass->getUri() == $tag->getUri())
 					return $vocabulary;
 			}
 		}
@@ -727,7 +727,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		$array = [];
 			
 		for ( $i = 1; $i < sizeof($properties); $i++) {
-			if ($i % 2 === 0) continue;
+			if ($i % 2 == 0) continue;
 			$array[$properties[$i]] = trim(preg_replace('/^\s*"|"\s*$/', '', $properties[$i + 1]));
 		}
 		
@@ -899,11 +899,11 @@ class OWLFileHandler extends AbstractFileHandler {
 			return true;
 		
 		foreach ($individual->allResources('rdf:type') as $class) {
-			if ($class->getUri() === $superClass) {
+			if ($class->getUri() == $superClass) {
 				return true;
 			} else {
 				foreach ($this->findAllSuperClassesOf($class) as $curSuperClass) {
-					if ($curSuperClass->getUri() === $superClass)
+					if ($curSuperClass->getUri() == $superClass)
 						return true;
 				}
 			}
