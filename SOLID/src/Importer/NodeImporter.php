@@ -77,13 +77,6 @@ class NodeImporter extends AbstractImporter {
 			$this->logWarning("Content type '$type' does not exist in Drupal.");
 			return;
 		}
-
-		// try {
-		// 	$this->deleteNodeIfExists($uuid);
-		// } catch (Exception $e) {
-		// 	$this->logWarning($e->getMessage());
-		// 	return;
-		// }
 		
 		$node;
 		if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {

@@ -432,7 +432,7 @@ class OWLFileHandler extends AbstractFileHandler {
 						"Non-existing tag '$tag' in vocabulary '$vid' "
 						. "referenced by '$individual->localname()' "
 						. "and property '{$property->localname()}'."
-					)
+					);
 					return [];
 				}
 
@@ -585,7 +585,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach($axioms as $axiom) {
 			$axiomTarget = $axiom->get('owl:annotatedTarget');
 
-			if ($axiomTarget == $target->getValue()
+			if ((method_exists($target, 'getValue') && $axiomTarget == $target->getValue())
 				|| (method_exists($axiomTarget, 'getUri') && $axiomTarget->getUri() === $target->getUri())
 			) {
 				return $axiom;
