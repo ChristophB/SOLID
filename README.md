@@ -59,3 +59,4 @@ It is possible to define files, which will be attached to Nodes.
 
 * After the import of a vocabulary you have to assigne it to the fields, where you want to use the tags.
 * If one of your declared nodes references an image or file, you have to place that image in the specified folder before importing the node.
+* The user account for your web server requires read and write access to the module's folder `[Drupal root folder]/modules/SOLID`.
