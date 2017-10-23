@@ -296,7 +296,8 @@ class NodeImporter extends AbstractImporter {
 		if (empty($params['id'])) throw new Exception('Error: named parameter "id" missing.');
 		if (empty($params['alias'])) return;
 		
-		$path = \Drupal::service('path.alias_storage')->save( # @todo: dont allow duplicated paths 
+		\Drupal::service('path.alias_storage')->delete([ 'alias' => "/$params[alias]" ]);
+		$path = \Drupal::service('path.alias_storage')->save(
 			"/node/$params[id]",
 			"/$params[alias]",
 			'en'
