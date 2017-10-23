@@ -130,8 +130,8 @@ class Form extends FormBase {
         copy($filePath, $newFilePath);
         
         $cmd 
-            = "php -q modules/SOLID/src/Script/import.php $drupalPath "
-            . "$newFilePath $userId $importVocabularies $importNodes $classesAsNodes "
+            = "php -q modules/SOLID/src/Script/import.php '$drupalPath' "
+            . "'$newFilePath' $userId $importVocabularies $importNodes $classesAsNodes "
             . "$onlyLeafClassesAsNodes $overwrite";
         
         $this->execInBackground($cmd);
