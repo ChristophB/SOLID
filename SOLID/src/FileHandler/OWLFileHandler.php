@@ -800,14 +800,19 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return array subclasses as resources
 	 */
 	private function getDirectSubClassesOf($class) {
-		return $this->graph->resourcesMatching(
-			'rdfs:subClassOf', 
-			$this->graph->resource($class)
-		);
+		$subClasses = [];
+		foreach ($this->graph->resourcesMatching('rdfs:subClassOf', $this->graph->resource($class)) as $subClass) {
+			if ($subClass != $class) $subClasses[] = $subClass;
+		}
+		return $subClasses;
 	}
 	
 	private function getDirectSuperClassesOf($class) {
-		return $class->allResources('rdfs:subClassOf');
+		$superClasses = [];
+		foreach ($class->allResources('rdfs:subClassOf') as $superClass) {
+			if ($superClass != $class) $superClasses[] = $superClass;
+		}
+		return $superClasses;
 	}
 	
 	private function getClasses() {
@@ -899,6 +904,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			return true;
 		
 		foreach ($individual->allResources('rdf:type') as $class) {
+			if ($class == $individual) continue;
 			if ($class->getUri() == $superClass) {
 				return true;
 			} else {
