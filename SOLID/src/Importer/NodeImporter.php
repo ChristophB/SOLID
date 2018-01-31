@@ -211,7 +211,7 @@ class NodeImporter extends AbstractImporter {
 			
 			if (!$this->nodeHasField($node, $fieldName)) {
 				$this->logWarning(
-					"field '$fieldName' does not exists in '{$node->bundle()}'"
+					"field '$fieldName' does not exist in '{$node->bundle()}'"
 				);
 				continue;
 			}
