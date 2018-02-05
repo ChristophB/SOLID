@@ -862,11 +862,19 @@ class OWLFileHandler extends AbstractFileHandler {
 	}
 	
 	private function getProperties() {
-		return array_merge(
+		$properties = array_merge(
 			$this->getAnnotationProperties(),
 			$this->getDatatypeProperties(),
 			$this->getObjectProperties()
 		);
+
+		$result = [];
+		foreach ($properties as $property) {
+			if ($property->getUri() != self::CONTENT && $property->getUri() != self::SUMMARY)
+				$result[] = $property;
+		}
+
+		return $result;
 	}
 	
 	/**
