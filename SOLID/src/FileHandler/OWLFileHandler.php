@@ -622,7 +622,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function removeRdfsType($string) {
 		if (is_null($string)) return null;
 		
-		return preg_replace('/"?\^\^.*$/', '', $string);
+		return preg_replace('/"?(@.+)?\^\^.*$/', '', $string);
 	}
 	
 	/**
@@ -728,7 +728,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 		for ( $i = 1; $i < sizeof($properties); $i++) {
 			if ($i % 2 == 0) continue;
-			$array[$properties[$i]] = trim(preg_replace('/^\s*"|"\s*$/', '', $properties[$i + 1]));
+			$array[$properties[$i]] = trim(preg_replace('/^\s*"|"(@.+)?\s*$/', '', $properties[$i + 1]));
 		}
 		
 		return $array;
