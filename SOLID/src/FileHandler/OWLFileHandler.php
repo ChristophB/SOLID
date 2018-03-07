@@ -66,9 +66,9 @@ class OWLFileHandler extends AbstractFileHandler {
 	
 	public function setVocabularyData() {
 		foreach ($this->getVocabularyClasses() as $class) {
-			$vid = $class->localName();
+			$vid = strtolower($class->localName());
 			$this->logNotice("Handling vocabulary: $vid");
-			$this->vocabularyImporter->createVocabulary($vid, $vid);
+			$this->vocabularyImporter->createVocabulary($vid, $this->getNodeTitle($class));
 			
 			$this->logNotice('Collecting terms...');
 			$tags = $this->findAllSubClassesOf($class->getUri());
@@ -76,7 +76,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->createTag($vid, $tag->label() ?: $tag->localName());
+				$this->vocabularyImporter->createTag($vid, $this->getNodeTitle($tag));
 			}
 			
 			$this->logNotice('Adding child parent linkages to terms...');
@@ -85,7 +85,7 @@ class OWLFileHandler extends AbstractFileHandler {
 					$vid,
 					[
 						[
-							'name'    => $tag->label() ?: $tag->localName(),
+							'name'    => $this->getNodeTitle($tag),
 							'parents' => $this->getParentTags($tag)
 						]
 					]
@@ -424,13 +424,13 @@ class OWLFileHandler extends AbstractFileHandler {
 			// } elseif ($this->isATransitive($target, self::DOC)) { // @TODO
 			// 	$refType = self::DOC_REF;
 			} elseif ($vocabulary != null) {
-				$vid = $vocabulary->localName();
-				$tag = $target->label() ?: $target->localName();
+				$vid = strtolower($vocabulary->localName());
+				$tag = $this->getNodeTitle($target);
 				
 				if (!$this->vocabularyImporter->tagExists($vid, $tag)) {
 					$this->logWarning(
 						"Non-existing tag '$tag' in vocabulary '$vid' "
-						. "referenced by '$individual->localname()' "
+						. "referenced by '{$individual->localname()}' "
 						. "and property '{$property->localname()}'."
 					);
 					return [];

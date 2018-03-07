@@ -137,7 +137,7 @@ class Form extends FormBase {
         $this->execInBackground($cmd);
         
         drupal_set_message(
-			$this->t('Import started! Have a look at /admin/reports/dblog to see the progress.')
+			$this->t('Import started! Have a look at <a href="/admin/reports/dblog">/admin/reports/dblog</a> to see the progress.')
 		);
     }
 	
