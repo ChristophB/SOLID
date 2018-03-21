@@ -17,7 +17,7 @@ Supported import formats:
 
 ## Requirements:
 
-* Drupal 8
+* Drupal 8 (tested up to version 8.5.0)
 * PHP >= 5.4
 
 ## How to install:
