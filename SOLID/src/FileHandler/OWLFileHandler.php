@@ -762,8 +762,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		foreach ($this->graph->allOfType('owl:NamedIndividual') as $individual) {
-			if (
-				!$this->isATransitive($individual, self::NODE)
+			if ($individual->isBNode() // blank nodes are ignored
+				|| !$this->isATransitive($individual, self::NODE)
 				|| $individual->isA(self::NODE) // individuals directly under Node are ignored
 			) continue;
 			$individuals[] = $individual;
@@ -889,6 +889,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		$result = [];
 		
 		foreach ($this->getDirectSubClassesOf($class) as $subClass) {
+			if ($subClass->isBNode()) continue;
 			$result[] = $subClass;
 			$result = array_merge($result, $this->findAllSubClassesOf($subClass->getUri()));
 		}
