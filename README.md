@@ -3,7 +3,7 @@
 ## General information:
 
 This is a Drupal 8 Module to import nodes and taxonomies into Drupal, using the available API.
-The module is still in development but is already capable of importing a JSON or OWL file.
+The module is capable of importing a JSON or OWL file.
 
 Idea is to enable users to upload a file containing all information about nodes and their relations.
 The module will then import all contained information with the Drupal 8 API.
@@ -17,7 +17,7 @@ Supported import formats:
 
 ## Requirements:
 
-* Drupal 8 (tested up to version 8.5.0)
+* Drupal 8 (tested up to version 8.5.1)
 * PHP >= 5.4
 
 ## How to install:
