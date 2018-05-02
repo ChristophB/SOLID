@@ -110,7 +110,7 @@ class VocabularyImporter extends AbstractImporter {
 	    if (empty($name)) return;
 	    
 	    if ($this->tagExists($vid, $name)) {
-	    	$this->logNotice("Tag '$name' already exists in vocabulary $vid.");
+	    	// $this->logNotice("Tag '$name' already exists in vocabulary $vid.");
 	    	return;
 	    }
 	    
@@ -132,11 +132,11 @@ class VocabularyImporter extends AbstractImporter {
 	 * @return boolean
 	 */
 	private function clearVocabularyIfExists($vid) {
-		if ($this->vocabularyExists($vid)) {
+		if ($this->vocabularyExists($vid) && $this->overwrite) {
 			$tids = $this->searchEntityIds([
 	        	'entity_type' => 'taxonomy_term',
 	        	'vid'         => $vid
-	    	]);
+			]);
 			
 			if (!empty($tids)) {
 				$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
