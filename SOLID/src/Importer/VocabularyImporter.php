@@ -54,8 +54,7 @@ class VocabularyImporter extends AbstractImporter {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
-		
-		if (!$this->clearVocabularyIfExists($vid)) {
+		if (!$this->vocabularyExists($vid)) {
 			$vocabulary = Vocabulary::create([
 				'name'   => $name,
 				'weight' => 0,
@@ -64,6 +63,8 @@ class VocabularyImporter extends AbstractImporter {
 			$vocabulary->save();
 			$this->entities['taxonomy_vocabulary'][] = $vocabulary->id();
 			$vocabulary = null;
+		} else if ($this->overwrite) {
+			$this->clearVocabulary($vid);
 		}
 	}
 	
@@ -124,32 +125,31 @@ class VocabularyImporter extends AbstractImporter {
 	}
 	
 	/**
-	 * Checks of a vocabulary with given vid already exists
-	 * and deletes all its tags.
+	 * Checks if a vocabulary with given vid already exists
+	 * and deletes all its tags if $this->overwrite is true.
 	 * 
 	 * @param $vid vid of the vocabulary
 	 * 
 	 * @return boolean
 	 */
-	private function clearVocabularyIfExists($vid) {
-		if ($this->vocabularyExists($vid) && $this->overwrite) {
-			$tids = $this->searchEntityIds([
-	        	'entity_type' => 'taxonomy_term',
-	        	'vid'         => $vid
-			]);
-			
-			if (!empty($tids)) {
-				$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-				$terms = $storage_handler->loadMultiple($tids);
-				$storage_handler->delete($terms);
-					
-				$storage_handler = null;
-				$terms = null;
-				$tids = null;
-			}
-	    	return true;
-	    }
-	    return false;
+	private function clearVocabulary($vid) {
+		if (!$this->vocabularyExists($vid) || !$this->overwrite)
+			throw new Exception("clearVocabulary() called for non existing vocabulary or overwrite = false");	
+
+		$tids = $this->searchEntityIds([
+			'entity_type' => 'taxonomy_term',
+			'vid'         => $vid
+		]);
+		
+		if (!empty($tids)) {
+			$storage_handler = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+			$terms = $storage_handler->loadMultiple($tids);
+			$storage_handler->delete($terms);
+				
+			$storage_handler = null;
+			$terms = null;
+			$tids = null;
+		}
 	}
 	
 	/**
