@@ -79,7 +79,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				$this->vocabularyImporter->createTag($vid, $this->getNodeTitle($tag));
 			}
 			
-			$this->logNotice('Adding child parent linkages to terms...');
+			// $this->logNotice('Adding child parent linkages to terms...');
 			foreach ($tags as $tag) {
 				$this->vocabularyImporter->setTagParents(
 					$vid,
