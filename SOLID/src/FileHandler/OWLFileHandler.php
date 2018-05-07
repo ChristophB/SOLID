@@ -459,12 +459,17 @@ class OWLFileHandler extends AbstractFileHandler {
 					continue;
 				}
 			} else {
-				$this->logWarning(
-					"Non-existing entity '{$target->localName()}' "
-					. "referenced by '{$individual->localName()}' "
-					. "and property '{$property->localName()}'."
-				);
-				continue;
+				if (!is_null($this->nodeImporter->searchNodeIdByUuid($target->getUri()))) {
+					$value = $target->getUri();
+					$field['references'] = 'node';
+				} else {
+					$this->logWarning(
+						"Non-existing entity '{$target->localName()}' "
+						. "referenced by '{$individual->localName()}' "
+						. "and property '{$property->localName()}'."
+					);
+					continue;
+				}
 			}
 			
 			$field['value'][] = $value;

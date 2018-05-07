@@ -185,7 +185,7 @@ class NodeImporter extends AbstractImporter {
 	 * 
 	 * @return id
 	 */
-	protected function searchNodeIdByUuid($uuid) {
+	public function searchNodeIdByUuid($uuid) {
 	    if (empty($uuid)) throw new Exception('Error: parameter $uuid missing');
 	    
 	    $result = array_values($this->searchEntityIds([
@@ -310,7 +310,7 @@ class NodeImporter extends AbstractImporter {
 	 * Handles all in $nodeReferences saved references and inserts them.
 	 */
 	public function insertNodeReferences() {
-		foreach ($this->nodeReferences as $pid => $field) {
+		foreach ($this->nodeReferences as $nid => $field) {
 			foreach ($field as $fieldName => $reference) { // assumption: only one entitytype per field
 				foreach ($reference as $entityType => $entityNames) {
 					$entityIds = [];
@@ -327,7 +327,7 @@ class NodeImporter extends AbstractImporter {
 								"Error: not supported entity type '$entityType' in reference found."
 							);
 					}
-					$node = Node::load($pid);
+					$node = Node::load($nid);
 					$node->get($fieldName)->setValue($entityIds);
 					$node->save();
 				}
