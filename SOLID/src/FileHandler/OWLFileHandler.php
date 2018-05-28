@@ -68,7 +68,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($this->getVocabularyClasses() as $class) {
 			$vid = strtolower($class->localName());
 			$this->logNotice("Handling vocabulary: $vid");
-			$this->vocabularyImporter->createVocabulary($vid, $this->getNodeTitle($class));
+			$this->vocabularyImporter->createVocabulary($vid, $this->getTitle($class));
 			
 			$this->logNotice('Collecting terms...');
 			$tags = $this->findAllSubClassesOf($class->getUri());
@@ -76,7 +76,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->createTag($vid, $this->getNodeTitle($tag));
+				$this->vocabularyImporter->createTag($vid, $this->getTitle($tag));
 			}
 			
 			// $this->logNotice('Adding child parent linkages to terms...');
@@ -85,7 +85,7 @@ class OWLFileHandler extends AbstractFileHandler {
 					$vid,
 					[
 						[
-							'name'    => $this->getNodeTitle($tag),
+							'name'    => $this->getTitle($tag),
 							'parents' => $this->getParentTags($tag)
 						]
 					]
@@ -104,7 +104,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		$this->logNotice('Inserting nodes into Drupal DB...');
 		foreach ($individuals as $individual) {
 			$node = [
-				'title'  => $this->getNodeTitle($individual),
+				'title'  => $this->getTitle($individual),
 				'type'   => $this->getBundle($individual),
 				'alias'  => $this->getProperty($individual, self::ALIAS),
 				'fields' => $this->createNodeFields($individual),
@@ -149,7 +149,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				|| $this->hasTransitiveSuperClass($node, $bundleResource->getUri())
 			)
 				return strtolower(preg_replace(
-					'/[^A-Za-z0-9]/', '_', $bundleResource->localName()
+					'/[^A-Za-z0-9]/', '_', $this->getTitle($bundleResource)
 				));
 		}
 		
@@ -370,7 +370,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * 
 	 * @return string title
 	 */
-	private function getNodeTitle($entity) {
+	private function getTitle($entity) {
 		return
 			$this->getProperty($entity, self::TITLE)
 			?: $entity->label()
@@ -425,7 +425,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			// 	$refType = self::DOC_REF;
 			} elseif ($vocabulary != null) {
 				$vid = strtolower($vocabulary->localName());
-				$tag = $this->getNodeTitle($target);
+				$tag = $this->getTitle($target);
 				
 				if (!$this->vocabularyImporter->tagExists($vid, $tag)) {
 					$this->logWarning(
