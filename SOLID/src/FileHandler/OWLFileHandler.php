@@ -223,17 +223,18 @@ class OWLFileHandler extends AbstractFileHandler {
 			$parents = $resource->allResources('rdf:type');
 		}
 		
+		$parents = array_filter(
+			$parents,
+			function($x) {
+				return $this->hasTransitiveSuperClass($x, self::NODE)
+					&& !$this->hasDirectSuperClass($x, self::NODE);
+			}
+		);
+
 		return [
 			'field_name' => 'field_parent',
 			'value'      => array_map(
-				function($x) { return $x->getUri(); },
-				array_filter(
-					$parents,
-					function($x) {
-						return $this->hasTransitiveSuperClass($x, self::NODE)
-							&& !$this->hasDirectSuperClass($x, self::NODE);
-					}
-				)
+				function($x) { return $x->getUri(); }, $parents
 			),
 			'references' => 'node'
 		];
@@ -242,11 +243,12 @@ class OWLFileHandler extends AbstractFileHandler {
 	private function createFieldChild($class) {
 		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
 		
+		$children = array_merge($this->getDirectSubClassesOf($class), $this->getInstancesOf($class));
+
 		return [
 			'field_name' => 'field_child',
 			'value'      => array_map(
-				function($x) { return $x->getUri(); },
-				array_merge($this->getDirectSubClassesOf($class), $this->getInstancesOf($class))
+				function($x) { return $x->getUri(); }, $children
 			),
 			'references' => 'node'
 		];
