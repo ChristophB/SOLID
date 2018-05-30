@@ -231,6 +231,8 @@ class OWLFileHandler extends AbstractFileHandler {
 			}
 		);
 
+		if (empty($parents)) return null;
+
 		return [
 			'field_name' => 'field_parent',
 			'value'      => array_map(
@@ -244,6 +246,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($class)) throw new Exception('Error: parameter $class missing.');
 		
 		$children = array_merge($this->getDirectSubClassesOf($class), $this->getInstancesOf($class));
+
+		if (empty($children)) return null;
 
 		return [
 			'field_name' => 'field_child',
