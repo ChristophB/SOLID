@@ -97,6 +97,7 @@ fclose($STDOUT);
 
 
 function doLog($msg) {
+	if (class_exists('Drupal'))
 	\Drupal::logger('SOLID')->notice($msg);
 	echo date('H:i:s', time()). "> $msg", PHP_EOL;
 }

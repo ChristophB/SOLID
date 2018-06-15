@@ -8,6 +8,7 @@
 namespace Drupal\SOLID\FileHandler;
 
 use Drupal\file\Entity\File;
+use Drupal\field\Entity\FieldStorageConfig;
 use \Exception;
 
 
@@ -195,7 +196,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (
 			$this->isATransitive($individual, self::VOCABULARY)
 			|| $this->hasTransitiveSuperClass($individual, self::VOCABULARY)
-		) {
+		) {	
 			$fields[] = [
 				'field_name' => 'field_tags',
 				'value'      => $this->createFieldTags($individual),
@@ -377,10 +378,11 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return string title
 	 */
 	private function getTitle($entity) {
-		return
-			$this->getProperty($entity, self::TITLE)
+		$title
+			= $this->getProperty($entity, self::TITLE)
 			?: $entity->label()
 			?: $entity->localName();
+		return isset($title) ? $title. '' : null; 
 	}
 	
 	/**
@@ -409,27 +411,22 @@ class OWLFileHandler extends AbstractFileHandler {
 			$vocabulary = $this->getVocabularyForTag($target);
 			
 			if (
-				$this->isATransitive($target, self::NODE)
-				|| $this->hasTransitiveSuperClass($target, self::NODE)
+				($this->isATransitive($target, self::NODE)
+				|| $this->hasTransitiveSuperClass($target, self::NODE))
+				&& $this->getFieldTargetType($property) == 'node'
 			) {
 				$value = $target->getUri();
 				$field['references'] = 'node';
-			//} elseif ($this->isATransitive($target, self::IMG)) { // @TODO
-			// 	$value = [
-			// 		'alt'   => $targetProperties[self::ALT],
-			// 		'title' => $targetProperties[self::TITLE],
-			// 		'uri'   => $targetProperties[self::URI]
-			// 	];
-			// 	$field['entity'] = 'file';
 			} elseif (
 				$this->isATransitive($target, self::FILE)
 				|| $this->hasTransitiveSuperClass($target, self::FILE)
 			) {
 				$value = [ 'uri' => $this->getFilePath($target) ];
 				$field['references'] = 'file';
-			// } elseif ($this->isATransitive($target, self::DOC)) { // @TODO
-			// 	$refType = self::DOC_REF;
-			} elseif ($vocabulary != null) {
+			} elseif (
+				$vocabulary != null
+				&& $this->getFieldTargetType($property) == 'taxonomy_term'
+			) {
 				$vid = strtolower($vocabulary->localName());
 				$tag = $this->getTitle($target);
 				
@@ -482,6 +479,11 @@ class OWLFileHandler extends AbstractFileHandler {
 		}
 		
 		return $field;
+	}
+
+	private function getFieldTargetType($fieldName) {
+		$field = FieldStorageConfig::loadByName('node', $fieldName->localName());
+		return $field->getSettings()['target_type'];
 	}
 	
 	/**
