@@ -10,7 +10,6 @@ namespace Drupal\SOLID\Importer;
 use \Exception;
 
 use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
 use Drupal\core\StreamWrapper\StreamWrapperManager;
 
 /**

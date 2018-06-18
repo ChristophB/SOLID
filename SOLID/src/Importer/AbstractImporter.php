@@ -7,6 +7,7 @@
 
 namespace Drupal\SOLID\Importer;
 
+use Drupal\file\Entity\File;
 use \Exception;
 
 /**
