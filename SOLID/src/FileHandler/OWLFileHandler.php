@@ -232,25 +232,6 @@ class OWLFileHandler extends AbstractFileHandler {
 	 private function createTagFields($tag) {
 		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
 		
-		$properties = $this->getPropertiesAsArray($tag);
-		
-		$fields = [
-			[
-				'field_name' => 'body', 
-				'value'      => [ 
-					'value'   => $this->removeRdfsType(
-						array_key_exists(self::CONTENT, $properties) 
-						? $properties[self::CONTENT] : null
-					),
-					'summary' => $this->removeRdfsType(
-						array_key_exists(self::SUMMARY, $properties) 
-						? $properties[self::SUMMARY] : null
-					),
-					'format'  => 'full_html'
-				]
-			]
-		];
-		
 		foreach ($this->getProperties() as $property) {
 			if (!$tag->hasProperty($property))
 				continue;
