@@ -231,7 +231,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 */
 	 private function createTagFields($tag) {
 		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
-		$Fields = [];
+		$fields = [];
 		foreach ($this->getProperties() as $property) {
 			if (!$tag->hasProperty($property))
 				continue;
