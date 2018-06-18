@@ -36,6 +36,7 @@ class OWLLargeFileHandler extends AbstractFileHandler {
 	private $onlyLeafClassesAsNodes = false;
 	
 	public function __construct(array $params) {
+		throw new Exception('deprecated use of OWLLargeFileHandler, use OWLFileHandler instead');
 		parent::__construct($params);
 		
 		if ($params['classesAsNodes']) $this->classesAsNodes = true;

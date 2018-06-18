@@ -18,39 +18,40 @@ use Drupal\taxonomy\Entity\Term;
  * @author Christoph Beger
  */
 class VocabularyImporter extends AbstractImporter {
-    
-    function __construct($overwrite = false, $userId) {
-    	parent::__construct($overwrite, $userId);
-    	
-        $this->entities['taxonomy_vocabulary'] = [];
-        $this->entities['taxonomy_term'] = [];
-    }
-    
-    public function import($data) {
-        if (empty($data)) return;
-        
-        foreach ($data as $vocabulary) {
-            $this->createVocabulary($vocabulary['vid'], $vocabulary['name']);
-            $this->createTags($vocabulary['vid'], $vocabulary['tags']);
-		    $this->setTagParents($vocabulary['vid'], $vocabulary['tags']);
-        }
-    }
-    
-    public function countCreatedVocabularies() {
-        return sizeof($this->entities['taxonomy_vocabulary']);
-    }
-    
-    public function countCreatedTags() {
-        return sizeof($this->entities['taxonomy_term']);
-    }
-    
-    /**
-     * Creates a vocabulary.
-     * 
-     * @param $vid vid of the vocabulary
-     * @param $name name of the vocabulary
-     */
-    public function createVocabulary($vid, $name) {
+	
+	function __construct($overwrite = false, $userId) {
+		parent::__construct($overwrite, $userId);
+		
+		$this->entities['taxonomy_vocabulary'] = [];
+		$this->entities['taxonomy_term'] = [];
+	}
+	
+	public function import($data) {
+		if (empty($data)) return;
+		
+		foreach ($data as $vocabulary) {
+			$this->createVocabulary($vocabulary['vid'], $vocabulary['name']);
+			$this->createTags($vocabulary['vid'], $vocabulary['tags']);
+			$this->setTagParents($vocabulary['vid'], $vocabulary['tags']);
+		}
+		$this->insertEntityReferences();
+	}
+	
+	public function countCreatedVocabularies() {
+		return sizeof($this->entities['taxonomy_vocabulary']);
+	}
+	
+	public function countCreatedTags() {
+		return sizeof($this->entities['taxonomy_term']);
+	}
+	
+	/**
+	 * Creates a vocabulary.
+	 * 
+	 * @param $vid vid of the vocabulary
+	 * @param $name name of the vocabulary
+	 */
+	public function createVocabulary($vid, $name) {
 		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
 		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
 		
@@ -76,10 +77,10 @@ class VocabularyImporter extends AbstractImporter {
 	 * @param $tags array of tags
 	 */
 	public function createTags($vid, $tags) {
-	    if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
-	    if (empty($tags)) return;
-	    
-	    foreach ($tags as $tag) {
+		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
+		if (empty($tags)) return;
+		
+		foreach ($tags as $tag) {
 			$term = $this->createTag($vid, $tag['name']);
 		}
 	}
@@ -103,25 +104,125 @@ class VocabularyImporter extends AbstractImporter {
 	 * Creates a single Drupal tag for given vocabulary.
 	 * Does not add parents to the tags, because they may not exit yet.
 	 * 
-	 * @param $vid vid of the vocabulary
-	 * @param $name name of the tag
+	 * @param $params the parameters to use for creation (e.g., 'vid' and 'name')
 	 */
-	public function createTag($vid, $name) {
-		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
-	    if (empty($name)) return;
-	    
-	    if ($this->tagExists($vid, $name)) {
-	    	// $this->logNotice("Tag '$name' already exists in vocabulary $vid.");
-	    	return;
-	    }
-	    
-	    $term = Term::create([
-			'name' => $name,
-			'vid'  => $vid,
-		]);
-		$term->save();
+	public function createTag($params) {
+		if (is_null($params['vid'])) throw new Exception('Error: parameter $vid missing.');
+		if (empty($params['name'])) return;
+		
+		if ($this->tagExists($params['vid'], $params['name'])) {
+			$term = Term::load($this->searchTagIdByName($params['vid'], $params['name']));
+		} else {
+			$term = Term::create([
+				'name' => $params['name'],
+				'vid'  => $params['vid'],
+			]);
+			$term->save();
+		}
+
+		if (array_key_exists('fields', $params))
+			$this->insertFields($term, $params['fields']);
 			
 		$this->entities['taxonomy_term'][] = $term->id();
+	}
+
+	/**
+	 * Handles all in $entityReferences saved references and inserts them.
+	 */
+	 public function insertEntityReferences() {
+		foreach ($this->entityReferences as $tid => $field) {
+			foreach ($field as $fieldName => $reference) { // assumption: only one entitytype per field
+				foreach ($reference as $entityType => $entityNames) {
+					$entityIds = [];
+					
+					switch ($entityType) {
+						case 'taxonomy_term': 
+							$entityIds = $this->searchTagIdsByNames($entityNames);
+							break;
+						case 'node':
+							$entityIds = $this->mapNodeUuidsToNids($entityNames);
+							break;
+						default:
+							throw new Exception(
+								"Error: not supported entity type '$entityType' in reference found."
+							);
+					}
+					$tag = Term::load($tid);
+					$tag->get($fieldName)->setValue($entityIds);
+					$tag->save();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Inserts fields into a tag
+	 * 
+	 * @param $tag drupal tag
+	 * @param $fields array of tag fields
+	 */
+	 private function insertFields($tag, $fields) {
+		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
+		if (empty($fields)) return;
+		
+		foreach ($fields as $field) {
+			if ($field == null) continue;
+			$fieldName = substr($field['field_name'], 0, self::MAX_FIELDNAME_LENGTH);
+			
+			if (!$this->entityHasField($tag, $fieldName)) {
+				$this->logWarning(
+					"field '$fieldName' does not exist in '{$tag->bundle()}'"
+				);
+				continue;
+			}
+			
+			if (array_key_exists('references', $field)
+				&& ($field['references'] == 'taxonomy_term' || $field['references'] == 'node')
+			) {
+				$this->entityReferences[$tag->id()][$fieldName][$field['references']]
+					= $field['value'];
+			} else {
+				if (array_key_exists('references', $field) && $field['references'] == 'file') {
+					if (array_key_exists('uri', $field['value'])) {
+						$file = $this->createFile($field['value']['uri']);
+						$field['value']['target_id'] = $file->id();
+						unset($file);
+					} else {
+						for ($i = 0; $i < sizeof($field['value']); $i++) {
+							$file = $this->createFile($field['value'][$i]['uri']);
+							$field['value'][$i]['target_id'] = $file->id();
+							unset($file);
+						}
+					}
+				}
+				if (array_key_exists('value', $field) && !is_null($field['value'])
+					&& (
+						!is_array($field['value'])
+						|| (array_key_exists('value', $field['value']) && !is_null($field['value']['value']))
+					)
+				) {
+					$tag->get($fieldName)->setValue($field['value']);
+				}
+				if (!is_null($field['value'])) {
+					if (is_array($field['value'])) {
+						if (!empty($field['value'])
+							&& (!array_key_exists('value', $field['value'])
+								|| !is_null($field['value']['value'])
+							)
+						) {
+							$tag->get($fieldName)->setValue($field['value']);
+						}
+					} else {
+						$tag->get($fieldName)->setValue($field['value']);
+					}
+				}
+
+			}
+			unset($field);
+		}
+		
+		$tag->save();
+		$tag = null;
 	}
 	
 	/**
@@ -188,12 +289,12 @@ class VocabularyImporter extends AbstractImporter {
 			$tagEntity = Term::load($this->searchTagIdByName($vid, $tag['name']));
 			
 			$tagEntity->parent->setValue($this->searchTagIdsByNames(
-			    array_map(
-			        function($parent) use($vid) { 
-			        	return [ 'vid' => $vid, 'name' => $parent ];
-			        }, 
-			        $tag['parents']
-			    )
+				array_map(
+					function($parent) use($vid) { 
+						return [ 'vid' => $vid, 'name' => $parent ];
+					}, 
+					$tag['parents']
+				)
 			));
 			$tagEntity->save();
 		}

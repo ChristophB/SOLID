@@ -77,10 +77,17 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$this->logNotice('Inserting terms into Drupal DB...');
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->createTag($vid, $this->getTitle($tag));
+				$tagParams = [
+					'vid'    => $vid,
+					'name'   => $this->getTitle($tag),
+					'fields' => $this->createTagFields($tag)
+				];
+				$this->vocabularyImporter->createTag($tagParams);
 			}
+
+			$this->logNotice('Adding entity references...');
+			$this->vocabularyImporter->insertEntityReferences();
 			
-			// $this->logNotice('Adding child parent linkages to terms...');
 			foreach ($tags as $tag) {
 				$this->vocabularyImporter->setTagParents(
 					$vid,
@@ -117,8 +124,8 @@ class OWLFileHandler extends AbstractFileHandler {
 		
 		unset($individuals);
 		
-		$this->logNotice('Adding node references...');
-		$this->nodeImporter->insertNodeReferences();
+		$this->logNotice('Adding entity references...');
+		$this->nodeImporter->insertEntityReferences();
 	}
 	
 	/**
@@ -208,7 +215,47 @@ class OWLFileHandler extends AbstractFileHandler {
 			if (!$individual->hasProperty($property))
 				continue;
 
-			if ($field = $this->createNodeField($individual, $property))
+			if ($field = $this->createEntityField('node', $individual, $property))
+				$fields[] = $field;
+		}
+		
+		return $fields;
+	}
+
+	/**
+	 * Returns an array of all drupal-fields for a given tag.
+	 * 
+	 * @param $tag tag resource
+	 * 
+	 * @return array of tag fields
+	 */
+	 private function createTagFields($tag) {
+		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
+		
+		$properties = $this->getPropertiesAsArray($tag);
+		
+		$fields = [
+			[
+				'field_name' => 'body', 
+				'value'      => [ 
+					'value'   => $this->removeRdfsType(
+						array_key_exists(self::CONTENT, $properties) 
+						? $properties[self::CONTENT] : null
+					),
+					'summary' => $this->removeRdfsType(
+						array_key_exists(self::SUMMARY, $properties) 
+						? $properties[self::SUMMARY] : null
+					),
+					'format'  => 'full_html'
+				]
+			]
+		];
+		
+		foreach ($this->getProperties() as $property) {
+			if (!$tag->hasProperty($property))
+				continue;
+
+			if ($field = $this->createEntityField('taxonomy_term', $tag, $property))
 				$fields[] = $field;
 		}
 		
@@ -319,12 +366,13 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array for a single field of a given node/individual.
 	 * 
+	 * @param $contentType content_type of the individual
 	 * @param $individual individual as resource
 	 * @param $property IRI representation of the property
 	 * 
 	 * @return array with all properties of the field
 	 */
-	private function createNodeField($individual, $property) {
+	private function createEntityField($contentType, $individual, $property) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
@@ -338,7 +386,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				'field_name' => $property->localName()
 			];
 		} elseif ($individual->allResources($property)) { // includes ObjectProperties
-			$field = $this->getResourceValuesForNodeField($individual, $property);
+			$field = $this->getResourceValuesForEntityField($contentType, $individual, $property);
 		}
 		
 		return $field ?: null;
@@ -388,12 +436,13 @@ class OWLFileHandler extends AbstractFileHandler {
 	/**
 	 * Returns an array for a field with values for each referenced resource.
 	 * 
+	 * @param $contentType content_type of the individual
 	 * @param $individual individual resource
 	 * @param $property the property for which the field should get constructed.
 	 * 
 	 * @return array containing fields: 'value' (array of values), 'field_name'
 	 */
-	private function getResourceValuesForNodeField($individual, $property) {
+	private function getResourceValuesForEntityField($contentType, $individual, $property) {
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
@@ -413,7 +462,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			if (
 				($this->isATransitive($target, self::NODE)
 				|| $this->hasTransitiveSuperClass($target, self::NODE))
-				&& $this->getFieldTargetType($property) == 'node'
+				&& $this->getFieldTargetType($contentType, $property) == 'node'
 			) {
 				$value = $target->getUri();
 				$field['references'] = 'node';
@@ -425,7 +474,7 @@ class OWLFileHandler extends AbstractFileHandler {
 				$field['references'] = 'file';
 			} elseif (
 				$vocabulary != null
-				&& $this->getFieldTargetType($property) == 'taxonomy_term'
+				&& $this->getFieldTargetType($contentType, $property) == 'taxonomy_term'
 			) {
 				$vid = strtolower($vocabulary->localName());
 				$tag = $this->getTitle($target);
@@ -481,8 +530,9 @@ class OWLFileHandler extends AbstractFileHandler {
 		return $field;
 	}
 
-	private function getFieldTargetType($fieldName) {
-		$field = FieldStorageConfig::loadByName('node', $fieldName->localName());
+	private function getFieldTargetType($contentType, $fieldName) {
+		$field = FieldStorageConfig::loadByName($contentType, $fieldName->localName());
+		if (!isset($field)) return null;
 		return $field->getSettings()['target_type'];
 	}
 	
