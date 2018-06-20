@@ -497,7 +497,7 @@ class OWLFileHandler extends AbstractFileHandler {
 					$field['references'] = 'node';
 				} else {
 					$this->logWarning(
-						"Non-existing entity '{$target->localName()}' "
+						"Non-existing '". $contentType. "' '{$target->localName()}' "
 						. "referenced by '{$individual->localName()}' "
 						. "and property '{$property->localName()}'."
 					);
