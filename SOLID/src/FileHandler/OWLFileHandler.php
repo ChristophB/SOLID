@@ -491,6 +491,13 @@ class OWLFileHandler extends AbstractFileHandler {
 					);
 					continue;
 				}
+			} else {
+				$this->logWarning(
+					"Could not handle reference to Entity '{$target->localName()}' "
+					. "by '{$individual->localName()}' "
+					. "and field ('{$property->localName()}')"
+				);
+				continue;
 			}
 			
 			$field['value'][] = $value;
