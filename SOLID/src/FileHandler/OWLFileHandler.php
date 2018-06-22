@@ -90,12 +90,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			$this->vocabularyImporter->insertEntityReferences();
 			
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->setTagParents([
-						'vid'    => $vid,
-						'name'   => $this->getTitle($tag),
-						'fields' => $this->createTagFields($tag),
-						'uuid'   => $tag->getUri()
-				]);
+				$this->vocabularyImporter->setTagParents($tag->getUri(), $this->getParentTags($tag));
 			}
 			
 			unset($tags);
@@ -1006,7 +1001,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		if (is_null($tag)) throw new Exception('Error: parameter $tag missing');
 		
 		return array_map(
-			function($x) { return $x->label() ?: $x->localName(); },
+			function($x) { return $x->getUri(); },
 			array_filter(
 				$this->getDirectSuperClassesOf($tag),
 				function($x) {

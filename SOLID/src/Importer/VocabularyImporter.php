@@ -27,6 +27,7 @@ class VocabularyImporter extends AbstractImporter {
 	}
 	
 	public function import($data) {
+		throw new Exception('deprecated use of import()');
 		if (empty($data)) return;
 		
 		foreach ($data as $vocabulary) {
@@ -269,19 +270,16 @@ class VocabularyImporter extends AbstractImporter {
 	/**
 	 * Adds parents to all created tags.
 	 * 
-	 * @param $vid vid of the vocabulary to process
-	 * @param $tags all tags which were created previously
+	 * @param $uuid uuid
+	 * @param $parents all parent tags of the tag specified by uuid
 	 */
-	public function setTagParents($tags) {
-		if (empty($tags)) return;
-		
-		foreach ($tags as $tag) {
-			if (empty($tag['parents'])) continue;
+	public function setTagParents($uuid, $parents) {
+		if (is_null($uuid)) throw new Exception('Error: parameter $uuid missing');
+		if (empty($parents)) return;
 			
-			$tagEntity = Term::load($this->searchEntityIdByUuid('taxonomy_term', $tag['uuid']));
-			$tagEntity->parent->setValue($this->searchEntityIdsByUuids($tag['parents']));
-			$tagEntity->save();
-		}
+		$tagEntity = Term::load($this->searchEntityIdByUuid('taxonomy_term', $uuid));
+		$tagEntity->parent->setValue($this->searchEntityIdsByUuids('taxonomy_term', $parents));
+		$tagEntity->save();
 	}
 	
 }
