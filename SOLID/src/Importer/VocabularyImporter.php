@@ -109,7 +109,7 @@ class VocabularyImporter extends AbstractImporter {
 				]);
 				$term->save();
 			} catch (Exception $e) {
-				doLog(t($e->getMessage()). " In {$e->getFile()} (line:{$e->getLine()}) ");
+				$this->logWarning(t($e->getMessage()). " In {$e->getFile()} (line:{$e->getLine()}) ");
 			}
 		}
 
