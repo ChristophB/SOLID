@@ -279,7 +279,7 @@ class VocabularyImporter extends AbstractImporter {
 			if (empty($tag['parents'])) continue;
 			
 			$tagEntity = Term::load($this->searchEntityIdByUuid('taxonomy_term', $tag['uuid']));
-			$tagEntity->parent->setValue($this->searchTagIdsByUuids($tag['parents']));
+			$tagEntity->parent->setValue($this->searchEntityIdsByUuids($tag['parents']));
 			$tagEntity->save();
 		}
 	}
