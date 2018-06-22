@@ -69,7 +69,7 @@ class NodeImporter extends AbstractImporter {
 		}
 		
 		$node;
-		if (!is_null($id = $this->searchNodeIdByUuid($uuid))) {
+		if (!is_null($id = $this->searchEntityIdByUuid('node', $uuid))) {
 			$node = Node::load($id);
 			$node->setNewRevision(true);
 			$node->setRevisionLogMessage('Incrementally updated at '. date('Y-m-d h:i', time()));
@@ -216,10 +216,10 @@ class NodeImporter extends AbstractImporter {
 					
 					switch ($entityType) {
 						case 'taxonomy_term': 
-							$entityIds = $this->searchTagIdsByNames($entityNames);
+							$entityIds = $this->searchEntityIdsByUuids('taxonomy_term', $entityNames);
 							break;
 						case 'node':
-							$entityIds = $this->mapNodeUuidsToNids($entityNames);
+							$entityIds = $this->searchEntityIdsByUuids('node', $entityNames);
 							break;
 						default:
 							throw new Exception(

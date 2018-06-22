@@ -18,13 +18,13 @@ use \Exception;
 abstract class AbstractImporter {
 	const MAX_FIELDNAME_LENGTH = 32;
 
-    /**
-     * @var array $entities array of created entities, used to rollback.
-     * @var boolean $overwrite importer overwrites existing nodes/vocabularies if true.
-     */
-    protected $entities  = [];
-    protected $overwrite = false;
-    protected $warnings  = [];
+	/**
+	 * @var array $entities array of created entities, used to rollback.
+	 * @var boolean $overwrite importer overwrites existing nodes/vocabularies if true.
+	 */
+	protected $entities  = [];
+	protected $overwrite = false;
+	protected $warnings  = [];
 	protected $userId;
 	
 	/**
@@ -34,26 +34,26 @@ abstract class AbstractImporter {
 	 *   [ id => [ field_name => [ refEntityType => [ EntityTitle, ... ] ], ... ], ... ]
 	 */
 	protected $entityReferences = [];
-    
-    public function __construct($overwrite = false, $userId) {
-    	$this->userId = $userId;
-    	if ($overwrite) $this->overwrite = true;
-    }
-    
-    /**
-     * Imports given data php object.
-     * 
-     * @param $data php object with the data to be imported
-     * @param $overwrite specifies overwrite, default: false
-     */
-    abstract public function import($data);
-    
-    /**
-     * Deletes all created entities.
-     */
-    public function rollback() {
-         foreach ($this->entities as $type => $entities) {
-         	$entity_manager = \Drupal::entityManager();
+	
+	public function __construct($overwrite = false, $userId) {
+		$this->userId = $userId;
+		if ($overwrite) $this->overwrite = true;
+	}
+	
+	/**
+	 * Imports given data php object.
+	 * 
+	 * @param $data php object with the data to be imported
+	 * @param $overwrite specifies overwrite, default: false
+	 */
+	abstract public function import($data);
+	
+	/**
+	 * Deletes all created entities.
+	 */
+	public function rollback() {
+		 foreach ($this->entities as $type => $entities) {
+		 	$entity_manager = \Drupal::entityManager();
 			foreach ($entities as $entity) {
 				switch ($type) {
 					case 'path':
@@ -69,18 +69,18 @@ abstract class AbstractImporter {
 				}
 			}
 		}
-     }
-    
-    /**
-     * Returns an array of IDs for a given entity_type and additional restrictions.
-     * 
-     * @param $params array of named parameters
-     *   "entity_type" is required.
-     *   All additional fields are used to query the Drupal DB.
-     * 
-     * @return array of IDs
-     */
-    protected function searchEntityIds($params) {
+	 }
+	
+	/**
+	 * Returns an array of IDs for a given entity_type and additional restrictions.
+	 * 
+	 * @param $params array of named parameters
+	 *   "entity_type" is required.
+	 *   All additional fields are used to query the Drupal DB.
+	 * 
+	 * @return array of IDs
+	 */
+	protected function searchEntityIds($params) {
 		if (is_null($params['entity_type'])) throw new Exception('Error: named parameter "entity_type" missing');
 		$query
 			= \Drupal::entityQuery($params['entity_type'])
@@ -158,77 +158,44 @@ abstract class AbstractImporter {
 
 		return $result ? array_values($result)[0] : null;
 	}
-	
-	/**
-	 * Returns the tid for a vid and tag name.
-	 * 
-	 * @param $vid vid of the vocabulary to search in
-	 * @param $name name of the tag
-	 * 
-	 * @return integer tid
-	 */
-	protected function searchTagIdByName($vid, $name) {
-	    if (is_null($vid)) throw new Exception('Error: parameter $vid missing');
-	    if (is_null($name)) throw new Exception('Error: parameter $name missing');
-	    
-	    $result = $this->searchEntityIds([
-	        'entity_type' => 'taxonomy_term',
-	        'vid'         => $vid,
-	        'name'        => $name
-	    ]);
-	    
-	    return $result ? array_values($result)[0] : null;
-	}
 
 	/**
-	 * Queries the drupal DB with node uuid and returns corresponding id.
+	 * Queries the drupal DB with entity uuid and returns corresponding id.
 	 * 
+	 * @param $entityType entity_type
 	 * @param $uuid uuid
 	 * 
 	 * @return id
 	 */
-	 public function searchNodeIdByUuid($uuid) {
-	    if (empty($uuid)) throw new Exception('Error: parameter $uuid missing');
-	    
-	    $result = array_values($this->searchEntityIds([
-	        'entity_type' => 'node',
-	        'uuid'        => $uuid,
-	    ]));
-	    
-	    return empty($result) ? null : $result[0];
-	}
-
-	/**
-	 * Returns an array of nids for a given array of recently created node uuids.
-	 * 
-	 * @param $uuids array of node uuids
-	 * 
-	 * @return array of nids
-	 */
-	 protected function mapNodeUuidsToNids($uuids) {
-		if (empty($uuids)) return [];
+	 public function searchEntityIdByUuid($entityType, $uuid) {
+		if (is_null($entityType)) throw new Exception('Error: parameter $entityType missing'); 
+		if (is_null($uuid)) throw new Exception('Error: parameter $uuid missing');
 		
-		return array_map(
-			function($uuid) { return $this->searchNodeIdByUuid($uuid); }, 
-			$uuids
-		);
+		$result = array_values($this->searchEntityIds([
+			'entity_type' => $entityType,
+			'uuid'        => $uuid,
+		]));
+		
+		return empty($result) ? null : $result[0];
 	}
 	
 	/**
-	 * Returns an array of tids for a set of tags.
-	 * Each tag is represented by an array [vid, name].
+	 * Returns an array of tids for a set of entities.
+	 * Each entity is represented by its UUID.
 	 * 
-	 * @param $tag array of tag representations
+	 * @param $entityType entity_type
+	 * @param $uuids array of uuids representations
 	 * 
-	 * @return array of tids
+	 * @return array of entityIds
 	 */
-	protected function searchTagIdsByNames($tags) {
-		if (empty($tags)) return [];
+	protected function searchEntityIdsByUuids($entityType, $uuids) {
+		if (is_null($entityType)) throw new Exception('Error: parameter $entityType missing');
+		if (empty($uuids)) return [];
 		
 		return array_map(
-			function($tag) {
-				return $this->searchTagIdByName($tag['vid'], $tag['name']);
-			}, $tags
+			function($uuid) use($entityType) {
+				return $this->searchEntityIdByUuid($entityType, $uuid);
+			}, $uuids
 		);
 	}
 	

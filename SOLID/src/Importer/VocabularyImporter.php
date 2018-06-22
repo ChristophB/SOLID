@@ -31,8 +31,8 @@ class VocabularyImporter extends AbstractImporter {
 		
 		foreach ($data as $vocabulary) {
 			$this->createVocabulary($vocabulary['vid'], $vocabulary['name']);
-			$this->createTags($vocabulary['vid'], $vocabulary['tags']);
-			$this->setTagParents($vocabulary['vid'], $vocabulary['tags']);
+			$this->createTags($vocabulary['tags']);
+			$this->setTagParents($vocabulary['tags']);
 		}
 		$this->insertEntityReferences();
 	}
@@ -81,23 +81,9 @@ class VocabularyImporter extends AbstractImporter {
 		if (empty($tags)) return;
 		
 		foreach ($tags as $tag) {
-			$term = $this->createTag($vid, $tag['name']);
+			$tag['vid'] = $vid;
+			$term = $this->createTag($tag);
 		}
-	}
-	
-	/**
-	 * Checks if a tag with given name already exists in given vocabulary.
-	 * 
-	 * @param $vid vocabulary
-	 * @param $name name of the tag
-	 * 
-	 * @return {boolean}
-	 */
-	public function tagExists($vid, $name) {
-		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
-		if (is_null($name)) throw new Exception('Error: parameter $name missing.');
-		
-		return null !== $this->searchTagIdByName($vid, $name);
 	}
 	
 	/**
@@ -108,16 +94,23 @@ class VocabularyImporter extends AbstractImporter {
 	 */
 	public function createTag($params) {
 		if (is_null($params['vid'])) throw new Exception('Error: parameter $vid missing.');
-		if (empty($params['name'])) return;
+		if (empty($params['name']) || empty($params['uuid'])) return;
 		
-		if ($this->tagExists($params['vid'], $params['name'])) {
-			$term = Term::load($this->searchTagIdByName($params['vid'], $params['name']));
-		} else {
-			$term = Term::create([
-				'name' => $params['name'],
-				'vid'  => $params['vid'],
-			]);
+		if (!is_null($tid = $this->searchEntityIdByUuid('taxonomy_term', $params['uuid']))) {
+			$term = Term::load($tid);
+			$term->setName($params['name']);
 			$term->save();
+		} else {
+			try {
+				$term = Term::create([
+					'name' => $params['name'],
+					'vid'  => $params['vid'],
+					'uuid' => $params['uuid']
+				]);
+				$term->save();
+			} catch (Exception $e) {
+				doLog(t($e->getMessage()). " In {$e->getFile()} (line:{$e->getLine()}) ");
+			}
 		}
 
 		if (array_key_exists('fields', $params))
@@ -137,10 +130,10 @@ class VocabularyImporter extends AbstractImporter {
 					
 					switch ($entityType) {
 						case 'taxonomy_term': 
-							$entityIds = $this->searchTagIdsByNames($entityNames);
+							$entityIds = $this->searchEntityIdsByUuids('taxonomy_term', $entityNames);
 							break;
 						case 'node':
-							$entityIds = $this->mapNodeUuidsToNids($entityNames);
+							$entityIds = $this->searchEntityIdsByUuids('node', $entityNames);
 							break;
 						default:
 							throw new Exception(
@@ -279,23 +272,14 @@ class VocabularyImporter extends AbstractImporter {
 	 * @param $vid vid of the vocabulary to process
 	 * @param $tags all tags which were created previously
 	 */
-	public function setTagParents($vid, $tags) {
-		if (is_null($vid)) throw new Exception('Error: parameter $vid missing.');
+	public function setTagParents($tags) {
 		if (empty($tags)) return;
 		
 		foreach ($tags as $tag) {
 			if (empty($tag['parents'])) continue;
 			
-			$tagEntity = Term::load($this->searchTagIdByName($vid, $tag['name']));
-			
-			$tagEntity->parent->setValue($this->searchTagIdsByNames(
-				array_map(
-					function($parent) use($vid) { 
-						return [ 'vid' => $vid, 'name' => $parent ];
-					}, 
-					$tag['parents']
-				)
-			));
+			$tagEntity = Term::load($this->searchEntityIdByUuid('taxonomy_term', $tag['uuid']));
+			$tagEntity->parent->setValue($this->searchTagIdsByUuids($tag['parents']));
 			$tagEntity->save();
 		}
 	}

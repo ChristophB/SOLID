@@ -80,7 +80,8 @@ class OWLFileHandler extends AbstractFileHandler {
 				$tagParams = [
 					'vid'    => $vid,
 					'name'   => $this->getTitle($tag),
-					'fields' => $this->createTagFields($tag)
+					'fields' => $this->createTagFields($tag),
+					'uuid'   => $tag->getUri()
 				];
 				$this->vocabularyImporter->createTag($tagParams);
 			}
@@ -89,15 +90,12 @@ class OWLFileHandler extends AbstractFileHandler {
 			$this->vocabularyImporter->insertEntityReferences();
 			
 			foreach ($tags as $tag) {
-				$this->vocabularyImporter->setTagParents(
-					$vid,
-					[
-						[
-							'name'    => $this->getTitle($tag),
-							'parents' => $this->getParentTags($tag)
-						]
-					]
-				);
+				$this->vocabularyImporter->setTagParents([
+						'vid'    => $vid,
+						'name'   => $this->getTitle($tag),
+						'fields' => $this->createTagFields($tag),
+						'uuid'   => $tag->getUri()
+				]);
 			}
 			
 			unset($tags);
@@ -316,10 +314,7 @@ class OWLFileHandler extends AbstractFileHandler {
 			
 			$vocabulary = $this->getVocabularyForTag($tag);
 			
-			$fieldTags[] = [
-				'vid'  => $vocabulary->localName(),
-				'name' => $tag->label() ?: $tag->localName()
-			];
+			$fieldTags[] = $tag->getUri();
 		}
 		
 		return $fieldTags ?: [];
@@ -424,6 +419,7 @@ class OWLFileHandler extends AbstractFileHandler {
 	 * @return array containing fields: 'value' (array of values), 'field_name'
 	 */
 	private function getResourceValuesForEntityField($contentType, $individual, $property) {
+		if (is_null($contentType)) throw new Exception('Error: parameter $contentType missing');
 		if (is_null($individual)) throw new Exception('Error: parameter $individual missing');
 		if (is_null($property)) throw new Exception('Error: parameter $property missing');
 		
@@ -438,13 +434,19 @@ class OWLFileHandler extends AbstractFileHandler {
 		foreach ($resources as $target) {
 			$targetProperties = $this->getPropertiesAsArray($target);
 			$value;
-			$vocabulary = $this->getVocabularyForTag($target);
 			
-			if (
-				($this->isATransitive($target, self::NODE)
-				|| $this->hasTransitiveSuperClass($target, self::NODE))
-				&& $this->getFieldTargetType($contentType, $property) == 'node'
-			) {
+			if ($this->getFieldTargetType($contentType, $property) == 'node') {
+				if (
+					!$this->isATransitive($target, self::NODE) && !$this->hasTransitiveSuperClass($target, self::NODE)
+					&& is_null($this->nodeImporter->searchEntityIdByUuid('node', $target->getUri()))
+				) {
+					$this->logWarning(
+						"Non-existing node '{$target->localName()}' "
+						. "referenced by '{$individual->localName()}' "
+						. "and property '{$property->localName()}'."
+					);
+					continue;
+				}
 				$value = $target->getUri();
 				$field['references'] = 'node';
 			} elseif (
@@ -454,25 +456,23 @@ class OWLFileHandler extends AbstractFileHandler {
 				$value = [ 'uri' => $this->getFilePath($target) ];
 				$field['references'] = 'file';
 			} elseif (
-				$vocabulary != null
-				&& $this->getFieldTargetType($contentType, $property) == 'taxonomy_term'
+				$this->getFieldTargetType($contentType, $property) == 'taxonomy_term'
 			) {
-				$vid = strtolower($vocabulary->localName());
-				$tag = $this->getTitle($target);
+				$vocabulary = $this->getVocabularyForTag($target);
+				$name = $this->getTitle($target);
+				$uuid = $target->getUri();
 				
-				if (!$this->vocabularyImporter->tagExists($vid, $tag)) {
+				if ($vocabulary == null && is_null($this->vocabularyImporter->searchEntityIdByUuid('taxonomy_term', $uuid))) {
 					$this->logWarning(
-						"Non-existing tag '$tag' in vocabulary '$vid' "
+						"Non-existing tag '$name' "
 						. "referenced by '{$individual->localname()}' "
 						. "and property '{$property->localname()}'."
 					);
 					return [];
 				}
+				$vid = strtolower($vocabulary->localName());
 
-				$value = [
-					'vid'  => $vid,
-					'name' => $tag
-				];
+				$value = $uuid;
 				$field['references'] = 'taxonomy_term';
 			} elseif ($this->isATransitive($target, self::ENTITY)) {
 				$axiom = $this->getAxiomWithTargetForIndividual($individual, $property, $target);
@@ -488,18 +488,6 @@ class OWLFileHandler extends AbstractFileHandler {
 						"Entity '{$target->localName()}' "
 						. "by '{$individual->localName()}' "
 						. "referenced but no field given. ('{$property->localName()}')"
-					);
-					continue;
-				}
-			} else {
-				if (!is_null($this->nodeImporter->searchNodeIdByUuid($target->getUri()))) {
-					$value = $target->getUri();
-					$field['references'] = 'node';
-				} else {
-					$this->logWarning(
-						"Non-existing '". $contentType. "' '{$target->localName()}' "
-						. "referenced by '{$individual->localName()}' "
-						. "and property '{$property->localName()}'."
 					);
 					continue;
 				}
