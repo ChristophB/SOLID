@@ -133,7 +133,7 @@ abstract class AbstractImporter {
 			$this->logWarning("File '$drupalUri' does not exist, but URI entry inserted into DB. Upload the file manually to the server!");
 		
 		if ($fid = $this->searchFileByUri($drupalUri)) {
-			$this->logNotice("Found file $fid for uri '$drupalUri'.");
+			# $this->logNotice("Found file $fid for uri '$drupalUri'.");
 			return File::load($fid);
 		}
 		
