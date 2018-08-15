@@ -71,8 +71,8 @@ class NodeImporter extends AbstractImporter {
 		$node;
 		if (!is_null($id = $this->searchEntityIdByUuid('node', $uuid))) {
 			$node = Node::load($id);
-			$node->setNewRevision(true);
-			$node->setRevisionLogMessage('Incrementally updated at '. date('Y-m-d h:i', time()));
+			# $node->setNewRevision(true);
+			# $node->setRevisionLogMessage('Incrementally updated at '. date('Y-m-d h:i', time()));
 			$node->setTitle($params['title']);
 			$node->save();
 		} else {
