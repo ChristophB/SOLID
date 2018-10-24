@@ -384,6 +384,11 @@ class OWLFileHandler extends AbstractFileHandler {
 				'uri'   => $this->removeRdfsType($literal->getValue()),
 				'title' => $title
 			];
+		} elseif (!is_null($axiom) && $uri = $this->getProperty($axiom, self::URI)) {
+			return [
+				'uri'   => $uri,
+				'title' => $this->removeRdfsType($literal->getValue())
+			];
 		}
 
 		return $this->removeRdfsType($literal->getValue());
