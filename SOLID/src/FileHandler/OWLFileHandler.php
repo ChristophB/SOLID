@@ -723,8 +723,7 @@ class OWLFileHandler extends AbstractFileHandler {
 		 		continue;
 		 		
 			$curIndex = preg_replace('/"\^\^xsd:integer/', '', $this->getProperty($axiom, self::REF_NUM));
-			if (is_null($curIndex))
-				$curIndex = $prevIndex + 1;
+			if (is_null($curIndex) || $curIndex == '') $curIndex = $prevIndex + 1;
 			$result[$curIndex] = $axiom;
 			$prevIndex = $curIndex;	
 		}
